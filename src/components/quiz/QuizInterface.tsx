@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuizzes, useAppStore } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
+import { getQuiz, saveQuizResult } from '@/lib/firebase-quiz';
 import { QuestionDisplay } from './QuestionDisplay';
 import { QuestionNavigation } from './QuestionNavigation';
 import { QuizTimer } from './QuizTimer';
 import { QuizProgress } from './QuizProgress';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { ButtonLoader } from '@/components/common/LoadingSpinner';
-import { CheckCircle, AlertTriangle, Clock, Flag } from '@/lib/icons';
+import { CheckCircle, AlertTriangle, Clock, Flag, Loader2 } from '@/lib/icons';
 
 interface QuizInterfaceProps {
   quizId: string;
@@ -23,23 +24,54 @@ interface Answer {
 
 export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const router = useRouter();
-  const quizzes = useQuizzes();
-  const { addResult } = useAppStore();
+  const { user } = useAppStore();
   
+  const [quiz, setQuiz] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
 
-  const quiz = quizzes.find(q => q.id === quizId);
+  // Load quiz from Firebase
+  useEffect(() => {
+    const loadQuiz = async () => {
+      try {
+        setLoading(true);
+        const quizData = await getQuiz(quizId);
+        
+        if (quizData) {
+          setQuiz(quizData);
+          setTimeRemaining(quizData.timeLimit * 60); // Convert minutes to seconds
+          
+          // Initialize answers array
+          const initialAnswers = quizData.questions.map((question: any) => ({
+            questionId: question.id,
+            selectedOption: '',
+            isFlagged: false
+          }));
+          setAnswers(initialAnswers);
+        } else {
+          showError('Quiz Not Found', 'The quiz you\'re looking for doesn\'t exist.');
+        }
+      } catch (error) {
+        console.error('Error loading quiz:', error);
+        showError('Loading Failed', 'Failed to load quiz. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQuiz();
+  }, [quizId]);
 
   // Calculate score function
   const calculateScore = useCallback(() => {
     if (!quiz) return 0;
     let correctAnswers = 0;
     answers.forEach(answer => {
-      const question = quiz.questions.find(q => q.id === answer.questionId);
+      const question = quiz.questions.find((q: any) => q.id === answer.questionId);
       if (question && answer.selectedOption === question.correctAnswer) {
         correctAnswers++;
       }
@@ -49,21 +81,20 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
 
   // Submit quiz function
   const submitQuiz = useCallback(async () => {
-    if (!quiz) return;
+    if (!quiz || !user) return;
     
     setIsSubmitting(true);
     try {
       const score = calculateScore();
-      const timeSpent = ((quiz.timeLimit || 60) * 60) - timeRemaining;
+      const timeSpent = (quiz.timeLimit * 60) - timeRemaining;
       const correctAnswers = answers.filter(answer => {
-        const question = quiz.questions.find(q => q.id === answer.questionId);
+        const question = quiz.questions.find((q: any) => q.id === answer.questionId);
         return question && answer.selectedOption === question.correctAnswer;
       }).length;
 
       const result = {
-        id: Date.now().toString(),
         quizId: quiz.id,
-        userId: 'current-user', // This should come from auth context
+        userId: user.id,
         score,
         totalQuestions: quiz.questions.length,
         correctAnswers,
@@ -72,21 +103,21 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
         answers: answers.map(answer => ({
           questionId: answer.questionId,
           userAnswer: answer.selectedOption,
-          isCorrect: quiz.questions.find(q => q.id === answer.questionId)?.correctAnswer === answer.selectedOption || false,
+          isCorrect: quiz.questions.find((q: any) => q.id === answer.questionId)?.correctAnswer === answer.selectedOption || false,
           points: 1
         }))
       };
 
-      addResult(result);
+      const resultId = await saveQuizResult(result);
       showSuccess('Quiz Submitted!', `Your score: ${score}%`);
-      router.push(`/results/${result.id}`);
+      router.push(`/results/${resultId}`);
     } catch (error) {
       console.error('Error submitting quiz:', error);
       showError('Submission Failed', 'Failed to submit quiz. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
-  }, [quiz, timeRemaining, answers, calculateScore, addResult, router]);
+  }, [quiz, timeRemaining, answers, calculateScore, user, router]);
 
   // Handle submit quiz function
   const handleSubmitQuiz = useCallback(async () => {
@@ -102,20 +133,6 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
   }, [quiz, answers, submitQuiz]);
 
   useEffect(() => {
-    if (quiz) {
-      setTimeRemaining((quiz.timeLimit || 60) * 60); // Convert minutes to seconds, default 60 minutes
-      
-      // Initialize answers array
-      const initialAnswers = quiz.questions.map(question => ({
-        questionId: question.id,
-        selectedOption: '',
-        isFlagged: false
-      }));
-      setAnswers(initialAnswers);
-    }
-  }, [quiz]);
-
-  useEffect(() => {
     if (timeRemaining <= 0 && quiz) {
       handleSubmitQuiz();
       return;
@@ -127,6 +144,18 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
 
     return () => clearInterval(timer);
   }, [timeRemaining, quiz, handleSubmitQuiz]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-[#20C997] animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Quiz...</h2>
+          <p className="text-gray-600">Please wait while we load your quiz.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!quiz) {
     return (
@@ -179,6 +208,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{quiz.title}</h1>
             <p className="text-gray-600 mt-1">{quiz.description}</p>
+            <p className="text-sm text-gray-500 mt-1">Subject: {quiz.subject}</p>
           </div>
           <div className="flex items-center gap-4">
             <QuizTimer timeRemaining={timeRemaining} />

@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2, Eye, Edit } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2, Eye, Edit, Plus } from 'lucide-react';
 import { showSuccess, showError, showInfo } from '@/components/common/NotificationSystem';
 import { useAppStore } from '@/lib/store';
 import { processPDFText, validateQuestions, ExtractedQuestion } from '@/lib/pdf-processor';
+import { createQuiz } from '@/lib/firebase-quiz';
+import { useRouter } from 'next/navigation';
 
 interface UploadedFile {
   id: string;
@@ -18,13 +20,32 @@ interface UploadedFile {
   error?: string;
 }
 
+interface QuizCreationData {
+  title: string;
+  description: string;
+  subject: string;
+  timeLimit: number;
+  passingScore: number;
+}
+
 export function FileUploadArea() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [showPreview, setShowPreview] = useState<string | null>(null);
+  const [showQuizModal, setShowQuizModal] = useState<string | null>(null);
+  const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
+  const [quizData, setQuizData] = useState<QuizCreationData>({
+    title: '',
+    description: '',
+    subject: '',
+    timeLimit: 60,
+    passingScore: 70
+  });
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addNotification } = useAppStore();
+  const { addNotification, user } = useAppStore();
+  const router = useRouter();
 
   const supportedTypes = [
     'application/pdf',
@@ -110,7 +131,7 @@ export function FileUploadArea() {
               
               showSuccess(
                 'PDF Processed Successfully', 
-                `Extracted ${result.questions.length} questions from ${file.name}`
+                `Extracted ${result.questions.length} questions from ${file.name}. You can now create a quiz!`
               );
             } else {
               setUploadedFiles(prev => prev.map(f => 
@@ -188,12 +209,51 @@ export function FileUploadArea() {
     setShowPreview(showPreview === fileId ? null : fileId);
   };
 
-  const handleEditQuestions = (fileId: string) => {
+  const handleCreateQuiz = (fileId: string) => {
     const file = uploadedFiles.find(f => f.id === fileId);
     if (file?.extractedQuestions) {
-      // Navigate to quiz creation with pre-filled questions
-      // This would integrate with your quiz creation flow
-      showInfo('Edit Questions', 'Redirecting to quiz creation with extracted questions...');
+      // Pre-fill quiz data with file name
+      setQuizData(prev => ({
+        ...prev,
+        title: file.name.replace(/\.[^/.]+$/, '') + ' Quiz',
+        description: `Quiz created from ${file.name}`,
+        subject: 'General'
+      }));
+      setShowQuizModal(fileId);
+    }
+  };
+
+  const handleSubmitQuiz = async () => {
+    if (!user) {
+      showError('Authentication Required', 'Please sign in to create quizzes');
+      return;
+    }
+
+    const file = uploadedFiles.find(f => f.id === showQuizModal);
+    if (!file?.extractedQuestions) {
+      showError('No Questions', 'No questions found to create quiz');
+      return;
+    }
+
+    setIsCreatingQuiz(true);
+    try {
+      const quizId = await createQuiz({
+        ...quizData,
+        questions: file.extractedQuestions,
+        createdBy: user.id
+      });
+
+      showSuccess('Quiz Created!', 'Your quiz has been created successfully');
+      setShowQuizModal(null);
+      
+      // Navigate to the quiz
+      router.push(`/quiz/${quizId}`);
+      
+    } catch (error) {
+      console.error('Error creating quiz:', error);
+      showError('Quiz Creation Failed', 'Failed to create quiz. Please try again.');
+    } finally {
+      setIsCreatingQuiz(false);
     }
   };
 
@@ -201,6 +261,9 @@ export function FileUploadArea() {
     setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
     if (showPreview === fileId) {
       setShowPreview(null);
+    }
+    if (showQuizModal === fileId) {
+      setShowQuizModal(null);
     }
   };
 
@@ -299,11 +362,11 @@ export function FileUploadArea() {
                     
                     {file.extractedQuestions && (
                       <button
-                        onClick={() => handleEditQuestions(file.id)}
+                        onClick={() => handleCreateQuiz(file.id)}
                         className="p-1 text-gray-400 hover:text-gray-600"
-                        title="Edit questions"
+                        title="Create quiz"
                       >
-                        <Edit className="h-4 w-4" />
+                        <Plus className="h-4 w-4" />
                       </button>
                     )}
                     
@@ -348,6 +411,109 @@ export function FileUploadArea() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Creation Modal */}
+      {showQuizModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Quiz</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Quiz Title
+                </label>
+                <input
+                  type="text"
+                  value={quizData.title}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
+                  placeholder="Enter quiz title"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={quizData.description}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
+                  rows={3}
+                  placeholder="Enter quiz description"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  value={quizData.subject}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
+                  placeholder="e.g., Mathematics, Science"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Time Limit (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    value={quizData.timeLimit}
+                    onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 60 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
+                    min="1"
+                    max="480"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Passing Score (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={quizData.passingScore}
+                    onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 70 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
+                    min="0"
+                    max="100"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowQuizModal(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitQuiz}
+                disabled={isCreatingQuiz || !quizData.title.trim()}
+                className="flex-1 px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCreatingQuiz ? (
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Creating...
+                  </div>
+                ) : (
+                  'Create Quiz'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
