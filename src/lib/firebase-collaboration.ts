@@ -12,10 +12,11 @@ import {
   orderBy,
   serverTimestamp,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  FieldValue
 } from 'firebase/firestore';
 
-// Team interface
+// Team interface (for user-facing operations)
 export interface Team {
   id: string;
   name: string;
@@ -24,6 +25,16 @@ export interface Team {
   members: TeamMember[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Database Team interface (for Firestore operations)
+interface DatabaseTeam {
+  name: string;
+  description: string;
+  ownerId: string;
+  members: TeamMember[];
+  createdAt: FieldValue;
+  updatedAt: FieldValue;
 }
 
 // Team member interface
@@ -35,7 +46,7 @@ export interface TeamMember {
   email: string;
 }
 
-// Quiz sharing interface
+// Quiz sharing interface (for user-facing operations)
 export interface QuizShare {
   id: string;
   quizId: string;
@@ -47,7 +58,18 @@ export interface QuizShare {
   expiresAt?: Date;
 }
 
-// Collaboration invitation interface
+// Database Quiz Share interface (for Firestore operations)
+interface DatabaseQuizShare {
+  quizId: string;
+  sharedBy: string;
+  sharedWith: string[];
+  permissions: 'view' | 'edit' | 'admin';
+  message?: string;
+  createdAt: FieldValue;
+  expiresAt?: Date;
+}
+
+// Collaboration invitation interface (for user-facing operations)
 export interface CollaborationInvite {
   id: string;
   type: 'team' | 'quiz';
@@ -61,12 +83,25 @@ export interface CollaborationInvite {
   expiresAt: Date;
 }
 
+// Database Collaboration Invite interface (for Firestore operations)
+interface DatabaseCollaborationInvite {
+  type: 'team' | 'quiz';
+  targetId: string;
+  fromUserId: string;
+  toUserId: string;
+  role: 'admin' | 'member' | 'viewer';
+  message?: string;
+  status: 'pending' | 'accepted' | 'declined';
+  createdAt: FieldValue;
+  expiresAt: Date;
+}
+
 /**
  * Create a new team
  */
 export async function createTeam(teamData: Omit<Team, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
   try {
-    const teamDoc = {
+    const teamDoc: DatabaseTeam = {
       name: teamData.name,
       description: teamData.description,
       ownerId: teamData.ownerId,
@@ -189,7 +224,7 @@ export async function removeTeamMember(teamId: string, userId: string): Promise<
  */
 export async function shareQuiz(shareData: Omit<QuizShare, 'id' | 'createdAt'>): Promise<string> {
   try {
-    const shareDoc = {
+    const shareDoc: DatabaseQuizShare = {
       quizId: shareData.quizId,
       sharedBy: shareData.sharedBy,
       sharedWith: shareData.sharedWith,
@@ -251,7 +286,7 @@ export async function sendInvitation(inviteData: Omit<CollaborationInvite, 'id' 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
     
-    const inviteDoc = {
+    const inviteDoc: DatabaseCollaborationInvite = {
       type: inviteData.type,
       targetId: inviteData.targetId,
       fromUserId: inviteData.fromUserId,

@@ -4,10 +4,11 @@ import {
   setDoc, 
   getDoc, 
   updateDoc,
-  serverTimestamp 
+  serverTimestamp,
+  FieldValue
 } from 'firebase/firestore';
 
-// User Settings interface
+// User Settings interface (for user-facing operations)
 export interface UserSettings {
   userId: string;
   // Profile settings
@@ -50,6 +51,41 @@ export interface UserSettings {
   
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Database Settings interface (for Firestore operations)
+interface DatabaseSettings {
+  userId: string;
+  displayName: string;
+  bio: string;
+  avatar: string;
+  timezone: string;
+  language: string;
+  emailNotifications: {
+    newQuizzes: boolean;
+    quizResults: boolean;
+    systemUpdates: boolean;
+    marketing: boolean;
+  };
+  quizPreferences: {
+    defaultTimeLimit: number;
+    defaultPassingScore: number;
+    showTimer: boolean;
+    allowReview: boolean;
+    randomizeQuestions: boolean;
+  };
+  privacy: {
+    profileVisibility: 'public' | 'private' | 'friends';
+    showResults: boolean;
+    allowAnalytics: boolean;
+  };
+  theme: {
+    mode: 'light' | 'dark' | 'auto';
+    primaryColor: string;
+    fontSize: 'small' | 'medium' | 'large';
+  };
+  createdAt: FieldValue;
+  updatedAt: FieldValue;
 }
 
 // Default settings
@@ -139,7 +175,7 @@ export async function saveUserSettings(userId: string, settings: Partial<UserSet
   try {
     const existingSettings = await getUserSettings(userId);
     
-    const settingsData = {
+    const settingsData: DatabaseSettings = {
       ...(existingSettings || defaultSettings),
       ...settings,
       userId,

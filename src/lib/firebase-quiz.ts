@@ -10,11 +10,12 @@ import {
   query, 
   where, 
   orderBy,
-  serverTimestamp 
+  serverTimestamp,
+  FieldValue
 } from 'firebase/firestore';
 import { ExtractedQuestion } from './pdf-processor';
 
-// Quiz interface
+// Quiz interface (for user-facing operations)
 export interface Quiz {
   id: string;
   title: string;
@@ -29,6 +30,20 @@ export interface Quiz {
   isPublished: boolean;
 }
 
+// Database Quiz interface (for Firestore operations)
+interface DatabaseQuiz {
+  title: string;
+  description: string;
+  subject: string;
+  questions: Question[];
+  timeLimit: number;
+  passingScore: number;
+  createdBy: string;
+  createdAt: FieldValue;
+  updatedAt: FieldValue;
+  isPublished: boolean;
+}
+
 // Question interface
 export interface Question {
   id: string;
@@ -40,7 +55,7 @@ export interface Question {
   explanation?: string;
 }
 
-// Result interface
+// Result interface (for user-facing operations)
 export interface QuizResult {
   id: string;
   quizId: string;
@@ -50,6 +65,18 @@ export interface QuizResult {
   correctAnswers: number;
   timeTaken: number; // in seconds
   completedAt: Date;
+  answers: Answer[];
+}
+
+// Database Result interface (for Firestore operations)
+interface DatabaseQuizResult {
+  quizId: string;
+  userId: string;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  timeTaken: number;
+  completedAt: FieldValue;
   answers: Answer[];
 }
 
@@ -77,7 +104,7 @@ export interface CreateQuizData {
  */
 export async function createQuiz(quizData: CreateQuizData): Promise<string> {
   try {
-    const quizDoc = {
+    const quizDoc: DatabaseQuiz = {
       title: quizData.title,
       description: quizData.description,
       subject: quizData.subject,
@@ -210,7 +237,7 @@ export async function deleteQuiz(quizId: string): Promise<void> {
  */
 export async function saveQuizResult(result: Omit<QuizResult, 'id'>): Promise<string> {
   try {
-    const resultDoc = {
+    const resultDoc: DatabaseQuizResult = {
       quizId: result.quizId,
       userId: result.userId,
       score: result.score,
