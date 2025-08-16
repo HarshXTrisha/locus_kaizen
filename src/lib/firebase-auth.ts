@@ -1,62 +1,37 @@
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
+'use client';
+import {
   signOut,
-  sendPasswordResetEmail,
+  onAuthStateChanged as onFirebaseAuthStateChanged,
   User,
+  signInWithPopup,
+  GoogleAuthProvider,
   UserCredential
 } from 'firebase/auth';
 import { auth } from './firebase';
 
-// Sign in with email and password
-export const signInWithEmail = async (email: string, password: string): Promise<UserCredential> => {
+// Sign in with Google
+export const signInWithGoogle = async (): Promise<UserCredential> => {
   if (!auth) {
     throw new Error('Firebase Auth is not initialized');
   }
-  
+  const provider = new GoogleAuthProvider();
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithPopup(auth, provider);
     return userCredential;
   } catch (error) {
+    console.error("Error during Google sign-in:", error);
     throw error;
   }
 };
 
-// Create user with email and password
-export const createUserWithEmail = async (email: string, password: string): Promise<UserCredential> => {
-  if (!auth) {
-    throw new Error('Firebase Auth is not initialized');
-  }
-  
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential;
-  } catch (error) {
-    throw error;
-  }
-};
 
 // Sign out
 export const signOutUser = async (): Promise<void> => {
   if (!auth) {
     throw new Error('Firebase Auth is not initialized');
   }
-  
   try {
     await signOut(auth);
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Send password reset email
-export const resetPassword = async (email: string): Promise<void> => {
-  if (!auth) {
-    throw new Error('Firebase Auth is not initialized');
-  }
-  
-  try {
-    await sendPasswordResetEmail(auth, email);
   } catch (error) {
     throw error;
   }
@@ -73,6 +48,5 @@ export const onAuthStateChanged = (callback: (user: User | null) => void) => {
     console.error('Firebase Auth is not initialized');
     return () => {};
   }
-  
-  return auth.onAuthStateChanged(callback);
+  return onFirebaseAuthStateChanged(auth, callback);
 };

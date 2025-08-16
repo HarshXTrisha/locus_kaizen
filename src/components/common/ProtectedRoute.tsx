@@ -4,7 +4,7 @@ import React from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useIsAuthenticated } from '@/lib/store';
 import { LoadingSpinner } from './LoadingSpinner';
-import { LogIn, UserPlus } from '@/lib/icons';
+import { LogIn } from '@/lib/icons';
 import Link from 'next/link';
 
 interface ProtectedRouteProps {
@@ -50,24 +50,16 @@ export function ProtectedRoute({
           </h1>
           
           <p className="text-gray-600 mb-8">
-            You need to be signed in to access this page. Please sign in to continue.
+            You need to be signed in to access this page. Please sign in with your Google account to continue.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex justify-center">
             <Link
               href={redirectTo}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
             >
               <LogIn className="h-5 w-5" />
-              Sign In
-            </Link>
-            
-            <Link
-              href="/signup"
-              className="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <UserPlus className="h-5 w-5" />
-              Create Account
+              Sign In with Google
             </Link>
           </div>
         </div>

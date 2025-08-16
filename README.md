@@ -12,7 +12,7 @@ A comprehensive, modern quiz management platform built with Next.js 14, TypeScri
 - **Tree Shaking**: Optimized imports for minimal bundle size
 
 ### 🔐 **Advanced Authentication**
-- **Firebase Integration**: Secure email/password authentication
+- **Google Sign-In Only**: Secure authentication using Google accounts
 - **Protected Routes**: Automatic authentication checks
 - **Global State Management**: Zustand for seamless state handling
 - **Real-time Auth State**: Instant authentication status updates

@@ -9,16 +9,13 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-gray-800">Locus</h1>
-            <p className="text-gray-600 mt-2">Sign in to your account</p>
+            <p className="text-gray-600 mt-2">Sign in with your Google account</p>
           </div>
           
           <LoginForm />
 
           <p className="mt-6 text-center text-sm text-[#6C757D]">
-            Don&apos;t have an account?{' '}
-            <a href="/signup" className="font-medium text-[#20C997] hover:underline">
-              Sign up
-            </a>
+            New users will be automatically created when signing in with Google
           </p>
         </div>
       </main>

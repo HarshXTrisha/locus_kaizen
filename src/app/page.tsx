@@ -14,8 +14,7 @@ import {
   Star,
   Zap,
   Shield,
-  Globe,
-  UserPlus
+  Globe
 } from '@/lib/icons';
 
 export default function Home() {
@@ -108,15 +107,9 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <Link 
                 href="/login"
-                className="text-[#6C757D] hover:text-[#20C997] transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link 
-                href="/dashboard"
                 className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-colors"
               >
-                Get Started
+                Sign In with Google
               </Link>
             </div>
           </div>
@@ -132,21 +125,15 @@ export default function Home() {
           </h1>
           <p className="text-xl text-[#6C757D] mb-8 max-w-3xl mx-auto">
             A comprehensive quiz management platform that helps you create, take, and analyze quizzes 
-            with powerful analytics and beautiful insights.
+            with powerful analytics and beautiful insights. Sign in with your Google account to get started.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/dashboard"
+              href="/login"
               className="bg-[#20C997] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1BA085] transition-colors flex items-center justify-center"
             >
-              Start Exploring
+              Sign In with Google
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-            <Link 
-              href="/login"
-              className="border-2 border-[#20C997] text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#20C997] hover:text-white transition-colors"
-            >
-              Sign In
             </Link>
           </div>
         </div>
@@ -304,13 +291,7 @@ export default function Home() {
               <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign In</span>
             </Link>
             
-            <Link 
-              href="/signup"
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
-            >
-              <UserPlus className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign Up</span>
-            </Link>
+
           </div>
         </div>
       </section>
@@ -326,16 +307,10 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/signup"
+              href="/login"
               className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              Start Free Trial
-            </Link>
-            <Link 
-              href="/login"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-[#20C997] transition-colors"
-            >
-              Sign In Now
+              Sign In with Google
             </Link>
           </div>
         </div>
@@ -387,3 +362,4 @@ export default function Home() {
     </div>
   );
 }
+
