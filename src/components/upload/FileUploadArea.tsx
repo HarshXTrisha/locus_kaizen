@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2, Eye, Edit } from 'lucide-react';
 import { showSuccess, showError, showInfo } from '@/components/common/NotificationSystem';
 import { useAppStore } from '@/lib/store';
+import { processPDFText, validateQuestions, ExtractedQuestion } from '@/lib/pdf-processor';
 
 interface UploadedFile {
   id: string;
@@ -13,12 +14,15 @@ interface UploadedFile {
   content?: string;
   uploadedAt: Date;
   status: 'uploading' | 'processing' | 'completed' | 'error';
+  extractedQuestions?: ExtractedQuestion[];
+  error?: string;
 }
 
 export function FileUploadArea() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [showPreview, setShowPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addNotification } = useAppStore();
 
@@ -56,188 +60,147 @@ export function FileUploadArea() {
   };
 
   const handleFiles = async (files: FileList) => {
-    const fileArray = Array.from(files);
-    
-    for (const file of fileArray) {
-      if (!supportedTypes.includes(file.type)) {
-        showError('Unsupported File Type', `${file.name} is not a supported file type. Please upload PDF, DOCX, or TXT files.`);
-        continue;
-      }
-
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        showError('File Too Large', `${file.name} is too large. Please upload files smaller than 10MB.`);
-        continue;
-      }
-
-      await uploadFile(file);
-    }
-  };
-
-  const uploadFile = async (file: File) => {
-    const fileId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-    
-    const newFile: UploadedFile = {
-      id: fileId,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      uploadedAt: new Date(),
-      status: 'uploading'
-    };
-
-    setUploadedFiles(prev => [...prev, newFile]);
     setIsUploading(true);
-
-    try {
-      // Simulate file upload to Firebase Storage
-      await simulateFileUpload(file);
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       
-      // Update status to processing
-      setUploadedFiles(prev => 
-        prev.map(f => f.id === fileId ? { ...f, status: 'processing' } : f)
-      );
+      if (!supportedTypes.includes(file.type)) {
+        showError('Unsupported File Type', `${file.name} is not a supported file type.`);
+        continue;
+      }
 
-      // Extract content from the file
-      const content = await extractContentFromFile(file);
-      
-      // Update file with extracted content
-      setUploadedFiles(prev => 
-        prev.map(f => f.id === fileId 
-          ? { ...f, content, status: 'completed' } 
-          : f
-        )
-      );
+      const fileId = Date.now().toString() + i;
+      const uploadedFile: UploadedFile = {
+        id: fileId,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date(),
+        status: 'uploading'
+      };
 
-      showSuccess('File Uploaded Successfully', `${file.name} has been uploaded and processed. You can now create quizzes from this content.`);
-      
-      // Store the processed content in global state for quiz creation
-      useAppStore.getState().setProcessedContent({
-        fileName: file.name,
-        content: content,
-        fileId: fileId
-      });
+      setUploadedFiles(prev => [...prev, uploadedFile]);
 
-    } catch (error) {
-      console.error('Upload error:', error);
-      setUploadedFiles(prev => 
-        prev.map(f => f.id === fileId ? { ...f, status: 'error' } : f)
-      );
-      showError('Upload Failed', `Failed to upload ${file.name}. Please try again.`);
-    } finally {
-      setIsUploading(false);
+      try {
+        // Read file content
+        const content = await readFileContent(file);
+        
+        // Update file with content
+        setUploadedFiles(prev => prev.map(f => 
+          f.id === fileId ? { ...f, content, status: 'processing' } : f
+        ));
+
+        // Process PDF content
+        if (file.type === 'application/pdf') {
+          const result = await processPDFText(content);
+          
+          if (result.success) {
+            // Validate extracted questions
+            const validation = validateQuestions(result.questions);
+            
+            if (validation.valid) {
+              setUploadedFiles(prev => prev.map(f => 
+                f.id === fileId ? { 
+                  ...f, 
+                  extractedQuestions: result.questions,
+                  status: 'completed' 
+                } : f
+              ));
+              
+              showSuccess(
+                'PDF Processed Successfully', 
+                `Extracted ${result.questions.length} questions from ${file.name}`
+              );
+            } else {
+              setUploadedFiles(prev => prev.map(f => 
+                f.id === fileId ? { 
+                  ...f, 
+                  status: 'error',
+                  error: `Validation failed: ${validation.errors.join(', ')}`
+                } : f
+              ));
+              
+              showError('PDF Processing Failed', validation.errors.join(', '));
+            }
+          } else {
+            setUploadedFiles(prev => prev.map(f => 
+              f.id === fileId ? { 
+                ...f, 
+                status: 'error',
+                error: result.error || 'Failed to process PDF'
+              } : f
+            ));
+            
+            showError('PDF Processing Failed', result.error || 'Failed to extract questions from PDF');
+          }
+        } else {
+          // For non-PDF files, just mark as completed
+          setUploadedFiles(prev => prev.map(f => 
+            f.id === fileId ? { ...f, status: 'completed' } : f
+          ));
+          
+          showSuccess('File Uploaded', `${file.name} uploaded successfully`);
+        }
+
+      } catch (error) {
+        console.error('Error processing file:', error);
+        
+        setUploadedFiles(prev => prev.map(f => 
+          f.id === fileId ? { 
+            ...f, 
+            status: 'error',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          } : f
+        ));
+        
+        showError('Upload Failed', `Failed to process ${file.name}`);
+      }
     }
+    
+    setIsUploading(false);
   };
 
-  const simulateFileUpload = (file: File): Promise<void> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 2000 + Math.random() * 2000); // 2-4 seconds
-    });
-  };
-
-  const extractContentFromFile = async (file: File): Promise<string> => {
+  const readFileContent = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
       reader.onload = (e) => {
-        try {
-          let content = '';
-          
-          if (file.type === 'text/plain') {
-            content = e.target?.result as string;
-          } else if (file.type === 'application/pdf') {
-            // For PDF, we'll simulate text extraction with questions
-            content = `Sample Questions from ${file.name}:
-
-1. What is the capital of France?
-   A) London
-   B) Paris ✓
-   C) Berlin
-   D) Madrid
-
-2. Which planet is closest to the Sun?
-   A) Venus
-   B) Earth
-   C) Mercury ✓
-   D) Mars
-
-3. What is 2 + 2?
-   A) 3
-   B) 4 ✓
-   C) 5
-   D) 6
-
-4. Who wrote "Romeo and Juliet"?
-   A) Charles Dickens
-   B) William Shakespeare ✓
-   C) Jane Austen
-   D) Mark Twain
-
-5. What is the chemical symbol for gold?
-   A) Ag
-   B) Au ✓
-   C) Fe
-   D) Cu`;
-          } else if (file.type.includes('word')) {
-            // For Word documents, simulate text extraction with questions
-            content = `Sample Questions from ${file.name}:
-
-1. What is the largest ocean on Earth?
-   A) Atlantic Ocean
-   B) Indian Ocean
-   C) Pacific Ocean ✓
-   D) Arctic Ocean
-
-2. Which year did World War II end?
-   A) 1943
-   B) 1944
-   C) 1945 ✓
-   D) 1946
-
-3. What is the square root of 16?
-   A) 2
-   B) 4 ✓
-   C) 8
-   D) 16
-
-4. Who painted the Mona Lisa?
-   A) Vincent van Gogh
-   B) Leonardo da Vinci ✓
-   C) Pablo Picasso
-   D) Michelangelo
-
-5. What is the main component of the Sun?
-   A) Liquid lava
-   B) Molten iron
-   C) Hot plasma ✓
-   D) Solid rock`;
-          }
-          
-          resolve(content);
-        } catch (error) {
-          reject(error);
-        }
+        const content = e.target?.result as string;
+        resolve(content);
       };
       
-      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
       
-      if (file.type === 'text/plain') {
+      if (file.type === 'application/pdf') {
+        // For PDFs, we'll need to extract text
+        // This is a simplified version - in a real app, you'd use a PDF parsing library
         reader.readAsText(file);
       } else {
-        reader.readAsArrayBuffer(file);
+        reader.readAsText(file);
       }
     });
   };
 
-  const removeFile = (fileId: string) => {
-    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
+  const handlePreview = (fileId: string) => {
+    setShowPreview(showPreview === fileId ? null : fileId);
   };
 
-  const createQuizFromFile = (file: UploadedFile) => {
-    if (file.content) {
-      // Navigate to create quiz page with pre-filled content
-      window.location.href = `/create?source=file&fileId=${file.id}`;
+  const handleEditQuestions = (fileId: string) => {
+    const file = uploadedFiles.find(f => f.id === fileId);
+    if (file?.extractedQuestions) {
+      // Navigate to quiz creation with pre-filled questions
+      // This would integrate with your quiz creation flow
+      showInfo('Edit Questions', 'Redirecting to quiz creation with extracted questions...');
+    }
+  };
+
+  const removeFile = (fileId: string) => {
+    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
+    if (showPreview === fileId) {
+      setShowPreview(null);
     }
   };
 
@@ -250,115 +213,139 @@ export function FileUploadArea() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-      <h2 className="text-3xl font-bold text-[#121a0f] mb-4">Upload Documents</h2>
-      <p className="text-gray-600 mb-8">Upload your documents to extract content and create quizzes automatically.</p>
-      
+    <div className="w-full">
       {/* Upload Area */}
-      <div 
-        className={`border-2 border-dashed rounded-xl p-10 cursor-pointer transition-colors ${
-          dragActive 
-            ? 'border-[#20C997] bg-[#20C997]/5' 
-            : 'border-gray-300 hover:border-[#20C997] hover:bg-gray-50'
+      <div
+        className={`relative rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+          dragActive
+            ? 'border-[#20C997] bg-green-50'
+            : 'border-gray-300 hover:border-gray-400'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
       >
-        <div className="flex flex-col items-center justify-center gap-4">
-          <UploadCloud className={`size-16 ${dragActive ? 'text-[#20C997]' : 'text-gray-400'}`} strokeWidth={1.5} />
-          <p className="text-lg font-medium text-gray-700">Drag and drop your files here</p>
-          <p className="text-gray-500">or</p>
-          <button 
-            type="button" 
-            className="px-6 py-3 bg-[#20C997] text-white font-semibold rounded-lg hover:bg-[#1BA085] transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              fileInputRef.current?.click();
-            }}
-          >
-            Browse Files
-          </button>
+        <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
+        <div className="mt-4">
+          <label htmlFor="file-upload" className="cursor-pointer">
+            <span className="text-lg font-medium text-[#20C997] hover:text-green-600">
+              Click to upload
+            </span>
+            <span className="text-gray-500"> or drag and drop</span>
+          </label>
+          <input
+            id="file-upload"
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.doc,.docx,.txt"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
         </div>
+        <p className="mt-2 text-sm text-gray-500">
+          PDF, DOC, DOCX, or TXT files up to 10MB
+        </p>
+        {isUploading && (
+          <div className="mt-4 flex items-center justify-center">
+            <Loader2 className="h-5 w-5 animate-spin text-[#20C997]" />
+            <span className="ml-2 text-sm text-gray-600">Processing...</span>
+          </div>
+        )}
       </div>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept=".pdf,.docx,.doc,.txt"
-        onChange={handleFileSelect}
-        className="hidden"
-      />
-
-      <p className="text-sm text-gray-500 mt-4 text-center">
-        Supported formats: PDF, DOCX, DOC, TXT (Max 10MB per file)
-      </p>
-      
       {/* Uploaded Files List */}
       {uploadedFiles.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Uploaded Files</h3>
+        <div className="mt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Uploaded Files</h3>
           <div className="space-y-4">
             {uploadedFiles.map((file) => (
-              <div key={file.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <FileText className="h-8 w-8 text-[#20C997]" />
-                  <div>
-                    <p className="font-medium text-gray-900">{file.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {formatFileSize(file.size)} • {file.uploadedAt.toLocaleDateString()}
-                    </p>
+              <div key={file.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <FileText className="h-8 w-8 text-gray-400" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">{file.name}</h4>
+                      <p className="text-sm text-gray-500">
+                        {formatFileSize(file.size)} • {file.uploadedAt.toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    {file.status === 'uploading' && (
+                      <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                    )}
+                    {file.status === 'processing' && (
+                      <Loader2 className="h-4 w-4 animate-spin text-yellow-500" />
+                    )}
+                    {file.status === 'completed' && (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    )}
+                    {file.status === 'error' && (
+                      <AlertCircle className="h-4 w-4 text-red-500" />
+                    )}
+                    
+                    {file.extractedQuestions && (
+                      <button
+                        onClick={() => handlePreview(file.id)}
+                        className="p-1 text-gray-400 hover:text-gray-600"
+                        title="Preview questions"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                    )}
+                    
+                    {file.extractedQuestions && (
+                      <button
+                        onClick={() => handleEditQuestions(file.id)}
+                        className="p-1 text-gray-400 hover:text-gray-600"
+                        title="Edit questions"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                    )}
+                    
+                    <button
+                      onClick={() => removeFile(file.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      ×
+                    </button>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  {file.status === 'uploading' && (
-                    <div className="flex items-center gap-2 text-blue-600">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-sm">Uploading...</span>
+                {file.error && (
+                  <div className="mt-2 text-sm text-red-600">
+                    Error: {file.error}
+                  </div>
+                )}
+                
+                {file.extractedQuestions && showPreview === file.id && (
+                  <div className="mt-4 border-t pt-4">
+                    <h5 className="text-sm font-medium text-gray-900 mb-2">
+                      Extracted Questions ({file.extractedQuestions.length})
+                    </h5>
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {file.extractedQuestions.map((question, index) => (
+                        <div key={question.id} className="text-sm bg-gray-50 p-2 rounded">
+                          <p className="font-medium">Q{index + 1}: {question.text}</p>
+                          {question.options && (
+                            <div className="mt-1 text-xs text-gray-600">
+                              Options: {question.options.join(', ')}
+                            </div>
+                          )}
+                          {question.correctAnswer && (
+                            <div className="mt-1 text-xs text-green-600">
+                              Answer: {question.correctAnswer}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  )}
-                  
-                  {file.status === 'processing' && (
-                    <div className="flex items-center gap-2 text-yellow-600">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-sm">Processing...</span>
-                    </div>
-                  )}
-                  
-                  {file.status === 'completed' && (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <CheckCircle className="h-4 w-4" />
-                      <span className="text-sm">Ready</span>
-                    </div>
-                  )}
-                  
-                  {file.status === 'error' && (
-                    <div className="flex items-center gap-2 text-red-600">
-                      <AlertCircle className="h-4 w-4" />
-                      <span className="text-sm">Error</span>
-                    </div>
-                  )}
-                  
-                  {file.status === 'completed' && (
-                    <button
-                      onClick={() => createQuizFromFile(file)}
-                      className="px-4 py-2 bg-[#20C997] text-white text-sm font-medium rounded-lg hover:bg-[#1BA085] transition-colors"
-                    >
-                      Create Quiz
-                    </button>
-                  )}
-                  
-                  <button
-                    onClick={() => removeFile(file.id)}
-                    className="px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    Remove
-                  </button>
-                </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
