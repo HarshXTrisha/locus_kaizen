@@ -20,5 +20,5 @@ export const googleConfig = {
 export const appConfig = {
   name: 'Locus',
   version: '1.0.0',
-  url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  url: process.env.NEXT_PUBLIC_APP_URL || 'https://locus-kaizen.vercel.app'
 };

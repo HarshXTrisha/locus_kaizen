@@ -15,21 +15,47 @@ const GoogleIcon = () => (
   </svg>
 );
 
-
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
+    console.log('🔍 Starting Google Sign-In process...');
+    
     try {
-      await signInWithGoogle();
+      console.log('📡 Attempting to sign in with Google...');
+      const result = await signInWithGoogle();
+      console.log('✅ Google Sign-In successful:', result);
+      
       showSuccess('Signed In!', 'You have successfully signed in with Google.');
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 1500);
-    } catch (error) {
-      console.error('Google sign in error:', error);
-      showError('Sign In Failed', 'Could not sign in with Google. Please try again.');
+    } catch (error: any) {
+      console.error('❌ Google sign in error:', error);
+      console.error('❌ Error code:', error.code);
+      console.error('❌ Error message:', error.message);
+      
+      // Provide more specific error messages based on error codes
+      let errorMessage = 'Could not sign in with Google. Please try again.';
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        errorMessage = 'This domain is not authorized. Please contact support.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your internet connection.';
+      } else if (error.code === 'auth/invalid-client') {
+        errorMessage = 'Invalid client configuration. Please check Firebase settings.';
+      } else if (error.code === 'auth/redirect-uri-mismatch') {
+        errorMessage = 'Redirect URI mismatch. Please check OAuth configuration.';
+      } else if (error.message) {
+        errorMessage = `Sign-in failed: ${error.message}`;
+      }
+      
+      showError('Sign In Failed', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -58,6 +84,14 @@ export function LoginForm() {
             </>
           )}
         </button>
+      </div>
+      
+      {/* Debug Information */}
+      <div className="mt-4 p-3 bg-gray-50 rounded text-xs text-gray-600">
+        <p><strong>Debug Info:</strong></p>
+        <p>• Client ID: 5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com</p>
+        <p>• Domain: {typeof window !== 'undefined' ? window.location.origin : 'Loading...'}</p>
+        <p>• Check browser console (F12) for detailed error messages</p>
       </div>
     </div>
   );
