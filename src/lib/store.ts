@@ -57,6 +57,13 @@ interface Answer {
   points: number;
 }
 
+// Processed content interface
+interface ProcessedContent {
+  fileName: string;
+  content: string;
+  fileId: string;
+}
+
 // App state interface
 interface AppState {
   // User state
@@ -68,6 +75,9 @@ interface AppState {
   quizzes: Quiz[];
   currentQuiz: Quiz | null;
   quizResults: Result[];
+  
+  // File processing state
+  processedContent: ProcessedContent | null;
   
   // UI state
   theme: 'light' | 'dark';
@@ -84,6 +94,10 @@ interface AppState {
   updateQuiz: (id: string, updates: Partial<Quiz>) => void;
   deleteQuiz: (id: string) => void;
   setCurrentQuiz: (quiz: Quiz | null) => void;
+  
+  // File processing actions
+  setProcessedContent: (content: ProcessedContent | null) => void;
+  clearProcessedContent: () => void;
   
   // Result actions
   addResult: (result: Result) => void;
@@ -119,6 +133,7 @@ export const useAppStore = create<AppState>()(
       quizzes: [],
       currentQuiz: null,
       quizResults: [],
+      processedContent: null,
       theme: 'light',
       sidebarOpen: false,
       notifications: [],
@@ -144,6 +159,10 @@ export const useAppStore = create<AppState>()(
       })),
       
       setCurrentQuiz: (quiz) => set({ currentQuiz: quiz }),
+
+      // File processing actions
+      setProcessedContent: (content) => set({ processedContent: content }),
+      clearProcessedContent: () => set({ processedContent: null }),
 
       // Result actions
       addResult: (result) => set((state) => ({
@@ -194,6 +213,7 @@ export const useIsLoading = () => useAppStore((state) => state.isLoading);
 export const useQuizzes = () => useAppStore((state) => state.quizzes);
 export const useCurrentQuiz = () => useAppStore((state) => state.currentQuiz);
 export const useQuizResults = () => useAppStore((state) => state.quizResults);
+export const useProcessedContent = () => useAppStore((state) => state.processedContent);
 export const useTheme = () => useAppStore((state) => state.theme);
 export const useSidebarOpen = () => useAppStore((state) => state.sidebarOpen);
 export const useNotifications = () => useAppStore((state) => state.notifications);

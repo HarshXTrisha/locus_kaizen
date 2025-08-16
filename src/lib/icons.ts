@@ -14,7 +14,7 @@ export { LogIn, Mail, ShieldCheck, UserPlus, Eye, EyeOff } from 'lucide-react';
 export { Clock, Flag } from 'lucide-react';
 
 // Upload icons
-export { UploadCloud } from 'lucide-react';
+export { UploadCloud, FileText } from 'lucide-react';
 
 // Success icons
 export { CheckCircle2 } from 'lucide-react';
@@ -29,4 +29,4 @@ export { BarChart3, Users, BookOpen, Upload, Settings, ArrowRight, Star, Zap, Sh
 export { X, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
 // Error and utility icons
-export { RefreshCw, Home } from 'lucide-react';
+export { RefreshCw, Home, Trash2, Save, Eye, EyeOff, Loader2 } from 'lucide-react';
