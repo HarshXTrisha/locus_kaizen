@@ -2,16 +2,16 @@
 // Only import icons that are actually used in the application
 
 // Dashboard icons
-export { Target, CheckCircle, TrendingUp, TrendingDown, Plus } from 'lucide-react';
+export { Target, CheckCircle, TrendingUp, TrendingDown, Plus, BookOpen, Award, Calendar, Clock } from 'lucide-react';
 
 // Navigation icons
 export { Bell, User, Search, ChevronLeft, ChevronRight, MoreVertical, ArrowDown, ChevronsUpDown, ArrowLeft } from 'lucide-react';
 
 // Auth icons
-export { LogIn, Mail, ShieldCheck, UserPlus, Eye, EyeOff } from 'lucide-react';
+export { LogIn, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 
 // Quiz icons
-export { Clock, Flag } from 'lucide-react';
+export { Flag } from 'lucide-react';
 
 // Upload icons
 export { UploadCloud, FileText } from 'lucide-react';
@@ -23,7 +23,7 @@ export { CheckCircle2 } from 'lucide-react';
 export { TrendingUp as TrendingUpResults, TrendingDown as TrendingDownResults, Timer } from 'lucide-react';
 
 // Landing page icons
-export { BarChart3, Users, BookOpen, Upload, Settings, ArrowRight, Star, Zap, Shield, Globe } from 'lucide-react';
+export { BarChart3, Users, Upload, Settings, ArrowRight, Star, Zap, Shield, Globe, Monitor, Smartphone } from 'lucide-react';
 
 // Notification icons
 export { X, AlertCircle, Info, AlertTriangle } from 'lucide-react';

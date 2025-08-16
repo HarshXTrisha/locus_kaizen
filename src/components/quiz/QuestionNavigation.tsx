@@ -1,66 +1,68 @@
-'use client'; // This component will have interactive states
+'use client';
 
 import React from 'react';
 
-// Sample data for question statuses. In a real app, this would be managed by state.
-const questions = [
-  { number: 1, status: 'unanswered' as const },
-  { number: 2, status: 'answered' as const },
-  { number: 3, status: 'flagged' as const },
-  // ...add all 40 questions here or generate them
-].concat(Array.from({ length: 37 }, (_, i) => ({ number: i + 4, status: 'unanswered' as const })));
+interface Question {
+  id: string;
+  text: string;
+  type: 'multiple-choice' | 'true-false' | 'short-answer';
+  options?: string[];
+  correctAnswer: string | string[];
+  points: number;
+}
 
-// A single question indicator button
-const QuestionIndicator = ({ number, status }: { number: number; status: 'unanswered' | 'answered' | 'flagged' }) => {
-  const baseClasses = "flex items-center justify-center size-10 rounded-full font-bold text-sm transition-all duration-300 ease-in-out shadow-sm hover:scale-110 hover:shadow-md";
-  
-  const statusClasses = {
-    unanswered: 'bg-white text-gray-400 border border-slate-200 hover:bg-gray-100',
-    answered: 'bg-green-500 text-white hover:bg-green-600',
-    flagged: 'bg-yellow-400 text-yellow-800 hover:bg-yellow-500',
+interface Answer {
+  questionId: string;
+  selectedOption: string;
+  isFlagged: boolean;
+}
+
+interface QuestionNavigationProps {
+  questions: Question[];
+  answers: Answer[];
+  currentQuestionIndex: number;
+  onQuestionSelect: (index: number) => void;
+}
+
+export function QuestionNavigation({
+  questions,
+  answers,
+  currentQuestionIndex,
+  onQuestionSelect
+}: QuestionNavigationProps) {
+  const getQuestionStatus = (index: number) => {
+    const answer = answers.find(a => a.questionId === questions[index].id);
+    if (!answer) return 'unanswered';
+    if (answer.isFlagged) return 'flagged';
+    return 'answered';
   };
 
   return (
-    <a href={`#question-${number}`} className={`${baseClasses} ${statusClasses[status]}`}>
-      {number}
-    </a>
-  );
-};
-
-export function QuestionNavigation() {
-  return (
-    <aside className="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sticky top-0 h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-slate-800">Question Navigation</h1>
-      
-      {/* Question Grid */}
-      <div className="flex-grow overflow-y-auto pr-4 -mr-4">
-        <div className="grid grid-cols-5 gap-3">
-          {questions.map(q => (
-            <QuestionIndicator key={q.number} number={q.number} status={q.status} />
-          ))}
-        </div>
-      </div>
-
-      {/* Legend and Submit Button */}
-      <div className="mt-6 pt-6 border-t border-slate-200">
-        <div className="space-y-3 text-sm">
-          <div className="flex items-center">
-            <span className="size-4 rounded-full bg-green-500 mr-3"></span>
-            <span className="text-gray-600">Answered</span>
-          </div>
-          <div className="flex items-center">
-            <span className="size-4 rounded-full bg-white border border-slate-200 mr-3"></span>
-            <span className="text-gray-600">Unanswered</span>
-          </div>
-          <div className="flex items-center">
-            <span className="size-4 rounded-full bg-yellow-400 mr-3"></span>
-            <span className="text-gray-600">Flagged for Review</span>
-          </div>
-        </div>
-        <button className="w-full mt-6 bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors duration-200">
-          Submit Test
-        </button>
-      </div>
-    </aside>
+    <div className="grid grid-cols-5 gap-2">
+      {questions.map((question, index) => {
+        const status = getQuestionStatus(index);
+        const isCurrent = index === currentQuestionIndex;
+        
+        return (
+          <button
+            key={question.id}
+            onClick={() => onQuestionSelect(index)}
+            className={`
+              w-10 h-10 rounded-lg text-sm font-medium transition-all
+              ${isCurrent 
+                ? 'bg-[#20C997] text-white ring-2 ring-[#20C997] ring-offset-2' 
+                : status === 'answered'
+                ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                : status === 'flagged'
+                ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }
+            `}
+          >
+            {index + 1}
+          </button>
+        );
+      })}
+    </div>
   );
 }

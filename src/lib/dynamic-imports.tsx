@@ -60,7 +60,7 @@ export const DynamicTestDataTable = dynamic(
 
 // Firebase components with loading states
 export const DynamicFirebaseAuth = dynamic(
-  () => import('@/components/auth/LoginFormWithFirebase').then(mod => ({ default: mod.LoginFormWithFirebase })),
+  () => import('@/components/auth/LoginForm').then(mod => ({ default: mod.LoginForm })),
   {
     loading: () => (
       <div className="w-full max-w-md rounded-lg border border-[#E9ECEF] bg-white p-8 shadow-sm">

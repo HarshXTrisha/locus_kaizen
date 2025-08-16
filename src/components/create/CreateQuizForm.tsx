@@ -354,7 +354,7 @@ export function CreateQuizForm() {
                   <div>
                     <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                     <p>No questions added yet.</p>
-                    <p className="text-sm">Click "Add Question" to get started.</p>
+                    <p className="text-sm">Click &ldquo;Add Question&rdquo; to get started.</p>
                   </div>
                 )}
               </div>
@@ -406,7 +406,7 @@ export function CreateQuizForm() {
                                 type="text"
                                 value={option}
                                 onChange={(e) => updateOption(question.id, optionIndex, e.target.value)}
-                                placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
+                                placeholder={'Option ' + String.fromCharCode(65 + optionIndex)}
                                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#20C997] focus:border-[#20C997]"
                               />
                               {question.correctAnswer === option && (
