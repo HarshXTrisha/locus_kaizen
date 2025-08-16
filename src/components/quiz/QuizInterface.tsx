@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuizzes, useAppStore } from '@/lib/store';
 import { QuestionDisplay } from './QuestionDisplay';
@@ -33,6 +33,73 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
 
   const quiz = quizzes.find(q => q.id === quizId);
+
+  // Calculate score function
+  const calculateScore = useCallback(() => {
+    if (!quiz) return 0;
+    let correctAnswers = 0;
+    answers.forEach(answer => {
+      const question = quiz.questions.find(q => q.id === answer.questionId);
+      if (question && answer.selectedOption === question.correctAnswer) {
+        correctAnswers++;
+      }
+    });
+    return Math.round((correctAnswers / quiz.questions.length) * 100);
+  }, [quiz, answers]);
+
+  // Submit quiz function
+  const submitQuiz = useCallback(async () => {
+    if (!quiz) return;
+    
+    setIsSubmitting(true);
+    try {
+      const score = calculateScore();
+      const timeSpent = ((quiz.timeLimit || 60) * 60) - timeRemaining;
+      const correctAnswers = answers.filter(answer => {
+        const question = quiz.questions.find(q => q.id === answer.questionId);
+        return question && answer.selectedOption === question.correctAnswer;
+      }).length;
+
+      const result = {
+        id: Date.now().toString(),
+        quizId: quiz.id,
+        userId: 'current-user', // This should come from auth context
+        score,
+        totalQuestions: quiz.questions.length,
+        correctAnswers,
+        timeTaken: timeSpent,
+        completedAt: new Date(),
+        answers: answers.map(answer => ({
+          questionId: answer.questionId,
+          userAnswer: answer.selectedOption,
+          isCorrect: quiz.questions.find(q => q.id === answer.questionId)?.correctAnswer === answer.selectedOption || false,
+          points: 1
+        }))
+      };
+
+      addResult(result);
+      showSuccess('Quiz Submitted!', `Your score: ${score}%`);
+      router.push(`/results/${result.id}`);
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      showError('Submission Failed', 'Failed to submit quiz. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [quiz, timeRemaining, answers, calculateScore, addResult, router]);
+
+  // Handle submit quiz function
+  const handleSubmitQuiz = useCallback(async () => {
+    if (!quiz) return;
+    
+    const answeredQuestions = answers.filter(a => a.selectedOption !== '').length;
+    if (answeredQuestions < quiz.questions.length) {
+      setShowConfirmSubmit(true);
+      return;
+    }
+    
+    await submitQuiz();
+  }, [quiz, answers, submitQuiz]);
 
   useEffect(() => {
     if (quiz) {
@@ -101,68 +168,6 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const handleQuestionNavigation = (index: number) => {
     if (index >= 0 && index < totalQuestions) {
       setCurrentQuestionIndex(index);
-    }
-  };
-
-  const calculateScore = () => {
-    let correctAnswers = 0;
-    answers.forEach(answer => {
-      const question = quiz.questions.find(q => q.id === answer.questionId);
-      if (question && answer.selectedOption === question.correctAnswer) {
-        correctAnswers++;
-      }
-    });
-    return Math.round((correctAnswers / totalQuestions) * 100);
-  };
-
-  const handleSubmitQuiz = async () => {
-    if (answeredQuestions < totalQuestions) {
-      setShowConfirmSubmit(true);
-      return;
-    }
-    
-    await submitQuiz();
-  };
-
-  const submitQuiz = async () => {
-    setIsSubmitting(true);
-    try {
-      const score = calculateScore();
-      const timeSpent = ((quiz.timeLimit || 60) * 60) - timeRemaining;
-      const correctAnswers = answers.filter(answer => {
-        const question = quiz.questions.find(q => q.id === answer.questionId);
-        return question && answer.selectedOption === question.correctAnswer;
-      }).length;
-
-      const result = {
-        id: Date.now().toString(),
-        quizId: quiz.id,
-        userId: 'current-user', // This should come from auth context
-        score,
-        totalQuestions,
-        correctAnswers,
-        timeTaken: timeSpent,
-        completedAt: new Date(),
-        answers: answers.map(answer => ({
-          questionId: answer.questionId,
-          userAnswer: answer.selectedOption,
-          isCorrect: quiz.questions.find(q => q.id === answer.questionId)?.correctAnswer === answer.selectedOption || false,
-          points: 1
-        }))
-      };
-
-      addResult(result);
-      showSuccess('Quiz Completed!', `Your score: ${score}%`);
-      
-      // Redirect to results page
-      setTimeout(() => {
-        router.push(`/results/${result.id}`);
-      }, 1500);
-    } catch (error) {
-      showError('Submission Failed', 'There was an error submitting your quiz. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-      setShowConfirmSubmit(false);
     }
   };
 
