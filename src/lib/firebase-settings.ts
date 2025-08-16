@@ -175,10 +175,30 @@ export async function saveUserSettings(userId: string, settings: Partial<UserSet
   try {
     const existingSettings = await getUserSettings(userId);
     
+    // Create database settings object with proper FieldValue types
     const settingsData: DatabaseSettings = {
-      ...(existingSettings || defaultSettings),
-      ...settings,
       userId,
+      displayName: (existingSettings || defaultSettings).displayName,
+      bio: (existingSettings || defaultSettings).bio,
+      avatar: (existingSettings || defaultSettings).avatar,
+      timezone: (existingSettings || defaultSettings).timezone,
+      language: (existingSettings || defaultSettings).language,
+      emailNotifications: {
+        ...(existingSettings || defaultSettings).emailNotifications,
+        ...settings.emailNotifications,
+      },
+      quizPreferences: {
+        ...(existingSettings || defaultSettings).quizPreferences,
+        ...settings.quizPreferences,
+      },
+      privacy: {
+        ...(existingSettings || defaultSettings).privacy,
+        ...settings.privacy,
+      },
+      theme: {
+        ...(existingSettings || defaultSettings).theme,
+        ...settings.theme,
+      },
       updatedAt: serverTimestamp(),
     };
     
@@ -200,8 +220,12 @@ export async function saveUserSettings(userId: string, settings: Partial<UserSet
 export async function updateUserSettings(userId: string, updates: Partial<UserSettings>): Promise<void> {
   try {
     const settingsRef = doc(db, 'userSettings', userId);
+    
+    // Filter out Date fields and only update non-timestamp fields
+    const { createdAt, updatedAt, userId: _, ...updateFields } = updates;
+    
     await updateDoc(settingsRef, {
-      ...updates,
+      ...updateFields,
       updatedAt: serverTimestamp(),
     });
     console.log('✅ User settings updated successfully');
