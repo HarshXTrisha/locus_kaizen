@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Bell, User, Settings, LogOut, Users, Share2, Plus } from 'lucide-react';
 import { useUser, useAppStore } from '@/lib/store';
+import { useAuth } from '@/lib/auth-context';
 import { getUserInvitations } from '@/lib/firebase-collaboration';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import Image from 'next/image';
@@ -10,7 +11,7 @@ import Link from 'next/link';
 
 export function Header() {
   const user = useUser();
-  const { signOut } = useAppStore();
+  const { signOut } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [invitations, setInvitations] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
