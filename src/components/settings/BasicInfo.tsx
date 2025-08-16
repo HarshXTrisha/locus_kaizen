@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 export function BasicInfo() {
   return (
@@ -23,7 +24,13 @@ export function BasicInfo() {
           <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
           <div className="mt-2 flex items-start gap-x-4">
             <div className="relative h-24 w-24">
-              <img alt="Profile Picture" className="h-24 w-24 rounded-full border-2 border-dashed border-gray-300 object-cover p-1" src="https://avatar.vercel.sh/sanjay" />
+              <Image 
+                alt="Profile Picture" 
+                className="h-24 w-24 rounded-full border-2 border-dashed border-gray-300 object-cover p-1" 
+                src="https://avatar.vercel.sh/sanjay" 
+                width={96}
+                height={96}
+              />
               <label className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black bg-opacity-40 text-sm font-medium text-white opacity-0 transition-opacity hover:opacity-100 focus-within:opacity-100" htmlFor="profile-picture-upload">
                 <span>Upload</span>
                 <input accept="image/jpeg, image/png" className="sr-only" id="profile-picture-upload" name="profile-picture-upload" type="file" />

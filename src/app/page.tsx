@@ -14,7 +14,8 @@ import {
   Star,
   Zap,
   Shield,
-  Globe
+  Globe,
+  UserPlus
 } from '@/lib/icons';
 
 export default function Home() {

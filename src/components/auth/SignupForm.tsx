@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { UserPlus, Eye, EyeOff } from '@/lib/icons';
 import { createUserWithEmail } from '@/lib/firebase-auth';
+import { showSuccess, showError } from '@/components/common/NotificationSystem';
+import { ButtonLoader } from '@/components/common/LoadingSpinner';
 
 export function SignupForm() {
   const [formData, setFormData] = useState({
@@ -14,7 +16,6 @@ export function SignupForm() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -24,33 +25,31 @@ export function SignupForm() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
-    if (error) setError(null);
   };
 
   const validateForm = () => {
     if (!formData.firstName.trim()) {
-      setError('First name is required');
+      showError('Validation Error', 'First name is required');
       return false;
     }
     if (!formData.lastName.trim()) {
-      setError('Last name is required');
+      showError('Validation Error', 'Last name is required');
       return false;
     }
     if (!formData.email.trim()) {
-      setError('Email is required');
+      showError('Validation Error', 'Email is required');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address');
+      showError('Validation Error', 'Please enter a valid email address');
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      showError('Validation Error', 'Password must be at least 6 characters long');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      showError('Validation Error', 'Passwords do not match');
       return false;
     }
     return true;
@@ -62,20 +61,12 @@ export function SignupForm() {
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setError(null);
 
     try {
       const userCredential = await createUserWithEmail(formData.email, formData.password);
-      console.log('User created successfully:', userCredential.user);
-      
-      // You can add additional user data to Firestore here
-      // await addUserToFirestore(userCredential.user.uid, {
-      //   firstName: formData.firstName,
-      //   lastName: formData.lastName,
-      //   email: formData.email,
-      //   createdAt: new Date()
-      // });
+      console.log('User created successfully:', userCredential);
 
+      showSuccess('Account Created!', 'Your account has been successfully created. Welcome to Locus!');
       setSuccess(true);
       
       // Redirect to dashboard after successful signup
@@ -88,13 +79,15 @@ export function SignupForm() {
       
       // Handle specific Firebase auth errors
       if (err.code === 'auth/email-already-in-use') {
-        setError('An account with this email already exists. Please sign in instead.');
+        showError('Email Already Exists', 'An account with this email already exists. Please sign in instead.');
       } else if (err.code === 'auth/weak-password') {
-        setError('Password is too weak. Please choose a stronger password.');
+        showError('Weak Password', 'Password is too weak. Please choose a stronger password.');
       } else if (err.code === 'auth/invalid-email') {
-        setError('Please enter a valid email address.');
+        showError('Invalid Email', 'Please enter a valid email address.');
+      } else if (err.code === 'auth/operation-not-allowed') {
+        showError('Signup Disabled', 'Email/password signup is not enabled. Please contact support.');
       } else {
-        setError('Failed to create account. Please try again.');
+        showError('Signup Failed', 'Failed to create account. Please try again.');
       }
     } finally {
       setIsLoading(false);
@@ -127,12 +120,6 @@ export function SignupForm() {
         </p>
       </div>
 
-      {error && (
-        <div className="mt-4 rounded-md bg-red-50 p-4">
-          <p className="text-sm text-red-700">{error}</p>
-        </div>
-      )}
-
       <form onSubmit={handleSignup} className="mt-8 space-y-6">
         {/* Name Fields */}
         <div className="grid grid-cols-2 gap-4">
@@ -149,6 +136,7 @@ export function SignupForm() {
               required
               placeholder="John"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#20C997] focus:ring-[#20C997] sm:text-sm"
+              disabled={isLoading}
             />
           </div>
           <div>
@@ -164,6 +152,7 @@ export function SignupForm() {
               required
               placeholder="Doe"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#20C997] focus:ring-[#20C997] sm:text-sm"
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -182,6 +171,7 @@ export function SignupForm() {
             required
             placeholder="john@example.com"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#20C997] focus:ring-[#20C997] sm:text-sm"
+            disabled={isLoading}
           />
         </div>
 
@@ -200,11 +190,13 @@ export function SignupForm() {
               required
               placeholder="••••••••"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#20C997] focus:ring-[#20C997] sm:text-sm pr-10"
+              disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              disabled={isLoading}
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4 text-gray-400" />
@@ -233,11 +225,13 @@ export function SignupForm() {
               required
               placeholder="••••••••"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#20C997] focus:ring-[#20C997] sm:text-sm pr-10"
+              disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              disabled={isLoading}
             >
               {showConfirmPassword ? (
                 <EyeOff className="h-4 w-4 text-gray-400" />
@@ -257,6 +251,7 @@ export function SignupForm() {
               type="checkbox"
               required
               className="h-4 w-4 text-[#20C997] focus:ring-[#20C997] border-gray-300 rounded"
+              disabled={isLoading}
             />
           </div>
           <div className="ml-3 text-sm">
@@ -281,10 +276,7 @@ export function SignupForm() {
             className="flex w-full items-center justify-center rounded-md bg-[#20C997] px-4 py-3 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
-              <>
-                <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                Creating Account...
-              </>
+              <ButtonLoader text="Creating Account..." />
             ) : (
               <>
                 <UserPlus className="mr-2 h-5 w-5" />

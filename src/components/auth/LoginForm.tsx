@@ -2,27 +2,45 @@
 
 import React, { useState } from 'react';
 import { LogIn } from '@/lib/icons';
-import { signInWithEmail } from '@/lib/firebase-auth'; // Import the sign-in function
+import { signInWithEmail } from '@/lib/firebase-auth';
+import { showSuccess, showError } from '@/components/common/NotificationSystem';
+import { ButtonLoader } from '@/components/common/LoadingSpinner';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignIn = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent the form from reloading the page
+    event.preventDefault();
     setIsLoading(true);
-    setError(null);
 
     try {
-      const user = await signInWithEmail(email, password);
-      console.log('Signed in successfully:', user);
-      // Redirect to the dashboard on successful login
-      window.location.href = '/dashboard';
+      const userCredential = await signInWithEmail(email, password);
+      console.log('Signed in successfully:', userCredential);
+      
+      showSuccess('Welcome Back!', 'You have been successfully signed in.');
+      
+      // Redirect to dashboard after successful login
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+      
     } catch (err: any) {
-      setError('Failed to sign in. Please check your email and password.');
-      console.error(err);
+      console.error('Sign in error:', err);
+      
+      // Handle specific Firebase auth errors
+      if (err.code === 'auth/user-not-found') {
+        showError('User Not Found', 'No account found with this email address. Please check your email or create a new account.');
+      } else if (err.code === 'auth/wrong-password') {
+        showError('Invalid Password', 'The password you entered is incorrect. Please try again.');
+      } else if (err.code === 'auth/invalid-email') {
+        showError('Invalid Email', 'Please enter a valid email address.');
+      } else if (err.code === 'auth/too-many-requests') {
+        showError('Too Many Attempts', 'Too many failed login attempts. Please try again later.');
+      } else {
+        showError('Sign In Failed', 'Failed to sign in. Please check your credentials and try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -48,20 +66,14 @@ export function LoginForm() {
             required
             placeholder="you@example.com"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#20C997] focus:ring-[#20C997] sm:text-sm"
+            disabled={isLoading}
           />
         </div>
 
         <div>
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="block text-sm font-medium text-[#495057]">
-              Password
-            </label>
-            <div className="text-sm">
-              <a href="/forgot-password" className="font-medium text-[#20C997] hover:underline">
-                Forgot password?
-              </a>
-            </div>
-          </div>
+          <label htmlFor="password" className="block text-sm font-medium text-[#495057]">
+            Password
+          </label>
           <input
             id="password"
             type="password"
@@ -70,11 +82,9 @@ export function LoginForm() {
             required
             placeholder="••••••••"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#20C997] focus:ring-[#20C997] sm:text-sm"
+            disabled={isLoading}
           />
         </div>
-
-        {/* Display error message if there is one */}
-        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div>
           <button
@@ -82,7 +92,9 @@ export function LoginForm() {
             disabled={isLoading}
             className="flex w-full items-center justify-center rounded-md bg-[#20C997] px-4 py-3 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isLoading ? 'Signing In...' : (
+            {isLoading ? (
+              <ButtonLoader text="Signing In..." />
+            ) : (
               <>
                 <LogIn className="mr-2 h-5 w-5" />
                 Sign In

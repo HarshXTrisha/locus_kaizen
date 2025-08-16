@@ -24,3 +24,9 @@ export { TrendingUp as TrendingUpResults, TrendingDown as TrendingDownResults, T
 
 // Landing page icons
 export { BarChart3, Users, BookOpen, Upload, Settings, ArrowRight, Star, Zap, Shield, Globe } from 'lucide-react';
+
+// Notification icons
+export { X, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+
+// Error and utility icons
+export { RefreshCw, Home } from 'lucide-react';
