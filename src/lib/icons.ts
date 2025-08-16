@@ -8,7 +8,7 @@ export { Target, CheckCircle, TrendingUp, TrendingDown, Plus } from 'lucide-reac
 export { Bell, User, Search, ChevronLeft, ChevronRight, MoreVertical, ArrowDown, ChevronsUpDown } from 'lucide-react';
 
 // Auth icons
-export { LogIn, Mail, ShieldCheck } from 'lucide-react';
+export { LogIn, Mail, ShieldCheck, UserPlus, Eye, EyeOff } from 'lucide-react';
 
 // Quiz icons
 export { Clock, Flag } from 'lucide-react';

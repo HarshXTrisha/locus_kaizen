@@ -302,6 +302,14 @@ export default function Home() {
               <LogIn className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
               <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign In</span>
             </Link>
+            
+            <Link 
+              href="/signup"
+              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+            >
+              <UserPlus className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
+              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign Up</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -317,7 +325,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/dashboard"
+              href="/signup"
               className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               Start Free Trial
