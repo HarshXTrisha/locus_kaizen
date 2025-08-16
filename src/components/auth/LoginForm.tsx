@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { signInWithGoogle } from '@/lib/firebase-auth';
+import React, { useState, useEffect } from 'react';
+import { signInWithGoogle, getGoogleSignInResult } from '@/lib/firebase-auth';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { ButtonLoader } from '@/components/common/LoadingSpinner';
 
@@ -17,6 +17,26 @@ const GoogleIcon = () => (
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check for redirect result on component mount
+  useEffect(() => {
+    const checkRedirectResult = async () => {
+      try {
+        const result = await getGoogleSignInResult();
+        if (result) {
+          console.log('✅ Redirect sign-in successful:', result);
+          showSuccess('Signed In!', 'You have successfully signed in with Google.');
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1500);
+        }
+      } catch (error) {
+        console.error('Error checking redirect result:', error);
+      }
+    };
+
+    checkRedirectResult();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -54,6 +74,10 @@ export function LoginForm() {
         errorMessage = 'Invalid client configuration. Please check Firebase settings.';
       } else if (error.code === 'auth/redirect-uri-mismatch') {
         errorMessage = 'Redirect URI mismatch. Please check OAuth configuration.';
+      } else if (error.message === 'Redirect initiated') {
+        // This is expected when using redirect method
+        console.log('🔄 Redirect initiated, user will be redirected to Google...');
+        return; // Don't show error for redirect
       } else if (error.message) {
         errorMessage = `Sign-in failed: ${error.message}`;
       }
@@ -97,6 +121,7 @@ export function LoginForm() {
         <p>• Full URL: {typeof window !== 'undefined' ? window.location.href : 'Loading...'}</p>
         <p>• Check browser console (F12) for detailed error messages</p>
         <p>• If you see &quot;redirect_uri_mismatch&quot;, update Google Cloud Console</p>
+        <p>• If popup fails, redirect method will be used automatically</p>
       </div>
     </div>
   );
