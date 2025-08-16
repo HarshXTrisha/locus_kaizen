@@ -19,10 +19,12 @@ export interface PDFProcessingResult {
 
 // Common question patterns to look for in PDF text
 const QUESTION_PATTERNS = [
-  /^\d+\.\s*(.+?)(?=\n\d+\.|$)/gms, // "1. Question text"
-  /^Q\d+\.\s*(.+?)(?=\nQ\d+\.|$)/gms, // "Q1. Question text"
-  /^Question\s*\d+\.\s*(.+?)(?=\nQuestion\s*\d+\.|$)/gms, // "Question 1. Question text"
-  /^\(\d+\)\s*(.+?)(?=\n\(\d+\)|$)/gms, // "(1) Question text"
+  /^\d+\.\s*(.+?)(?=\n\d+\.|$)/gm,  // "1. Question text"
+  /^Q\d+\.\s*(.+?)(?=\nQ\d+\.|$)/gm,  // "Q1. Question text"
+  /^Question\s*\d+\.\s*(.+?)(?=\nQuestion\s*\d+\.|$)/gm,  // "Question 1. Question text"
+  /^\(\d+\)\s*(.+?)(?=\n\(\d+\)|$)/gm,  // "(1) Question text"
+  /^[A-Z]\)\s*(.+?)(?=\n[A-Z]\)|$)/gm,  // "A) Question text"
+  /^[a-z]\)\s*(.+?)(?=\n[a-z]\)|$)/gm,  // "a) Question text"
 ];
 
 // Answer option patterns
