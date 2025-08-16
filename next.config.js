@@ -14,7 +14,7 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'recharts'],
   },
   
-  // Headers for better caching
+  // Headers for better caching and security
   async headers() {
     return [
       {
@@ -31,6 +31,15 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+          // Fix for Google Sign-In popup issues
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'unsafe-none',
           },
         ],
       },
