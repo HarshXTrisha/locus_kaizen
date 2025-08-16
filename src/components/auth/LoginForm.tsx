@@ -96,7 +96,7 @@ export function LoginForm() {
         <p>• Domain: {typeof window !== 'undefined' ? window.location.origin : 'Loading...'}</p>
         <p>• Full URL: {typeof window !== 'undefined' ? window.location.href : 'Loading...'}</p>
         <p>• Check browser console (F12) for detailed error messages</p>
-        <p>• If you see "redirect_uri_mismatch", update Google Cloud Console</p>
+        <p>• If you see &quot;redirect_uri_mismatch&quot;, update Google Cloud Console</p>
       </div>
     </div>
   );

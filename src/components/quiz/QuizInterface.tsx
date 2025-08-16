@@ -59,7 +59,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeRemaining, quiz]);
+  }, [timeRemaining, quiz, handleSubmitQuiz]);
 
   if (!quiz) {
     return (
