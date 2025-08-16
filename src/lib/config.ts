@@ -11,7 +11,7 @@ export const firebaseConfig = {
 
 // Google OAuth Configuration
 export const googleConfig = {
-  clientId: "5682995815-tiu7i6u4uivljjaqul51jmqsa56r50cn.apps.googleusercontent.com",
+  clientId: "5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com",
   scopes: ['email', 'profile'],
   prompt: 'select_account'
 };

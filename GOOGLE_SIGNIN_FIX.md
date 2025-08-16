@@ -16,7 +16,7 @@
 2. Select your project: `locus-8b4e8`
 3. Go to **Authentication** → **Sign-in method**
 4. Enable **Google** provider
-5. Add your **Web Client ID**: `5682995815-tiu7i6u4uivljjaqul51jmqsa56r50cn.apps.googleusercontent.com`
+5. Add your **Web Client ID**: `5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com`
 
 #### **Step 2: Configure Authorized Domains**
 1. In Firebase Console → **Authentication** → **Settings**
@@ -29,7 +29,7 @@
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Select project: `locus-8b4e8`
 3. Go to **APIs & Services** → **Credentials**
-4. Find your OAuth 2.0 Client ID: `5682995815-tiu7i6u4uivljjaqul51jmqsa56r50cn.apps.googleusercontent.com`
+4. Find your OAuth 2.0 Client ID: `5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com`
 5. Add these **Authorized JavaScript origins**:
    - `http://localhost:3000`
    - `https://locus-8b4e8.firebaseapp.com`
@@ -100,7 +100,7 @@ npm run dev
 }
 
 // Google OAuth Client ID
-5682995815-tiu7i6u4uivljjaqul51jmqsa56r50cn.apps.googleusercontent.com
+5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com
 ```
 
 #### **Required URLs to Add:**
