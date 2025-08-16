@@ -5,7 +5,7 @@
 export { Target, CheckCircle, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 
 // Navigation icons
-export { Bell, User, Search, ChevronLeft, ChevronRight, MoreVertical, ArrowDown, ChevronsUpDown } from 'lucide-react';
+export { Bell, User, Search, ChevronLeft, ChevronRight, MoreVertical, ArrowDown, ChevronsUpDown, ArrowLeft } from 'lucide-react';
 
 // Auth icons
 export { LogIn, Mail, ShieldCheck, UserPlus, Eye, EyeOff } from 'lucide-react';
