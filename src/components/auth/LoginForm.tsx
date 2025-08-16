@@ -21,6 +21,8 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     console.log('🔍 Starting Google Sign-In process...');
+    console.log('📍 Current URL:', window.location.href);
+    console.log('🌐 Origin:', window.location.origin);
     
     try {
       console.log('📡 Attempting to sign in with Google...');
@@ -35,6 +37,7 @@ export function LoginForm() {
       console.error('❌ Google sign in error:', error);
       console.error('❌ Error code:', error.code);
       console.error('❌ Error message:', error.message);
+      console.error('❌ Full error object:', error);
       
       // Provide more specific error messages based on error codes
       let errorMessage = 'Could not sign in with Google. Please try again.';
@@ -91,7 +94,9 @@ export function LoginForm() {
         <p><strong>Debug Info:</strong></p>
         <p>• Client ID: 5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com</p>
         <p>• Domain: {typeof window !== 'undefined' ? window.location.origin : 'Loading...'}</p>
+        <p>• Full URL: {typeof window !== 'undefined' ? window.location.href : 'Loading...'}</p>
         <p>• Check browser console (F12) for detailed error messages</p>
+        <p>• If you see "redirect_uri_mismatch", update Google Cloud Console</p>
       </div>
     </div>
   );
