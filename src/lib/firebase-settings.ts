@@ -84,7 +84,7 @@ interface DatabaseSettings {
     primaryColor: string;
     fontSize: 'small' | 'medium' | 'large';
   };
-  createdAt: FieldValue;
+  createdAt?: FieldValue;
   updatedAt: FieldValue;
 }
 
