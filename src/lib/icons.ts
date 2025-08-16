@@ -21,3 +21,6 @@ export { CheckCircle2 } from 'lucide-react';
 
 // Results icons
 export { TrendingUp as TrendingUpResults, TrendingDown as TrendingDownResults, Timer } from 'lucide-react';
+
+// Landing page icons
+export { BarChart3, Users, BookOpen, Upload, Settings, ArrowRight, Star, Zap, Shield, Globe } from 'lucide-react';
