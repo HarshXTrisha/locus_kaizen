@@ -51,7 +51,7 @@ Your Google Sign-In is failing because the Google Cloud Console hasn't been conf
      https://locus-8b4e8.firebaseapp.com
      ```
 5. Click **Create**
-6. **Copy the Client ID** that appears (it should match: `5682995815-tiu7i6u4uivljjaqul51jmqsa56r50cn.apps.googleusercontent.com`)
+6. **Copy the Client ID** that appears (it should match: `5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com`)
 
 ### **Step 5: Configure Firebase with Google Client ID**
 1. Go to [Firebase Console](https://console.firebase.google.com/)
@@ -60,7 +60,7 @@ Your Google Sign-In is failing because the Google Cloud Console hasn't been conf
 4. Click on **Google** provider
 5. **Enable** Google sign-in
 6. In the **Web SDK configuration** section:
-   - **Web client ID**: Paste your OAuth client ID from Step 4
+   - **Web client ID**: Paste your OAuth client ID from Step 4: `5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com`
    - **Web client secret**: Leave empty (not needed for Firebase)
 7. Click **Save**
 
@@ -122,7 +122,7 @@ npm run dev
 - [ ] OAuth 2.0 Client ID created for Web application
 - [ ] Authorized JavaScript origins include `http://localhost:3000`
 - [ ] Firebase Google provider enabled
-- [ ] Firebase Web client ID matches OAuth client ID
+- [ ] Firebase Web client ID matches OAuth client ID: `5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com`
 - [ ] Firebase authorized domains include `localhost`
 - [ ] Test user added to OAuth consent screen
 
