@@ -271,18 +271,32 @@ export default function DashboardPage() {
                     {quizzes.slice(0, 5).map((quiz: any) => (
                       <div key={quiz.id} className="border border-gray-200 rounded-lg p-4">
                         <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-medium text-gray-900">{quiz.title}</h3>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-medium text-gray-900">{quiz.title}</h3>
+                              {quiz.isTemporary && (
+                                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                  Quick Test
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-gray-600">{quiz.subject}</p>
                             <p className="text-xs text-gray-500">
                               {quiz.questions.length} questions • {quiz.timeLimit} minutes
+                              {quiz.isTemporary && (
+                                <span className="ml-2 text-blue-600">• Temporary</span>
+                              )}
                             </p>
                           </div>
                           <Link
                             href={`/quiz/${quiz.id}`}
-                            className="px-3 py-1 bg-[#20C997] text-white text-sm rounded hover:bg-[#1BA085] transition-colors"
+                            className={`px-3 py-1 text-white text-sm rounded transition-colors ${
+                              quiz.isTemporary 
+                                ? 'bg-blue-600 hover:bg-blue-700' 
+                                : 'bg-[#20C997] hover:bg-[#1BA085]'
+                            }`}
                           >
-                            Start
+                            {quiz.isTemporary ? 'Retake' : 'Start'}
                           </Link>
                         </div>
                       </div>
@@ -321,9 +335,16 @@ export default function DashboardPage() {
                       <div key={result.id} className="border border-gray-200 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <h3 className="font-medium text-gray-900">
-                              {quizzes.find((q: any) => q.id === result.quizId)?.title || 'Unknown Quiz'}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium text-gray-900">
+                                {quizzes.find((q: any) => q.id === result.quizId)?.title || 'Unknown Quiz'}
+                              </h3>
+                              {quizzes.find((q: any) => q.id === result.quizId)?.isTemporary && (
+                                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                  Quick Test
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-gray-600">
                               {result.correctAnswers}/{result.totalQuestions} correct
                             </p>

@@ -1,0 +1,45 @@
+{
+  "title": "Test Quiz for Upload",
+  "description": "A simple test quiz to verify JSON upload functionality",
+  "questions": [
+    {
+      "id": "q1",
+      "text": "What is the capital of France?",
+      "type": "multiple-choice",
+      "options": ["London", "Berlin", "Paris", "Madrid"],
+      "correctAnswer": "Paris",
+      "points": 1
+    },
+    {
+      "id": "q2",
+      "text": "Which planet is known as the Red Planet?",
+      "type": "multiple-choice",
+      "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+      "correctAnswer": "Mars",
+      "points": 1
+    },
+    {
+      "id": "q3",
+      "text": "The Earth is round.",
+      "type": "true-false",
+      "options": ["True", "False"],
+      "correctAnswer": "True",
+      "points": 1
+    },
+    {
+      "id": "q4",
+      "text": "What is 2 + 2?",
+      "type": "multiple-choice",
+      "options": ["3", "4", "5", "6"],
+      "correctAnswer": "4",
+      "points": 1
+    },
+    {
+      "id": "q5",
+      "text": "Explain the process of photosynthesis in your own words.",
+      "type": "short-answer",
+      "correctAnswer": "Photosynthesis is the process by which plants convert sunlight, water, and carbon dioxide into glucose and oxygen.",
+      "points": 2
+    }
+  ]
+}

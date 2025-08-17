@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { getAuth } from 'firebase/auth';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
@@ -22,6 +23,7 @@ const FileUploadArea = dynamic(
 export default function UploadPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAppStore();
+  const auth = getAuth();
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
   const [quizData, setQuizData] = useState({
@@ -49,7 +51,7 @@ export default function UploadPage() {
   };
 
   const handleCreateQuiz = async () => {
-    if (!user) {
+    if (!auth.currentUser) {
       showError('Authentication Required', 'Please sign in to create quizzes');
       return;
     }
@@ -66,11 +68,11 @@ export default function UploadPage() {
 
     setIsCreatingQuiz(true);
     try {
-      const quizId = await createQuiz({
-        ...quizData,
-        questions: extractedQuestions,
-        createdBy: user.id
-      });
+             const quizId = await createQuiz({
+         ...quizData,
+         questions: extractedQuestions,
+         createdBy: auth.currentUser.uid
+       });
 
       showSuccess('Quiz Created!', 'Your quiz has been created successfully');
       
@@ -86,7 +88,7 @@ export default function UploadPage() {
   };
 
   const handleStartTest = async () => {
-    if (!user) {
+    if (!auth.currentUser) {
       showError('Authentication Required', 'Please sign in to start tests');
       return;
     }
@@ -105,9 +107,9 @@ export default function UploadPage() {
         subject: quizData.subject || 'General',
         timeLimit: quizData.timeLimit,
         passingScore: quizData.passingScore,
-        questions: extractedQuestions,
-        createdBy: user.id,
-        isTemporary: true // Mark as temporary
+                 questions: extractedQuestions,
+         createdBy: auth.currentUser.uid,
+         isTemporary: true // Mark as temporary
       });
 
       showSuccess('Test Started!', 'Your test is ready to begin');
