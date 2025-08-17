@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { getUserQuizzes, deleteQuiz } from '@/lib/firebase-quiz';
@@ -44,16 +44,8 @@ export default function ArchivePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'published' | 'draft' | 'temporary'>('all');
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      router.replace('/login');
-      return;
-    }
-
-    loadQuizzes();
-  }, [isAuthenticated, user, router, loadQuizzes]);
-
-  const loadQuizzes = async () => {
+  // Move loadQuizzes above useEffect and wrap in useCallback
+  const loadQuizzes = useCallback(async () => {
     try {
       setLoading(true);
       const userQuizzes = await getUserQuizzes(user.id);
@@ -64,7 +56,15 @@ export default function ArchivePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, showError]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      router.replace('/login');
+      return;
+    }
+    loadQuizzes();
+  }, [isAuthenticated, user, router, loadQuizzes]);
 
   const handleDeleteQuiz = async (quizId: string, quizTitle: string) => {
     if (!confirm(`Are you sure you want to delete "${quizTitle}"? This action cannot be undone.`)) {
