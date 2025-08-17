@@ -99,13 +99,13 @@ export default function UploadPage() {
         return;
       }
 
-    if (extractedQuestions.length === 0) {
-      showError('No Questions', 'No questions available to start test');
-      return;
-    }
+      if (extractedQuestions.length === 0) {
+        showError('No Questions', 'No questions available to start test');
+        return;
+      }
 
-    setIsCreatingQuiz(true);
-    try {
+      setIsCreatingQuiz(true);
+      
       // Create a temporary quiz for immediate testing
       const tempQuizId = await createQuiz({
         title: quizData.title || `Quick Test - ${extractedQuestions.length} Questions`,
@@ -113,9 +113,9 @@ export default function UploadPage() {
         subject: quizData.subject || 'General',
         timeLimit: quizData.timeLimit,
         passingScore: quizData.passingScore,
-                 questions: extractedQuestions,
-         createdBy: auth?.currentUser?.uid,
-         isTemporary: true // Mark as temporary
+        questions: extractedQuestions,
+        createdBy: auth?.currentUser?.uid,
+        isTemporary: true // Mark as temporary
       });
 
       showSuccess('Test Started!', 'Your test is ready to begin');
