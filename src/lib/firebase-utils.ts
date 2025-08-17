@@ -1,4 +1,4 @@
-import { auth, db, storage } from './firebase';
+import { auth, db, storage, ensureFirebaseInitialized } from './firebase';
 
 /**
  * Safely get Firebase Auth instance
@@ -8,11 +8,13 @@ export function getFirebaseAuth() {
     throw new Error('Firebase Auth is only available on the client side');
   }
   
-  if (!auth) {
+  const { auth: firebaseAuth } = ensureFirebaseInitialized();
+  
+  if (!firebaseAuth) {
     throw new Error('Firebase Auth is not initialized');
   }
   
-  return auth;
+  return firebaseAuth;
 }
 
 /**
@@ -23,11 +25,13 @@ export function getFirebaseDb() {
     throw new Error('Firebase Firestore is only available on the client side');
   }
   
-  if (!db) {
+  const { db: firebaseDb } = ensureFirebaseInitialized();
+  
+  if (!firebaseDb) {
     throw new Error('Firebase Firestore is not initialized');
   }
   
-  return db;
+  return firebaseDb;
 }
 
 /**
@@ -38,11 +42,13 @@ export function getFirebaseStorage() {
     throw new Error('Firebase Storage is only available on the client side');
   }
   
-  if (!storage) {
+  const { storage: firebaseStorage } = ensureFirebaseInitialized();
+  
+  if (!firebaseStorage) {
     throw new Error('Firebase Storage is not initialized');
   }
   
-  return storage;
+  return firebaseStorage;
 }
 
 /**
