@@ -46,6 +46,7 @@ export default function ArchivePage() {
 
   // Move loadQuizzes above useEffect and wrap in useCallback
   const loadQuizzes = useCallback(async () => {
+    if (!user) return;
     try {
       setLoading(true);
       const userQuizzes = await getUserQuizzes(user.id);
@@ -56,7 +57,7 @@ export default function ArchivePage() {
     } finally {
       setLoading(false);
     }
-  }, [user, showError]);
+  }, [user]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
