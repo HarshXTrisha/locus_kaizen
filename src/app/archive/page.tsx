@@ -92,7 +92,7 @@ export default function ArchivePage() {
       });
     } catch (error) {
       console.error('Error deleting quiz:', error);
-      showError('Failed to delete quiz');
+      showError('Failed to delete quiz', 'An error occurred while deleting the quiz.');
     } finally {
       setDeletingQuiz(null);
     }
