@@ -22,8 +22,8 @@ export function QuizTimer({ timeRemaining, totalTime }: QuizTimerProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <Clock className="h-4 w-4 text-gray-500" />
+    <div className="flex items-center gap-1 text-xs">
+      <Clock className="h-3 w-3 text-gray-500" />
       <span className={`font-mono font-medium ${getTimeColor(timeRemaining)}`}>
         {formatTime(timeRemaining)}
       </span>
