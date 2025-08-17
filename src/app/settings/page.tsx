@@ -1,143 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { useAppStore } from '@/lib/store';
-import { showSuccess, showError } from '@/components/common/NotificationSystem';
-import { User, Shield, Bell, Palette, Database, Key, Save, X, Check } from 'lucide-react';
+import { User, Shield, Bell, Palette, Database, Key } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { updateProfile } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 export default function SettingsPage() {
   const { user } = useAppStore();
-  const [name, setName] = useState(user?.name || '');
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isAutoSaving, setIsAutoSaving] = useState(false);
-  const [lastSavedName, setLastSavedName] = useState(user?.name || '');
-
-  useEffect(() => {
-    if (user?.name) {
-      setName(user.name);
-      setLastSavedName(user.name);
-    }
-  }, [user?.name]);
-
-  const handleNameUpdate = async () => {
-    if (!name.trim() || name === lastSavedName) {
-      setIsEditingName(false);
-      return;
-    }
-
-    setIsAutoSaving(true);
-    try {
-      // Get the current user's ID token
-      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
-      
-      if (!token) {
-        throw new Error('No authentication token available');
-      }
-
-      // Update in our database
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: user?.email
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile in database');
-      }
-
-      // Update local state
-      useAppStore.getState().setUser({
-        ...user!,
-        name: name.trim()
-      });
-
-      // Update Firebase Auth displayName
-      if (auth && auth.currentUser) {
-        await updateProfile(auth.currentUser, { displayName: name.trim() });
-      }
-
-      setLastSavedName(name.trim());
-      setIsEditingName(false);
-      showSuccess('Profile Updated', 'Your name has been updated successfully');
-    } catch (error) {
-      console.error('Error updating name:', error);
-      showError('Update Failed', 'Failed to update your name. Please try again.');
-    } finally {
-      setIsAutoSaving(false);
-    }
-  };
-
-  const handleAutoSave = useCallback(async () => {
-    if (!name.trim() || name === lastSavedName) {
-      return;
-    }
-
-    setIsAutoSaving(true);
-    try {
-      // Get the current user's ID token
-      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
-      
-      if (!token) {
-        throw new Error('No authentication token available');
-      }
-
-      // Update in our database
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: user?.email
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile in database');
-      }
-
-      // Update local state
-      useAppStore.getState().setUser({
-        ...user!,
-        name: name.trim()
-      });
-
-      // Update Firebase Auth displayName
-      if (auth && auth.currentUser) {
-        await updateProfile(auth.currentUser, { displayName: name.trim() });
-      }
-
-      setLastSavedName(name.trim());
-      showSuccess('Auto-saved', 'Your name has been automatically updated');
-    } catch (error) {
-      console.error('Error auto-saving name:', error);
-      showError('Auto-save Failed', 'Failed to auto-save your name. Please try saving manually.');
-    } finally {
-      setIsAutoSaving(false);
-    }
-  }, [name, lastSavedName, user]);
-
-  // Debounced auto-save
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (name !== lastSavedName && name.trim()) {
-        handleAutoSave();
-      }
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  }, [name, lastSavedName, handleAutoSave]);
 
   if (!user) {
     return (
@@ -171,68 +40,17 @@ export default function SettingsPage() {
             </div>
             
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Display Name
-                </label>
-                <div className="flex items-center gap-3">
-                  {isEditingName ? (
-                    <>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
-                        placeholder="Enter your name"
-                      />
-                      <button
-                        onClick={handleNameUpdate}
-                        disabled={isAutoSaving}
-                        className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors disabled:opacity-50"
-                      >
-                        {isAutoSaving ? (
-                          <LoadingSpinner size="sm" />
-                        ) : (
-                          <Save className="h-4 w-4" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsEditingName(false);
-                          setName(lastSavedName);
-                        }}
-                        className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-                        <span className="text-gray-900">{name || 'Not set'}</span>
-                      </div>
-                      <button
-                        onClick={() => setIsEditingName(true)}
-                        className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
-                      >
-                        Edit
-                      </button>
-                    </>
-                  )}
-                </div>
-                {isAutoSaving && (
-                  <div className="flex items-center gap-2 mt-2 text-sm text-blue-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    Auto-saving...
-                  </div>
-                )}
-                {!isAutoSaving && name === lastSavedName && name && (
-                  <div className="flex items-center gap-2 mt-2 text-sm text-green-600">
-                    <Check className="h-4 w-4" />
-                    Saved
-                  </div>
-                )}
-              </div>
+                             <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                   Display Name
+                 </label>
+                 <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                   <span className="text-gray-900">{user.name || 'Not set'}</span>
+                 </div>
+                 <p className="text-sm text-gray-500 mt-1">
+                   Name is managed through your Google account. Update it in your Google profile if needed.
+                 </p>
+               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -54,8 +54,8 @@ export function Dashboard() {
               <BookOpen className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Upload Document</h3>
-              <p className="text-sm text-gray-600">Create from file</p>
+              <h3 className="font-semibold text-gray-900">Upload JSON</h3>
+              <p className="text-sm text-gray-600">Create from JSON files</p>
             </div>
           </div>
         </Link>

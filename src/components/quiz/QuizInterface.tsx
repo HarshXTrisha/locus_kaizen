@@ -257,17 +257,19 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
 
       {/* Full Screen Container */}
       <div className="w-full min-h-screen">
-        {/* Quiz Header - Full Width */}
+        {/* Quiz Header - Compact */}
         <div className="w-full bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">{quiz.title}</h1>
-                <p className="text-gray-600 mt-1 lg:text-lg">{quiz.description}</p>
-                <p className="text-sm text-gray-500 mt-1">Subject: {quiz.subject}</p>
-                <p className="text-sm text-gray-500">Total Questions: {totalQuestions}</p>
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div className="flex-1">
+                <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{quiz.title}</h1>
+                <p className="text-gray-600 text-sm lg:text-base">{quiz.description}</p>
+                <div className="flex flex-wrap gap-4 mt-1 text-xs text-gray-500">
+                  <span>Subject: {quiz.subject}</span>
+                  <span>Questions: {totalQuestions}</span>
+                </div>
               </div>
-              <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <QuizTimer timeRemaining={timeRemaining} totalTime={quiz.timeLimit * 60} />
                 <QuizProgress 
                   current={currentQuestionIndex + 1} 
@@ -280,13 +282,13 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
           </div>
         </div>
 
-        {/* Main Content Area - Full Width */}
-        <div className="w-full bg-gray-50 min-h-[calc(100vh-120px)]">
-          <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+        {/* Main Content Area - Compact */}
+        <div className="w-full bg-gray-50 min-h-[calc(100vh-100px)]">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               {/* Main Quiz Area */}
-              <div className="lg:col-span-3">
-                <div className="bg-white rounded-xl border border-gray-200 p-6 lg:p-8 shadow-sm min-h-[500px]">
+              <div className="lg:col-span-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6 shadow-sm">
                   <QuestionDisplay
                     question={currentQuestion}
                     questionNumber={currentQuestionIndex + 1}
@@ -298,38 +300,38 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
                   />
                 </div>
 
-                {/* Enhanced Navigation Buttons */}
-                <div className="flex items-center justify-between mt-6 p-6 lg:p-8 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+                {/* Compact Navigation Buttons */}
+                <div className="flex items-center justify-between mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <button
                     onClick={() => handleQuestionNavigation(currentQuestionIndex - 1)}
                     disabled={currentQuestionIndex === 0}
-                    className="flex items-center gap-2 px-4 lg:px-6 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-sm"
                   >
                     ← Previous
                   </button>
 
-                  <div className="flex items-center gap-2 lg:gap-4">
-                    <div className="text-sm lg:text-base text-gray-600 hidden sm:block">
-                      Question {currentQuestionIndex + 1} of {totalQuestions}
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm text-gray-600">
+                      {currentQuestionIndex + 1} of {totalQuestions}
                     </div>
                     
                     {currentQuestionIndex < totalQuestions - 1 ? (
                       <button
                         onClick={() => handleQuestionNavigation(currentQuestionIndex + 1)}
-                        className="flex items-center gap-2 px-6 lg:px-8 py-3 bg-gradient-to-r from-[#20C997] to-emerald-500 text-white rounded-lg hover:from-[#1BA085] hover:to-emerald-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                        className="flex items-center gap-2 px-6 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-all duration-200 font-medium text-sm"
                       >
                         Next →
                       </button>
                     ) : (
-                      <div className="w-24"></div> // Spacer for last question
+                      <div className="w-16"></div>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Desktop Question Navigation Sidebar */}
+              {/* Desktop Question Navigation Sidebar - Compact */}
               <div className="hidden lg:block lg:col-span-1">
-                <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm sticky top-6">
+                <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm sticky top-4">
                   <QuestionNavigation
                     questions={quiz.questions}
                     answers={answers}

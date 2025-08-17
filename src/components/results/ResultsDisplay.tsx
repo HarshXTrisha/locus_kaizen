@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { getQuizResult, getQuiz, Quiz, QuizResult } from '@/lib/firebase-quiz';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { AlertTriangle, Check, X } from 'lucide-react';
+import { AlertTriangle, Check, X, ArrowUp } from 'lucide-react';
 import { ScoreSummaryCard } from './ScoreSummaryCard';
 import { KeyInsights } from './KeyInsights';
 import { AnalyticsCharts } from './AnalyticsCharts';
-import { TopicPerformanceCard } from './TopicPerformanceCard';
+import { QuestionTypeAnalysis } from './TopicPerformanceCard';
 
 interface ResultsDisplayProps {
   resultId: string;
@@ -18,6 +18,7 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -41,6 +42,24 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
 
     fetchResults();
   }, [resultId]);
+
+  // Handle scroll to top functionality
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollToTop(scrollTop > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   if (loading) {
     return (
@@ -92,7 +111,7 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
 
       <AnalyticsCharts result={result} quiz={quiz} />
       
-      <TopicPerformanceCard result={result} quiz={quiz} />
+      <QuestionTypeAnalysis result={result} quiz={quiz} />
 
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-2xl font-semibold text-gray-900 mb-6">Detailed Answer Review</h2>
@@ -143,8 +162,19 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
               </div>
             );
           })}
-        </div>
-      </div>
-    </div>
-  );
-}
+                 </div>
+       </div>
+
+       {/* Floating Scroll to Top Button */}
+       {showScrollToTop && (
+         <button
+           onClick={scrollToTop}
+           className="fixed bottom-6 left-6 z-50 p-3 bg-[#20C997] text-white rounded-full shadow-lg hover:bg-[#1BA085] transition-all duration-200 hover:shadow-xl group"
+           title="Go to top"
+         >
+           <ArrowUp className="h-5 w-5 group-hover:animate-bounce" />
+         </button>
+       )}
+     </div>
+   );
+ }
