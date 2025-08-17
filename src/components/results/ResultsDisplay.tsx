@@ -29,7 +29,7 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
           const quizData = await getQuiz(resultData.quizId);
           setQuiz(quizData);
         } else {
-          setError("Sorry, we couldn't find the results for this quiz. Please check the ID and try again.");
+          setError("Sorry, we couldn&apos;t find the results for this quiz. Please check the ID and try again.");
         }
       } catch (err) {
         setError('An unexpected error occurred while loading the results. Please try again later.');
@@ -68,7 +68,7 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
         <div className="text-center">
           <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Results Not Found</h2>
-          <p className="text-gray-600">We couldn't find the results for this quiz.</p>
+          <p className="text-gray-600">We couldn&apos;t find the results for this quiz.</p>
         </div>
       </div>
     );
@@ -78,7 +78,7 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
     <div className="space-y-8">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-900">Quiz Results</h1>
-        <p className="text-xl text-gray-600 mt-2">Here's how you performed on the "{quiz.title}" quiz.</p>
+        <p className="text-xl text-gray-600 mt-2">Here&apos;s how you performed on the &quot;{quiz.title}&quot; quiz.</p>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -20,6 +20,13 @@ export async function GET(request: NextRequest) {
 
     const { user } = authResult;
 
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
     // Connect to database
     await connectDB();
 
@@ -120,8 +127,8 @@ export async function GET(request: NextRequest) {
       const firstHalf = scores.slice(0, Math.floor(scores.length / 2));
       const secondHalf = scores.slice(Math.floor(scores.length / 2));
       
-      const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
-      const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+      const firstAvg = firstHalf.reduce((a: number, b: number) => a + b, 0) / firstHalf.length;
+      const secondAvg = secondHalf.reduce((a: number, b: number) => a + b, 0) / secondHalf.length;
       
       improvementRate = secondAvg > firstAvg ? 
         ((secondAvg - firstAvg) / firstAvg) * 100 : 0;

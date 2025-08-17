@@ -4,6 +4,8 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { NotificationSystem } from "@/components/common/NotificationSystem";
 import { ClientInit } from "@/components/common/ClientInit";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -50,7 +52,15 @@ export default function RootLayout({
         <AuthProvider>
           <NotificationSystem />
           <ClientInit />
-          {children}
+          <div className="flex h-screen">
+            <Sidebar />
+            <div className="flex-1 flex flex-col lg:ml-20 xl:ml-64 transition-all duration-300">
+              <Header />
+              <main className="flex-1 overflow-auto bg-gray-50">
+                {children}
+              </main>
+            </div>
+          </div>
         </AuthProvider>
       </body>
     </html>

@@ -43,6 +43,13 @@ export async function GET(request: NextRequest) {
 
     const { user } = authResult;
 
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
     // Connect to database
     await connectDB();
 
@@ -114,6 +121,13 @@ export async function POST(request: NextRequest) {
 
     const { user } = authResult;
 
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
     // Parse request body
     const body = await request.json();
 
@@ -146,7 +160,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Validation failed',
-          details: error.errors 
+          details: error.issues 
         },
         { status: 400 }
       );

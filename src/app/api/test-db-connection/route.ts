@@ -16,14 +16,19 @@ export async function GET(request: NextRequest) {
       console.log('✅ MongoDB connection successful!');
       
       // Test basic operations
-      const collections = await mongoose.connection.db.listCollections().toArray();
+      const db = mongoose.connection.db;
+      if (!db) {
+        throw new Error('Database connection not available');
+      }
+      
+      const collections = await db.listCollections().toArray();
       
       return NextResponse.json({
         success: true,
         message: 'MongoDB connection successful!',
         details: {
           connectionState: mongoose.connection.readyState,
-          databaseName: mongoose.connection.db.databaseName,
+          databaseName: db.databaseName,
           collections: collections.map(col => col.name),
           host: mongoose.connection.host,
           port: mongoose.connection.port,

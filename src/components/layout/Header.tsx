@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, User, Settings, LogOut, Users, Share2, Plus } from 'lucide-react';
+import { Search, Bell, User, Settings, LogOut, Users, Share2, Plus, Home, Menu } from 'lucide-react';
 import { useUser, useAppStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
 import { getUserInvitations } from '@/lib/firebase-collaboration';
@@ -12,6 +12,7 @@ import Link from 'next/link';
 export function Header() {
   const user = useUser();
   const { signOut } = useAuth();
+  const { toggleSidebar } = useAppStore();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [invitations, setInvitations] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -46,8 +47,30 @@ export function Header() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 shadow-sm">
-      {/* Search Bar */}
-      <div className="flex items-center flex-1 max-w-md">
+      {/* Left Side - Home Button and Mobile Menu */}
+      <div className="flex items-center gap-4">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        {/* Locus Home Button */}
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white rounded-lg hover:from-[#1BA085] hover:to-[#20C997] transition-all duration-200 shadow-md hover:shadow-lg"
+        >
+          <div className="h-6 w-6 bg-white rounded flex items-center justify-center">
+            <Home className="h-4 w-4 text-[#20C997]" />
+          </div>
+          <span className="font-bold text-lg">Locus</span>
+        </Link>
+      </div>
+
+      {/* Center - Search Bar */}
+      <div className="flex items-center flex-1 max-w-md mx-8">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input

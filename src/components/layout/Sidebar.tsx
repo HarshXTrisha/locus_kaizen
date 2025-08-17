@@ -44,13 +44,16 @@ export function Sidebar() {
       <div className="flex flex-col h-full">
         {/* Logo and Toggle */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <Link href="/dashboard" className="flex items-center">
-            <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center">
+          <Link 
+            href="/dashboard" 
+            className="flex items-center group hover:bg-gray-50 rounded-lg p-2 transition-colors"
+          >
+            <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <Award className="h-5 w-5 text-white" />
             </div>
-            <span className={`ml-3 font-bold text-xl text-gray-900 transition-opacity duration-300 ${
+            <span className={`ml-3 font-bold text-xl text-gray-900 transition-all duration-300 ${
               isSidebarOpen ? 'opacity-100' : 'opacity-0'
-            }`}>
+            } group-hover:text-[#20C997]`}>
               Locus
             </span>
           </Link>
