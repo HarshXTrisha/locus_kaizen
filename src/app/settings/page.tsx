@@ -30,11 +30,19 @@ export default function SettingsPage() {
 
     setIsAutoSaving(true);
     try {
+      // Get the current user's ID token
+      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
+      
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+
       // Update in our database
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: name.trim(),
@@ -75,11 +83,19 @@ export default function SettingsPage() {
 
     setIsAutoSaving(true);
     try {
+      // Get the current user's ID token
+      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
+      
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+
       // Update in our database
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: name.trim(),
