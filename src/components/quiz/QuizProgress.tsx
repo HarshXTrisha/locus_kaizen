@@ -86,7 +86,7 @@ export function QuizProgress({ current, total, answered, flagged }: QuizProgress
             {progressPercentage >= 100 ? '🎉 Quiz completed!' : 
              progressPercentage >= 75 ? '🚀 Almost there!' :
              progressPercentage >= 50 ? '📈 Halfway through!' :
-             progressPercentage >= 25 ? '💪 Getting started!' : '🎯 Let\'s begin!'}
+             progressPercentage >= 25 ? '💪 Getting started!' : '📝 Quiz in progress'}
           </span>
         </div>
       </div>
