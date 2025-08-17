@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth-middleware';
-import { connectDB } from '@/lib/database';
-import User from '@/models/User';
+import { db } from '@/lib/firebase';
+import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -31,34 +31,55 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Connect to database
-    await connectDB();
-
-    // Find and update user
-    const updatedUser = await User.findOneAndUpdate(
-      { email: email },
-      {
+    // Update user profile in Firestore
+    const userRef = doc(db, 'users', authResult.user.uid);
+    
+    // Check if user document exists
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
+      // Update existing user
+      await updateDoc(userRef, {
         firstName: name.trim(),
         updatedAt: new Date()
-      },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedUser) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      });
+    } else {
+      // Create new user document
+      await setDoc(userRef, {
+        firebaseUid: authResult.user.uid,
+        email: email,
+        firstName: name.trim(),
+        lastName: '',
+        avatar: null,
+        settings: {
+          theme: 'light',
+          notifications: true,
+          timezone: 'UTC',
+          language: 'en'
+        },
+        stats: {
+          totalQuizzes: 0,
+          totalResults: 0,
+          averageScore: 0,
+          totalTimeSpent: 0
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
     }
+
+    // Get updated user data
+    const updatedUserDoc = await getDoc(userRef);
+    const userData = updatedUserDoc.data();
 
     return NextResponse.json({
       success: true,
       user: {
-        id: updatedUser._id.toString(),
-        email: updatedUser.email,
-        name: updatedUser.firstName,
-        createdAt: updatedUser.createdAt,
-        updatedAt: updatedUser.updatedAt
+        id: authResult.user.uid,
+        email: userData?.email || email,
+        name: userData?.firstName || name.trim(),
+        createdAt: userData?.createdAt?.toDate() || new Date(),
+        updatedAt: userData?.updatedAt?.toDate() || new Date()
       }
     });
 
@@ -82,27 +103,27 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Connect to database
-    await connectDB();
+    // Get user from Firestore
+    const userRef = doc(db, 'users', authResult.user.uid);
+    const userDoc = await getDoc(userRef);
 
-    // Find user
-    const user = await User.findOne({ email: authResult.user.email });
-
-    if (!user) {
+    if (!userDoc.exists()) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
 
+    const userData = userDoc.data();
+
     return NextResponse.json({
       success: true,
       user: {
-        id: user._id.toString(),
-        email: user.email,
-        name: user.firstName,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        id: authResult.user.uid,
+        email: userData.email,
+        name: userData.firstName,
+        createdAt: userData.createdAt?.toDate() || new Date(),
+        updatedAt: userData.updatedAt?.toDate() || new Date()
       }
     });
 
