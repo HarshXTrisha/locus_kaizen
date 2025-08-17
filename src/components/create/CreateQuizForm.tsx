@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useProcessedContent, useAppStore } from '@/lib/store';
-import { showSuccess, showError } from '@/components/common/NotificationSystem';
+import { createQuiz } from '@/lib/firebase-quiz';
 import { ButtonLoader } from '@/components/common/LoadingSpinner';
+import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { 
   FileText, 
   Plus, 
@@ -28,6 +29,7 @@ interface Question {
 interface QuizData {
   title: string;
   description: string;
+  subject: string;
   timeLimit: number;
   passingScore: number;
   questions: Question[];
@@ -35,12 +37,14 @@ interface QuizData {
 
 export function CreateQuizForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const processedContent = useProcessedContent();
-  const { addQuiz } = useAppStore();
+  const { user, clearProcessedContent } = useAppStore();
   
   const [quizData, setQuizData] = useState<QuizData>({
     title: '',
     description: '',
+    subject: 'General',
     timeLimit: 60,
     passingScore: 70,
     questions: []
@@ -212,26 +216,32 @@ export function CreateQuizForm() {
 
   const handleSave = async () => {
     if (!validateQuiz()) return;
+    if (!user) {
+      showError('Authentication Error', 'You must be signed in to create a quiz.');
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const newQuiz = {
-        id: Date.now().toString(),
-        ...quizData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isPublished: false
+      const quizToSave = {
+        title: quizData.title,
+        description: quizData.description,
+        subject: quizData.subject,
+        questions: quizData.questions,
+        timeLimit: quizData.timeLimit,
+        passingScore: quizData.passingScore,
+        createdBy: user.id
       };
 
-      addQuiz(newQuiz);
+      const quizId = await createQuiz(quizToSave);
       showSuccess('Quiz Created!', 'Your quiz has been saved successfully.');
       
       // Clear processed content after successful creation
-      useAppStore.getState().clearProcessedContent();
+      clearProcessedContent();
       
       // Redirect to dashboard
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        router.push('/dashboard');
       }, 1500);
 
     } catch (error) {
@@ -302,6 +312,18 @@ export function CreateQuizForm() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  value={quizData.subject}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                  placeholder="General"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#20C997] focus:border-[#20C997]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Time Limit (minutes)
                 </label>
                 <input
@@ -309,6 +331,18 @@ export function CreateQuizForm() {
                   value={quizData.timeLimit}
                   onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 0 }))}
                   placeholder="60"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#20C997] focus:border-[#20C997]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Passing Score (%)
+                </label>
+                <input
+                  type="number"
+                  value={quizData.passingScore}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 0 }))}
+                  placeholder="70"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#20C997] focus:border-[#20C997]"
                 />
               </div>
@@ -445,7 +479,7 @@ export function CreateQuizForm() {
               <h3 className="text-xl font-bold text-gray-900">{quizData.title || 'Untitled Quiz'}</h3>
               <p className="text-gray-600 mt-1">{quizData.description}</p>
               <p className="text-sm text-gray-500 mt-2">
-                Time Limit: {quizData.timeLimit} minutes | Questions: {quizData.questions.length}
+                Subject: {quizData.subject} | Time Limit: {quizData.timeLimit} minutes | Questions: {quizData.questions.length}
               </p>
             </div>
 

@@ -290,8 +290,6 @@ export default function Home() {
               <LogIn className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
               <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign In</span>
             </Link>
-            
-
           </div>
         </div>
       </section>

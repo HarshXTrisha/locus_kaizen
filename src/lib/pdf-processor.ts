@@ -1,4 +1,10 @@
 // PDF Processing Utility for Quiz Creation
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Set up PDF.js worker
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+}
 
 export interface ExtractedQuestion {
   id: string;
@@ -29,9 +35,9 @@ const QUESTION_PATTERNS = [
 
 // Answer option patterns
 const ANSWER_PATTERNS = [
-  /^[A-D]\)\s*(.+?)(?=\n[A-D]\)|$)/gms, // "A) Option text"
-  /^[A-D]\.\s*(.+?)(?=\n[A-D]\.|$)/gms, // "A. Option text"
-  /^[A-D]\s*(.+?)(?=\n[A-D]\s|$)/gms, // "A Option text"
+  /^[A-D]\)\s*(.+?)(?=\n[A-D]\)|$)/gm, // "A) Option text"
+  /^[A-D]\.\s*(.+?)(?=\n[A-D]\.|$)/gm, // "A. Option text"
+  /^[A-D]\s*(.+?)(?=\n[A-D]\s|$)/gm, // "A Option text"
 ];
 
 // Correct answer indicators
@@ -43,7 +49,66 @@ const CORRECT_ANSWER_INDICATORS = [
 ];
 
 /**
- * Process PDF text to extract questions and answers
+ * Process PDF file to extract questions and answers
+ */
+export async function processPDFFile(file: File): Promise<PDFProcessingResult> {
+  const startTime = Date.now();
+  
+  try {
+    console.log('🔍 Processing PDF file for questions...');
+    
+    // Convert file to ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+    
+    // Load PDF document
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    
+    let fullText = '';
+    
+    // Extract text from all pages
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      
+      // Combine text items
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+      
+      fullText += pageText + '\n';
+    }
+    
+    // Clean the text
+    const cleanedText = cleanText(fullText);
+    
+    // Extract questions
+    const questions = extractQuestions(cleanedText);
+    
+    const processingTime = Date.now() - startTime;
+    
+    console.log(`✅ Extracted ${questions.length} questions in ${processingTime}ms`);
+    
+    return {
+      success: true,
+      questions,
+      totalQuestions: questions.length,
+      processingTime
+    };
+    
+  } catch (error) {
+    console.error('❌ Error processing PDF:', error);
+    return {
+      success: false,
+      questions: [],
+      error: error instanceof Error ? error.message : 'Unknown error',
+      totalQuestions: 0,
+      processingTime: Date.now() - startTime
+    };
+  }
+}
+
+/**
+ * Process PDF text to extract questions and answers (for backward compatibility)
  */
 export async function processPDFText(pdfText: string): Promise<PDFProcessingResult> {
   const startTime = Date.now();

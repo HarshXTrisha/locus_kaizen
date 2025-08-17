@@ -2,9 +2,8 @@
 
 import React, { useState, useRef } from 'react';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2, Eye, Edit, Plus } from 'lucide-react';
-import { showSuccess, showError, showInfo } from '@/components/common/NotificationSystem';
 import { useAppStore } from '@/lib/store';
-import { processPDFText, validateQuestions, ExtractedQuestion } from '@/lib/pdf-processor';
+import { processPDFFile, validateQuestions, ExtractedQuestion } from '@/lib/pdf-processor';
 import { createQuiz } from '@/lib/firebase-quiz';
 import { useRouter } from 'next/navigation';
 
@@ -53,6 +52,39 @@ export function FileUploadArea() {
     'text/plain',
     'application/msword'
   ];
+
+  const showSuccess = (title: string, message: string) => {
+    addNotification({
+      id: Date.now().toString(),
+      type: 'success',
+      title,
+      message,
+      duration: 5000,
+      createdAt: new Date(),
+    });
+  };
+
+  const showError = (title: string, message: string) => {
+    addNotification({
+      id: Date.now().toString(),
+      type: 'error',
+      title,
+      message,
+      duration: 5000,
+      createdAt: new Date(),
+    });
+  };
+
+  const showInfo = (title: string, message: string) => {
+    addNotification({
+      id: Date.now().toString(),
+      type: 'info',
+      title,
+      message,
+      duration: 5000,
+      createdAt: new Date(),
+    });
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -104,17 +136,14 @@ export function FileUploadArea() {
       setUploadedFiles(prev => [...prev, uploadedFile]);
 
       try {
-        // Read file content
-        const content = await readFileContent(file);
-        
-        // Update file with content
+        // Update file status to processing
         setUploadedFiles(prev => prev.map(f => 
-          f.id === fileId ? { ...f, content, status: 'processing' } : f
+          f.id === fileId ? { ...f, status: 'processing' } : f
         ));
 
         // Process PDF content
         if (file.type === 'application/pdf') {
-          const result = await processPDFText(content);
+          const result = await processPDFFile(file);
           
           if (result.success) {
             // Validate extracted questions
@@ -180,29 +209,6 @@ export function FileUploadArea() {
     }
     
     setIsUploading(false);
-  };
-
-  const readFileContent = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        resolve(content);
-      };
-      
-      reader.onerror = () => {
-        reject(new Error('Failed to read file'));
-      };
-      
-      if (file.type === 'application/pdf') {
-        // For PDFs, we'll need to extract text
-        // This is a simplified version - in a real app, you'd use a PDF parsing library
-        reader.readAsText(file);
-      } else {
-        reader.readAsText(file);
-      }
-    });
   };
 
   const handlePreview = (fileId: string) => {

@@ -4,22 +4,17 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  BarChart3,
-  Users,
-  BookOpen,
+  Home,
+  Plus,
   Upload,
+  Target,
   Settings,
-  LogIn,
   ChevronLeft,
   ChevronRight,
-  Target,
-  Plus,
-  Share2,
-  Bell,
-  Home,
-  FolderOpen,
   Award,
-  TrendingUp
+  FolderOpen,
+  TrendingUp,
+  BookOpen
 } from 'lucide-react';
 import { useSidebarOpen, useAppStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
@@ -27,13 +22,10 @@ import { useAuth } from '@/lib/auth-context';
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
   { href: '/create', icon: Plus, label: 'Create Quiz' },
-  { href: '/upload', icon: Upload, label: 'Upload PDF' },
   { href: '/quiz', icon: BookOpen, label: 'My Quizzes' },
-  { href: '/shared', icon: Share2, label: 'Shared with Me' },
-  { href: '/teams', icon: Users, label: 'Teams' },
-  { href: '/results', icon: Target, label: 'Results' },
+  { href: '/upload', icon: Upload, label: 'Upload PDF' },
   { href: '/archive', icon: FolderOpen, label: 'Archive' },
-  { href: '/analytics', icon: TrendingUp, label: 'Analytics' },
+  { href: '/results', icon: Target, label: 'Results' },
   { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -125,19 +117,36 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Sign Out */}
-        <div className="px-6 py-4 border-t border-gray-200">
-          <button
-            onClick={signOut}
-            className="flex items-center w-full py-3 px-6 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors rounded-lg group"
-          >
-            <LogIn className="h-5 w-5 group-hover:rotate-180 transition-transform duration-200" />
-            <span className={`ml-4 font-medium transition-opacity duration-300 ${
-              isSidebarOpen ? 'opacity-100' : 'opacity-0'
-            }`}>
-              Sign Out
-            </span>
-          </button>
+        {/* User Section */}
+        <div className="border-t border-gray-200 p-4">
+          <div className="flex items-center">
+            <div className="h-8 w-8 bg-[#20C997] rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-medium">
+                {useAppStore.getState().user?.firstName?.charAt(0) || 'U'}
+              </span>
+            </div>
+            {isSidebarOpen && (
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-gray-900">
+                  {useAppStore.getState().user?.firstName || 'User'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {useAppStore.getState().user?.email || 'user@example.com'}
+                </p>
+              </div>
+            )}
+            <button
+              onClick={signOut}
+              className={`text-gray-500 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100 transition-colors ${
+                !isSidebarOpen ? 'ml-auto' : ''
+              }`}
+              title="Sign Out"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </aside>

@@ -8,7 +8,6 @@ import { QuestionDisplay } from './QuestionDisplay';
 import { QuestionNavigation } from './QuestionNavigation';
 import { QuizTimer } from './QuizTimer';
 import { QuizProgress } from './QuizProgress';
-import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { ButtonLoader } from '@/components/common/LoadingSpinner';
 import { CheckCircle, AlertTriangle, Clock, Flag, Loader2 } from '@/lib/icons';
 
@@ -24,7 +23,7 @@ interface Answer {
 
 export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const router = useRouter();
-  const { user } = useAppStore();
+  const { user, addNotification } = useAppStore();
   
   const [quiz, setQuiz] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -33,6 +32,28 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+
+  const showSuccess = (title: string, message: string) => {
+    addNotification({
+      id: Date.now().toString(),
+      type: 'success',
+      title,
+      message,
+      duration: 5000,
+      createdAt: new Date(),
+    });
+  };
+
+  const showError = (title: string, message: string) => {
+    addNotification({
+      id: Date.now().toString(),
+      type: 'error',
+      title,
+      message,
+      duration: 5000,
+      createdAt: new Date(),
+    });
+  };
 
   // Load quiz from Firebase
   useEffect(() => {
