@@ -132,10 +132,10 @@ export function QuestionNavigation({
         <div className="flex gap-2">
           <button
             onClick={() => {
-              const firstUnanswered = questions.findIndex((_, index) => getQuestionStatus(index) === 'unanswered');
+              const firstUnanswered = questions.findIndex((_, index) => getQuestionStatus(index) === 'visited-unanswered');
               if (firstUnanswered !== -1) onQuestionSelect(firstUnanswered);
             }}
-            disabled={statusCounts.unanswered === 0}
+            disabled={statusCounts.visitedUnanswered === 0}
             className="flex-1 px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded border border-blue-200 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next Unanswered
