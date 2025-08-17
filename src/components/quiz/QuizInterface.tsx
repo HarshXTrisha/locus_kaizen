@@ -85,7 +85,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
     };
 
     loadQuiz();
-  }, [quizId]);
+  }, [quizId, showError]);
 
   // Calculate score function
   const calculateScore = useCallback(() => {
@@ -138,7 +138,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [quiz, timeRemaining, answers, calculateScore, user, router]);
+  }, [quiz, timeRemaining, answers, calculateScore, user, router, showError, showSuccess]);
 
   // Handle submit quiz function
   const handleSubmitQuiz = useCallback(async () => {

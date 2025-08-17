@@ -54,7 +54,7 @@ export function DatabaseTest() {
       setTestResults([{
         success: false,
         message: 'System test failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'database'
       }]);
       setIsSystemWorking(false);
