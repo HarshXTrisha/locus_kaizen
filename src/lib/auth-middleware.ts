@@ -1,44 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from 'firebase-admin';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-
-// Initialize Firebase Admin if not already initialized
-if (!getApps().length) {
-  const serviceAccount = {
-    type: process.env.FIREBASE_ADMIN_TYPE,
-    project_id: process.env.FIREBASE_ADMIN_PROJECT_ID,
-    private_key_id: process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID,
-    private_key: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    client_email: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-    client_id: process.env.FIREBASE_ADMIN_CLIENT_ID,
-    auth_uri: process.env.FIREBASE_ADMIN_AUTH_URI,
-    token_uri: process.env.FIREBASE_ADMIN_TOKEN_URI,
-    auth_provider_x509_cert_url: process.env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL,
-    client_x509_cert_url: process.env.FIREBASE_ADMIN_CLIENT_X509_CERT_URL,
-  };
-
-  try {
-    initializeApp({
-      credential: cert(serviceAccount as any),
-    });
-    console.log('✅ Firebase Admin initialized successfully');
-  } catch (error) {
-    console.error('❌ Firebase Admin initialization failed:', error);
-  }
-}
+import { adminAuth } from '@/lib/firebase-admin'; // Import from the centralized admin file
+import { DecodedIdToken } from 'firebase-admin/auth';
 
 export interface AuthenticatedRequest extends NextRequest {
-  user?: {
-    uid: string;
-    email: string;
-    email_verified: boolean;
-    name?: string;
-    picture?: string;
-  };
+  user?: DecodedIdToken;
 }
 
 export async function verifyAuth(request: NextRequest): Promise<{
-  user?: any;
+  user?: DecodedIdToken;
   error?: string;
   status?: number;
 }> {
@@ -61,7 +30,7 @@ export async function verifyAuth(request: NextRequest): Promise<{
     }
 
     // Verify the token with Firebase Admin
-    const decodedToken = await auth().verifyIdToken(token);
+    const decodedToken = await adminAuth.verifyIdToken(token);
     
     if (!decodedToken) {
       return { 
@@ -78,15 +47,7 @@ export async function verifyAuth(request: NextRequest): Promise<{
       };
     }
 
-    return {
-      user: {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        email_verified: decodedToken.email_verified,
-        name: decodedToken.name,
-        picture: decodedToken.picture,
-      }
-    };
+    return { user: decodedToken };
 
   } catch (error) {
     console.error('🔐 Auth Middleware Error:', error);

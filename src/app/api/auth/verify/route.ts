@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     // Verify authentication
     const authResult = await verifyAuth(request);
     
-    if (authResult.error) {
+    if (authResult.error || !authResult.user) {
       return NextResponse.json(
         { 
           error: authResult.error,
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     // Verify authentication
     const authResult = await verifyAuth(request);
     
-    if (authResult.error) {
+    if (authResult.error || !authResult.user) {
       return NextResponse.json(
         { 
           error: authResult.error,

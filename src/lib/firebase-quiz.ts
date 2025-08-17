@@ -328,3 +328,32 @@ export async function getQuizResults(quizId: string): Promise<QuizResult[]> {
     throw new Error('Failed to get quiz results');
   }
 }
+
+/**
+ * Get a single quiz result by ID
+ */
+export async function getQuizResult(resultId: string): Promise<QuizResult | null> {
+  try {
+    const resultDoc = await getDoc(doc(db, 'quizResults', resultId));
+    
+    if (resultDoc.exists()) {
+      const data = resultDoc.data();
+      return {
+        id: resultDoc.id,
+        quizId: data.quizId,
+        userId: data.userId,
+        score: data.score,
+        totalQuestions: data.totalQuestions,
+        correctAnswers: data.correctAnswers,
+        timeTaken: data.timeTaken,
+        completedAt: data.completedAt?.toDate() || new Date(),
+        answers: data.answers
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('❌ Error getting quiz result:', error);
+    throw new Error('Failed to get quiz result');
+  }
+}

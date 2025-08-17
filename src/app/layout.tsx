@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { preloadFirebase } from "@/lib/firebase-lazy";
-import { initPerformanceTracking } from "@/lib/performance";
 import { AuthProvider } from "@/lib/auth-context";
 import { NotificationSystem } from "@/components/common/NotificationSystem";
+import { ClientInit } from "@/components/common/ClientInit";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,12 +35,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Preload Firebase and initialize performance tracking on client side
-  if (typeof window !== 'undefined') {
-    preloadFirebase();
-    initPerformanceTracking();
-  }
-
   return (
     <html lang="en" className={inter.variable}>
       <head>
@@ -56,6 +49,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <AuthProvider>
           <NotificationSystem />
+          <ClientInit />
           {children}
         </AuthProvider>
       </body>
