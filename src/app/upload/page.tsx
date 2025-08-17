@@ -34,8 +34,6 @@ export default function UploadPage() {
     passingScore: 70
   });
 
-
-
   useEffect(() => {
     if (!isAuthenticated || !user) {
       router.replace('/login');
@@ -60,23 +58,23 @@ export default function UploadPage() {
         return;
       }
 
-    if (extractedQuestions.length === 0) {
-      showError('No Questions', 'No questions available to create quiz');
-      return;
-    }
+      if (extractedQuestions.length === 0) {
+        showError('No Questions', 'No questions available to create quiz');
+        return;
+      }
 
-    if (!quizData.title.trim()) {
-      showError('Missing Title', 'Please enter a quiz title');
-      return;
-    }
+      if (!quizData.title.trim()) {
+        showError('Missing Title', 'Please enter a quiz title');
+        return;
+      }
 
-    setIsCreatingQuiz(true);
-    try {
-             const quizId = await createQuiz({
-         ...quizData,
-         questions: extractedQuestions,
-         createdBy: auth?.currentUser?.uid
-       });
+      setIsCreatingQuiz(true);
+      
+      const quizId = await createQuiz({
+        ...quizData,
+        questions: extractedQuestions,
+        createdBy: auth?.currentUser?.uid
+      });
 
       showSuccess('Quiz Created!', 'Your quiz has been created successfully');
       
@@ -332,7 +330,7 @@ export default function UploadPage() {
                 )}
               </button>
             </div>
-        </div>
+          </div>
         )}
       </div>
     </div>
