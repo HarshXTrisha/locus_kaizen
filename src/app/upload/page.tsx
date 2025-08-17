@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { getAuth } from 'firebase/auth';
+
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
@@ -23,7 +23,7 @@ const FileUploadArea = dynamic(
 export default function UploadPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAppStore();
-  const auth = getAuth();
+  const [auth, setAuth] = useState<any>(null);
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
   const [quizData, setQuizData] = useState({
@@ -33,6 +33,14 @@ export default function UploadPage() {
     timeLimit: 30,
     passingScore: 70
   });
+
+  // Initialize Firebase auth on client side only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const { getAuth } = require('firebase/auth');
+      setAuth(getAuth());
+    }
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -51,7 +59,7 @@ export default function UploadPage() {
   };
 
   const handleCreateQuiz = async () => {
-    if (!auth.currentUser) {
+    if (!auth?.currentUser) {
       showError('Authentication Required', 'Please sign in to create quizzes');
       return;
     }
@@ -71,7 +79,7 @@ export default function UploadPage() {
              const quizId = await createQuiz({
          ...quizData,
          questions: extractedQuestions,
-         createdBy: auth.currentUser.uid
+         createdBy: auth?.currentUser?.uid
        });
 
       showSuccess('Quiz Created!', 'Your quiz has been created successfully');
@@ -88,7 +96,7 @@ export default function UploadPage() {
   };
 
   const handleStartTest = async () => {
-    if (!auth.currentUser) {
+    if (!auth?.currentUser) {
       showError('Authentication Required', 'Please sign in to start tests');
       return;
     }
@@ -108,7 +116,7 @@ export default function UploadPage() {
         timeLimit: quizData.timeLimit,
         passingScore: quizData.passingScore,
                  questions: extractedQuestions,
-         createdBy: auth.currentUser.uid,
+         createdBy: auth?.currentUser?.uid,
          isTemporary: true // Mark as temporary
       });
 
