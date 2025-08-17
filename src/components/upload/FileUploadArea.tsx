@@ -1,526 +1,306 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2, Eye, Edit, Plus } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
-import { processPDFFile, validateQuestions, ExtractedQuestion } from '@/lib/pdf-processor';
-import { createQuiz } from '@/lib/firebase-quiz';
-import { useRouter } from 'next/navigation';
+import React, { useState, useCallback } from 'react';
+import { Upload, FileText, FileJson, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { processPDFFile, ExtractedQuestion } from '@/lib/pdf-processor';
+import { showSuccess, showError } from '@/components/common/NotificationSystem';
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  content?: string;
-  uploadedAt: Date;
-  status: 'uploading' | 'processing' | 'completed' | 'error';
-  extractedQuestions?: ExtractedQuestion[];
-  error?: string;
+interface FileUploadAreaProps {
+  onQuestionsExtracted: (questions: ExtractedQuestion[]) => void;
+  onUploadStart?: () => void;
+  onUploadComplete?: () => void;
 }
 
-interface QuizCreationData {
-  title: string;
-  description: string;
-  subject: string;
-  timeLimit: number;
-  passingScore: number;
+interface QuizJSON {
+  title?: string;
+  description?: string;
+  questions: {
+    id?: string;
+    text: string;
+    type: 'multiple-choice' | 'true-false' | 'short-answer';
+    options?: string[];
+    correctAnswer: string;
+    points?: number;
+  }[];
 }
 
-export function FileUploadArea() {
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const [showPreview, setShowPreview] = useState<string | null>(null);
-  const [showQuizModal, setShowQuizModal] = useState<string | null>(null);
-  const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
-  const [quizData, setQuizData] = useState<QuizCreationData>({
-    title: '',
-    description: '',
-    subject: '',
-    timeLimit: 60,
-    passingScore: 70
-  });
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addNotification, user } = useAppStore();
-  const router = useRouter();
+export function FileUploadArea({ 
+  onQuestionsExtracted, 
+  onUploadStart, 
+  onUploadComplete 
+}: FileUploadAreaProps) {
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [processingStatus, setProcessingStatus] = useState<string>('');
 
-  const supportedTypes = [
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain',
-    'application/msword'
-  ];
-
-  const showSuccess = (title: string, message: string) => {
-    addNotification({
-      id: Date.now().toString(),
-      type: 'success',
-      title,
-      message,
-      duration: 5000,
-      createdAt: new Date(),
-    });
-  };
-
-  const showError = (title: string, message: string) => {
-    addNotification({
-      id: Date.now().toString(),
-      type: 'error',
-      title,
-      message,
-      duration: 5000,
-      createdAt: new Date(),
-    });
-  };
-
-  const showInfo = (title: string, message: string) => {
-    addNotification({
-      id: Date.now().toString(),
-      type: 'info',
-      title,
-      message,
-      duration: 5000,
-      createdAt: new Date(),
-    });
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFiles(e.dataTransfer.files);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFiles(e.target.files);
-    }
-  };
-
-  const handleFiles = async (files: FileList) => {
-    setIsUploading(true);
-    
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      
-      if (!supportedTypes.includes(file.type)) {
-        showError('Unsupported File Type', `${file.name} is not a supported file type.`);
-        continue;
+  const processJSONFile = async (file: File): Promise<ExtractedQuestion[]> => {
+    try {
+      // Check file size first (limit to 10MB for JSON files)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        throw new Error('File too large. Maximum size is 10MB for JSON files.');
       }
 
-      const fileId = Date.now().toString() + i;
-      const uploadedFile: UploadedFile = {
-        id: fileId,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        uploadedAt: new Date(),
-        status: 'uploading'
-      };
+      const text = await file.text();
+      const quizData: QuizJSON = JSON.parse(text);
+      
+      if (!quizData.questions || !Array.isArray(quizData.questions)) {
+        throw new Error('Invalid JSON format: questions array is required');
+      }
 
-      setUploadedFiles(prev => [...prev, uploadedFile]);
+      // Limit number of questions to prevent performance issues
+      const maxQuestions = 500;
+      if (quizData.questions.length > maxQuestions) {
+        throw new Error(`Too many questions. Maximum allowed is ${maxQuestions} questions. Your file contains ${quizData.questions.length} questions.`);
+      }
 
-      try {
-        // Update file status to processing
-        setUploadedFiles(prev => prev.map(f => 
-          f.id === fileId ? { ...f, status: 'processing' } : f
-        ));
-
-        // Process PDF content
-        if (file.type === 'application/pdf') {
-          const result = await processPDFFile(file);
-          
-          if (result.success) {
-            // Validate extracted questions
-            const validation = validateQuestions(result.questions);
-            
-            if (validation.valid) {
-              setUploadedFiles(prev => prev.map(f => 
-                f.id === fileId ? { 
-                  ...f, 
-                  extractedQuestions: result.questions,
-                  status: 'completed' 
-                } : f
-              ));
-              
-              showSuccess(
-                'PDF Processed Successfully', 
-                `Extracted ${result.questions.length} questions from ${file.name}. You can now create a quiz!`
-              );
-            } else {
-              setUploadedFiles(prev => prev.map(f => 
-                f.id === fileId ? { 
-                  ...f, 
-                  status: 'error',
-                  error: `Validation failed: ${validation.errors.join(', ')}`
-                } : f
-              ));
-              
-              showError('PDF Processing Failed', validation.errors.join(', '));
-            }
-          } else {
-            setUploadedFiles(prev => prev.map(f => 
-              f.id === fileId ? { 
-                ...f, 
-                status: 'error',
-                error: result.error || 'Failed to process PDF'
-              } : f
-            ));
-            
-            showError('PDF Processing Failed', result.error || 'Failed to extract questions from PDF');
-          }
-        } else {
-          // For non-PDF files, just mark as completed
-          setUploadedFiles(prev => prev.map(f => 
-            f.id === fileId ? { ...f, status: 'completed' } : f
-          ));
-          
-          showSuccess('File Uploaded', `${file.name} uploaded successfully`);
+      // Validate each question to prevent malformed data
+      const validatedQuestions = quizData.questions.map((q, index) => {
+        if (!q.text || typeof q.text !== 'string') {
+          throw new Error(`Question ${index + 1}: Missing or invalid question text`);
+        }
+        if (!q.type || !['multiple-choice', 'true-false', 'short-answer'].includes(q.type)) {
+          throw new Error(`Question ${index + 1}: Invalid question type. Must be 'multiple-choice', 'true-false', or 'short-answer'`);
+        }
+        if (!q.correctAnswer || typeof q.correctAnswer !== 'string') {
+          throw new Error(`Question ${index + 1}: Missing or invalid correct answer`);
+        }
+        if (q.type === 'multiple-choice' && (!q.options || !Array.isArray(q.options) || q.options.length < 2)) {
+          throw new Error(`Question ${index + 1}: Multiple-choice questions must have at least 2 options`);
         }
 
-      } catch (error) {
-        console.error('Error processing file:', error);
-        
-        setUploadedFiles(prev => prev.map(f => 
-          f.id === fileId ? { 
-            ...f, 
-            status: 'error',
-            error: error instanceof Error ? error.message : 'Unknown error'
-          } : f
-        ));
-        
-        showError('Upload Failed', `Failed to process ${file.name}`);
-      }
-    }
-    
-    setIsUploading(false);
-  };
-
-  const handlePreview = (fileId: string) => {
-    setShowPreview(showPreview === fileId ? null : fileId);
-  };
-
-  const handleCreateQuiz = (fileId: string) => {
-    const file = uploadedFiles.find(f => f.id === fileId);
-    if (file?.extractedQuestions) {
-      // Pre-fill quiz data with file name
-      setQuizData(prev => ({
-        ...prev,
-        title: file.name.replace(/\.[^/.]+$/, '') + ' Quiz',
-        description: `Quiz created from ${file.name}`,
-        subject: 'General'
-      }));
-      setShowQuizModal(fileId);
-    }
-  };
-
-  const handleSubmitQuiz = async () => {
-    if (!user) {
-      showError('Authentication Required', 'Please sign in to create quizzes');
-      return;
-    }
-
-    const file = uploadedFiles.find(f => f.id === showQuizModal);
-    if (!file?.extractedQuestions) {
-      showError('No Questions', 'No questions found to create quiz');
-      return;
-    }
-
-    setIsCreatingQuiz(true);
-    try {
-      const quizId = await createQuiz({
-        ...quizData,
-        questions: file.extractedQuestions,
-        createdBy: user.id
+        return {
+          id: q.id || `q${index + 1}`,
+          text: q.text.trim(),
+          type: q.type,
+          options: q.options ? q.options.map(opt => opt.trim()) : undefined,
+          correctAnswer: q.correctAnswer.trim(),
+          points: q.points && q.points > 0 ? q.points : 1
+        };
       });
 
-      showSuccess('Quiz Created!', 'Your quiz has been created successfully');
-      setShowQuizModal(null);
-      
-      // Navigate to the quiz
-      router.push(`/quiz/${quizId}`);
+      return validatedQuestions;
+    } catch (error) {
+      throw new Error(`JSON parsing error: ${error instanceof Error ? error.message : 'Invalid JSON format'}`);
+    }
+  };
+
+  const handleFileProcess = async (file: File) => {
+    setIsProcessing(true);
+    setUploadedFile(file);
+    onUploadStart?.();
+
+    try {
+      let questions: ExtractedQuestion[] = [];
+
+      if (file.type === 'application/json' || file.name.endsWith('.json')) {
+        setProcessingStatus('Processing JSON file...');
+        questions = await processJSONFile(file);
+        setProcessingStatus(`✅ Extracted ${questions.length} questions from JSON`);
+      } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        setProcessingStatus('Processing PDF file...');
+        const result = await processPDFFile(file);
+        if (result.success) {
+          questions = result.questions;
+          setProcessingStatus(`✅ Extracted ${questions.length} questions from PDF`);
+        } else {
+          throw new Error(result.error || 'Failed to process PDF');
+        }
+      } else {
+        throw new Error('Unsupported file type. Please upload a PDF or JSON file.');
+      }
+
+      if (questions.length === 0) {
+        throw new Error('No questions found in the uploaded file.');
+      }
+
+      onQuestionsExtracted(questions);
+      showSuccess('Upload Successful', `Successfully extracted ${questions.length} questions from ${file.name}`);
       
     } catch (error) {
-      console.error('Error creating quiz:', error);
-      showError('Quiz Creation Failed', 'Failed to create quiz. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process file';
+      setProcessingStatus(`❌ Error: ${errorMessage}`);
+      showError('Upload Failed', errorMessage);
     } finally {
-      setIsCreatingQuiz(false);
+      setIsProcessing(false);
+      onUploadComplete?.();
     }
   };
 
-  const removeFile = (fileId: string) => {
-    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
-    if (showPreview === fileId) {
-      setShowPreview(null);
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleFileProcess(files[0]);
     }
-    if (showQuizModal === fileId) {
-      setShowQuizModal(null);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleFileProcess(files[0]);
     }
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  const clearUpload = () => {
+    setUploadedFile(null);
+    setProcessingStatus('');
+  };
+
+  const getFileIcon = (fileName: string) => {
+    if (fileName.endsWith('.json')) {
+      return <FileJson className="h-8 w-8 text-blue-500" />;
+    }
+    return <FileText className="h-8 w-8 text-red-500" />;
+  };
+
+  const getFileTypeText = (fileName: string) => {
+    if (fileName.endsWith('.json')) {
+      return 'JSON Quiz File';
+    }
+    return 'PDF Document';
   };
 
   return (
     <div className="w-full">
       {/* Upload Area */}
       <div
-        className={`relative rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
-          dragActive
-            ? 'border-[#20C997] bg-green-50'
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
+        className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
+          isDragOver
+            ? 'border-[#20C997] bg-[#20C997]/5'
+            : 'border-gray-300 hover:border-[#20C997] hover:bg-gray-50'
+        } ${isProcessing ? 'pointer-events-none opacity-75' : ''}`}
         onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
       >
-        <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-        <div className="mt-4">
-          <label htmlFor="file-upload" className="cursor-pointer">
-            <span className="text-lg font-medium text-[#20C997] hover:text-green-600">
-              Click to upload
-            </span>
-            <span className="text-gray-500"> or drag and drop</span>
-          </label>
-          <input
-            id="file-upload"
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-        </div>
-        <p className="mt-2 text-sm text-gray-500">
-          PDF, DOC, DOCX, or TXT files up to 10MB
-        </p>
-        {isUploading && (
-          <div className="mt-4 flex items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-[#20C997]" />
-            <span className="ml-2 text-sm text-gray-600">Processing...</span>
+        <input
+          type="file"
+          accept=".pdf,.json"
+          onChange={handleFileSelect}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          disabled={isProcessing}
+        />
+        
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <div className="p-3 bg-[#20C997]/10 rounded-full">
+              <Upload className="h-8 w-8 text-[#20C997]" />
+            </div>
           </div>
-        )}
+          
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Upload Quiz File
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Drag and drop your file here, or click to browse
+            </p>
+            
+            {/* Supported Formats */}
+            <div className="flex justify-center gap-6 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-red-500" />
+                <span>PDF Documents</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FileJson className="h-4 w-4 text-blue-500" />
+                <span>JSON Quiz Files</span>
+              </div>
+            </div>
+          </div>
+
+                     {/* JSON Format Example */}
+           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+             <h4 className="font-medium text-blue-900 mb-2">JSON Format Example:</h4>
+             <pre className="text-xs text-blue-800 bg-blue-100 p-2 rounded overflow-x-auto">
+{`{
+  "title": "Sample Quiz",
+  "description": "A sample quiz for testing",
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "multiple-choice",
+      "options": ["London", "Berlin", "Paris", "Madrid"],
+      "correctAnswer": "Paris",
+      "points": 1
+    }
+  ]
+}`}
+             </pre>
+             <div className="mt-3">
+               <a
+                 href="/quiz-template.json"
+                 download
+                 className="inline-flex items-center gap-2 text-sm text-blue-700 hover:text-blue-900 font-medium"
+               >
+                 <FileJson className="h-4 w-4" />
+                 Download JSON Template
+               </a>
+             </div>
+           </div>
+        </div>
       </div>
 
-      {/* Uploaded Files List */}
-      {uploadedFiles.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Uploaded Files</h3>
-          <div className="space-y-4">
-            {uploadedFiles.map((file) => (
-              <div key={file.id} className="bg-white rounded-lg border border-gray-200 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <FileText className="h-8 w-8 text-gray-400" />
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900">{file.name}</h4>
-                      <p className="text-sm text-gray-500">
-                        {formatFileSize(file.size)} • {file.uploadedAt.toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    {file.status === 'uploading' && (
-                      <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-                    )}
-                    {file.status === 'processing' && (
-                      <Loader2 className="h-4 w-4 animate-spin text-yellow-500" />
-                    )}
-                    {file.status === 'completed' && (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    )}
-                    {file.status === 'error' && (
-                      <AlertCircle className="h-4 w-4 text-red-500" />
-                    )}
-                    
-                    {file.extractedQuestions && (
-                      <button
-                        onClick={() => handlePreview(file.id)}
-                        className="p-1 text-gray-400 hover:text-gray-600"
-                        title="Preview questions"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                    )}
-                    
-                    {file.extractedQuestions && (
-                      <button
-                        onClick={() => handleCreateQuiz(file.id)}
-                        className="p-1 text-gray-400 hover:text-gray-600"
-                        title="Create quiz"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    )}
-                    
-                    <button
-                      onClick={() => removeFile(file.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-                
-                {file.error && (
-                  <div className="mt-2 text-sm text-red-600">
-                    Error: {file.error}
-                  </div>
-                )}
-                
-                {file.extractedQuestions && showPreview === file.id && (
-                  <div className="mt-4 border-t pt-4">
-                    <h5 className="text-sm font-medium text-gray-900 mb-2">
-                      Extracted Questions ({file.extractedQuestions.length})
-                    </h5>
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {file.extractedQuestions.map((question, index) => (
-                        <div key={question.id} className="text-sm bg-gray-50 p-2 rounded">
-                          <p className="font-medium">Q{index + 1}: {question.text}</p>
-                          {question.options && (
-                            <div className="mt-1 text-xs text-gray-600">
-                              Options: {question.options.join(', ')}
-                            </div>
-                          )}
-                          {question.correctAnswer && (
-                            <div className="mt-1 text-xs text-green-600">
-                              Answer: {question.correctAnswer}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+      {/* Processing Status */}
+      {isProcessing && (
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#20C997]"></div>
+            <span className="text-blue-800">{processingStatus}</span>
           </div>
         </div>
       )}
 
-      {/* Quiz Creation Modal */}
-      {showQuizModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Quiz</h3>
-            
-            <div className="space-y-4">
+      {/* Uploaded File Display */}
+      {uploadedFile && !isProcessing && (
+        <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {getFileIcon(uploadedFile.name)}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quiz Title
-                </label>
-                <input
-                  type="text"
-                  value={quizData.title}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
-                  placeholder="Enter quiz title"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  value={quizData.description}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
-                  rows={3}
-                  placeholder="Enter quiz description"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  value={quizData.subject}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
-                  placeholder="e.g., Mathematics, Science"
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Time Limit (minutes)
-                  </label>
-                  <input
-                    type="number"
-                    value={quizData.timeLimit}
-                    onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 60 }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
-                    min="1"
-                    max="480"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Passing Score (%)
-                  </label>
-                  <input
-                    type="number"
-                    value={quizData.passingScore}
-                    onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 70 }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#20C997]"
-                    min="0"
-                    max="100"
-                  />
-                </div>
+                <p className="font-medium text-gray-900">{uploadedFile.name}</p>
+                <p className="text-sm text-gray-500">{getFileTypeText(uploadedFile.name)}</p>
               </div>
             </div>
             
-            <div className="flex gap-3 mt-6">
+            <div className="flex items-center gap-2">
+              {processingStatus.includes('✅') ? (
+                <CheckCircle className="h-5 w-5 text-green-500" />
+              ) : processingStatus.includes('❌') ? (
+                <AlertCircle className="h-5 w-5 text-red-500" />
+              ) : null}
+              
               <button
-                onClick={() => setShowQuizModal(null)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                onClick={clearUpload}
+                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmitQuiz}
-                disabled={isCreatingQuiz || !quizData.title.trim()}
-                className="flex-1 px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isCreatingQuiz ? (
-                  <div className="flex items-center justify-center">
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Creating...
-                  </div>
-                ) : (
-                  'Create Quiz'
-                )}
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>
+          
+          {processingStatus && (
+            <p className={`mt-2 text-sm ${
+              processingStatus.includes('✅') ? 'text-green-600' : 
+              processingStatus.includes('❌') ? 'text-red-600' : 'text-gray-600'
+            }`}>
+              {processingStatus}
+            </p>
+          )}
         </div>
       )}
     </div>

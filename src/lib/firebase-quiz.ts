@@ -28,6 +28,7 @@ export interface Quiz {
   createdAt: Date;
   updatedAt: Date;
   isPublished: boolean;
+  isTemporary?: boolean;
 }
 
 // Database Quiz interface (for Firestore operations)
@@ -42,6 +43,7 @@ interface DatabaseQuiz {
   createdAt: FieldValue;
   updatedAt: FieldValue;
   isPublished: boolean;
+  isTemporary?: boolean;
 }
 
 // Question interface
@@ -97,6 +99,7 @@ export interface CreateQuizData {
   timeLimit: number;
   passingScore: number;
   createdBy: string;
+  isTemporary?: boolean;
 }
 
 /**
@@ -121,7 +124,8 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
       createdBy: quizData.createdBy,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      isPublished: false
+      isPublished: false,
+      isTemporary: quizData.isTemporary || false
     };
 
     const docRef = await addDoc(collection(db, 'quizzes'), quizDoc);
@@ -153,7 +157,8 @@ export async function getQuiz(quizId: string): Promise<Quiz | null> {
         createdBy: data.createdBy,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
-        isPublished: data.isPublished
+        isPublished: data.isPublished,
+        isTemporary: data.isTemporary || false
       };
     }
     
@@ -191,7 +196,8 @@ export async function getUserQuizzes(userId: string): Promise<Quiz[]> {
         createdBy: data.createdBy,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
-        isPublished: data.isPublished
+        isPublished: data.isPublished,
+        isTemporary: data.isTemporary || false
       });
     });
     
