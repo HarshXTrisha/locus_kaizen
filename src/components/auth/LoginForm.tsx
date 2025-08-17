@@ -113,16 +113,7 @@ export function LoginForm() {
         </button>
       </div>
       
-      {/* Debug Information */}
-      <div className="mt-4 p-3 bg-gray-50 rounded text-xs text-gray-600">
-        <p><strong>Debug Info:</strong></p>
-        <p>• Client ID: 5682995815-8rbch5j8993m1mpi7p1lhb05f9ltl6o4.apps.googleusercontent.com</p>
-        <p>• Domain: {typeof window !== 'undefined' ? window.location.origin : 'Loading...'}</p>
-        <p>• Full URL: {typeof window !== 'undefined' ? window.location.href : 'Loading...'}</p>
-        <p>• Check browser console (F12) for detailed error messages</p>
-        <p>• If you see &quot;redirect_uri_mismatch&quot;, update Google Cloud Console</p>
-        <p>• If popup fails, redirect method will be used automatically</p>
-      </div>
+
     </div>
   );
 }
