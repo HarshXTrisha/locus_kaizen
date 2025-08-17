@@ -133,7 +133,7 @@ export default function DashboardPage() {
             Welcome back, {user?.name || 'User'}! 👋
           </h1>
           <p className="text-lg text-gray-600">
-            Here's what's happening with your quizzes and results.
+            Here&apos;s what&apos;s happening with your quizzes and results.
           </p>
         </div>
 

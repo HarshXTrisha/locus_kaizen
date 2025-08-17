@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth-middleware';
-import { connectToDatabase } from '@/lib/database';
-import { User } from '@/models/User';
+import { connectDB } from '@/lib/database';
+import User from '@/models/User';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -32,13 +32,13 @@ export async function PUT(request: NextRequest) {
     }
 
     // Connect to database
-    await connectToDatabase();
+    await connectDB();
 
     // Find and update user
     const updatedUser = await User.findOneAndUpdate(
       { email: email },
-      { 
-        name: name.trim(),
+      {
+        firstName: name.trim(),
         updatedAt: new Date()
       },
       { new: true, runValidators: true }
@@ -56,7 +56,7 @@ export async function PUT(request: NextRequest) {
       user: {
         id: updatedUser._id.toString(),
         email: updatedUser.email,
-        name: updatedUser.name,
+        name: updatedUser.firstName,
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt
       }
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Connect to database
-    await connectToDatabase();
+    await connectDB();
 
     // Find user
     const user = await User.findOne({ email: authResult.user.email });
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
       user: {
         id: user._id.toString(),
         email: user.email,
-        name: user.name,
+        name: user.firstName,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       }

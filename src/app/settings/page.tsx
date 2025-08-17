@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
 import { getFirebaseAuth } from '@/lib/firebase-utils';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
@@ -72,7 +72,7 @@ export default function SettingsPage() {
     }
   };
 
-  const handleAutoSave = async () => {
+  const handleAutoSave = useCallback(async () => {
     if (!name.trim() || name === lastSavedName) {
       return;
     }
@@ -119,7 +119,7 @@ export default function SettingsPage() {
     } finally {
       setIsAutoSaving(false);
     }
-  };
+  }, [name, lastSavedName, user]);
 
   // Debounced auto-save
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function SettingsPage() {
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [name, lastSavedName]);
+  }, [name, lastSavedName, handleAutoSave]);
 
   if (!user) {
     return (

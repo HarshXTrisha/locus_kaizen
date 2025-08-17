@@ -36,38 +36,38 @@ export function FileUploadArea({
 
   const downloadJSONTemplate = () => {
     const template = {
-      title: "Sample Quiz",
-      description: "A sample quiz for testing purposes",
+      title: 'Sample Quiz',
+      description: 'A sample quiz for testing purposes',
       questions: [
         {
-          id: "q1",
-          text: "What is the capital of France?",
-          type: "multiple-choice",
-          options: ["London", "Berlin", "Paris", "Madrid"],
-          correctAnswer: "Paris",
+          id: 'q1',
+          text: 'What is the capital of France?',
+          type: 'multiple-choice',
+          options: ['London', 'Berlin', 'Paris', 'Madrid'],
+          correctAnswer: 'Paris',
           points: 1
         },
         {
-          id: "q2",
-          text: "Which planet is known as the Red Planet?",
-          type: "multiple-choice",
-          options: ["Earth", "Mars", "Jupiter", "Venus"],
-          correctAnswer: "Mars",
+          id: 'q2',
+          text: 'Which planet is known as the Red Planet?',
+          type: 'multiple-choice',
+          options: ['Earth', 'Mars', 'Jupiter', 'Venus'],
+          correctAnswer: 'Mars',
           points: 1
         },
         {
-          id: "q3",
-          text: "Is the Earth round?",
-          type: "true-false",
-          options: ["True", "False"],
-          correctAnswer: "True",
+          id: 'q3',
+          text: 'Is the Earth round?',
+          type: 'true-false',
+          options: ['True', 'False'],
+          correctAnswer: 'True',
           points: 1
         },
         {
-          id: "q4",
-          text: "What is 2 + 2?",
-          type: "short-answer",
-          correctAnswer: "4",
+          id: 'q4',
+          text: 'What is 2 + 2?',
+          type: 'short-answer',
+          correctAnswer: '4',
           points: 1
         }
       ]
@@ -138,7 +138,7 @@ export function FileUploadArea({
     }
   };
 
-  const handleFileProcess = async (file: File) => {
+  const handleFileProcess = useCallback(async (file: File) => {
     setIsProcessing(true);
     setUploadedFile(file);
     onUploadStart?.();
@@ -174,7 +174,7 @@ export function FileUploadArea({
       setIsProcessing(false);
       onUploadComplete?.();
     }
-  };
+  }, [onQuestionsExtracted, onUploadStart, onUploadComplete]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -184,7 +184,7 @@ export function FileUploadArea({
     if (files.length > 0) {
       handleFileProcess(files[0]);
     }
-  }, []);
+  }, [handleFileProcess]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -201,7 +201,7 @@ export function FileUploadArea({
     if (files && files.length > 0) {
       handleFileProcess(files[0]);
     }
-  }, []);
+  }, [handleFileProcess]);
 
   const clearUpload = () => {
     setUploadedFile(null);
