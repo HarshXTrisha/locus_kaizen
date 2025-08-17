@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Upload, FileText, FileJson, X, CheckCircle, AlertCircle, Download } from 'lucide-react';
-import { processPDFFile, ExtractedQuestion } from '@/lib/pdf-processor';
+import { Upload, FileJson, X, CheckCircle, AlertCircle, Download, Plus } from 'lucide-react';
+import { ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 
 interface FileUploadAreaProps {
@@ -14,6 +14,7 @@ interface FileUploadAreaProps {
 interface QuizJSON {
   title?: string;
   description?: string;
+  subject?: string;
   questions: {
     id?: string;
     text: string;
@@ -31,44 +32,53 @@ export function FileUploadArea({
 }: FileUploadAreaProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [processingStatus, setProcessingStatus] = useState<string>('');
 
   const downloadJSONTemplate = () => {
     const template = {
-      title: 'Sample Quiz',
-      description: 'A sample quiz for testing purposes',
+      title: "Sample Quiz",
+      description: "A comprehensive quiz covering multiple topics",
+      subject: "General Knowledge",
       questions: [
         {
-          id: 'q1',
-          text: 'What is the capital of France?',
-          type: 'multiple-choice',
-          options: ['London', 'Berlin', 'Paris', 'Madrid'],
-          correctAnswer: 'Paris',
+          id: "q1",
+          text: "What is the capital of France?",
+          type: "multiple-choice",
+          options: ["London", "Berlin", "Paris", "Madrid"],
+          correctAnswer: "Paris",
           points: 1
         },
         {
-          id: 'q2',
-          text: 'Which planet is known as the Red Planet?',
-          type: 'multiple-choice',
-          options: ['Earth', 'Mars', 'Jupiter', 'Venus'],
-          correctAnswer: 'Mars',
+          id: "q2",
+          text: "Which planet is known as the Red Planet?",
+          type: "multiple-choice",
+          options: ["Earth", "Mars", "Jupiter", "Venus"],
+          correctAnswer: "Mars",
           points: 1
         },
         {
-          id: 'q3',
-          text: 'Is the Earth round?',
-          type: 'true-false',
-          options: ['True', 'False'],
-          correctAnswer: 'True',
+          id: "q3",
+          text: "Is the Earth round?",
+          type: "true-false",
+          options: ["True", "False"],
+          correctAnswer: "True",
           points: 1
         },
         {
-          id: 'q4',
-          text: 'What is 2 + 2?',
-          type: 'short-answer',
-          correctAnswer: '4',
+          id: "q4",
+          text: "What is 2 + 2?",
+          type: "short-answer",
+          correctAnswer: "4",
           points: 1
+        },
+        {
+          id: "q5",
+          text: "Which programming language is known as the language of the web?",
+          type: "multiple-choice",
+          options: ["Python", "Java", "JavaScript", "C++"],
+          correctAnswer: "JavaScript",
+          points: 2
         }
       ]
     };
@@ -138,36 +148,40 @@ export function FileUploadArea({
     }
   };
 
-  const handleFileProcess = useCallback(async (file: File) => {
+  const handleFileProcess = useCallback(async (files: File[]) => {
     setIsProcessing(true);
-    setUploadedFile(file);
+    setUploadedFiles(files);
     onUploadStart?.();
 
     try {
-      let questions: ExtractedQuestion[] = [];
+      let allQuestions: ExtractedQuestion[] = [];
+      let totalQuestions = 0;
 
-      if (file.type === 'application/json' || file.name.endsWith('.json')) {
-        setProcessingStatus('Processing JSON file...');
-        questions = await processJSONFile(file);
-        setProcessingStatus(`✅ Extracted ${questions.length} questions from JSON`);
-      } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        setProcessingStatus('Processing PDF file...');
-        const result = await processPDFFile(file);
-        if (result.success) {
-          questions = result.questions;
-          setProcessingStatus(`✅ Extracted ${questions.length} questions from PDF`);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setProcessingStatus(`Processing file ${i + 1} of ${files.length}: ${file.name}...`);
+        
+        if (file.type === 'application/json' || file.name.endsWith('.json')) {
+          const questions = await processJSONFile(file);
+          allQuestions = [...allQuestions, ...questions];
+          totalQuestions += questions.length;
         } else {
-          throw new Error(result.error || 'Failed to process PDF');
+          throw new Error(`Unsupported file type: ${file.name}. Please upload only JSON files.`);
         }
-      } else {
-        throw new Error('Unsupported file type. Please upload a PDF or JSON file.');
       }
 
-      onQuestionsExtracted(questions);
-      showSuccess('File Processed', `Successfully extracted ${questions.length} questions`);
+      // Limit total questions across all files
+      const maxTotalQuestions = 1000;
+      if (totalQuestions > maxTotalQuestions) {
+        throw new Error(`Too many questions across all files. Maximum allowed is ${maxTotalQuestions} questions. Total: ${totalQuestions}`);
+      }
+
+      setProcessingStatus(`✅ Successfully processed ${files.length} file(s) with ${totalQuestions} total questions`);
+      onQuestionsExtracted(allQuestions);
+      showSuccess('Files Processed', `Successfully extracted ${totalQuestions} questions from ${files.length} file(s)`);
     } catch (error) {
-      console.error('Error processing file:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to process file';
+      console.error('Error processing files:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process files';
       setProcessingStatus(`❌ ${errorMessage}`);
       showError('Processing Failed', errorMessage);
     } finally {
@@ -180,9 +194,14 @@ export function FileUploadArea({
     e.preventDefault();
     setIsDragOver(false);
 
-    const files = Array.from(e.dataTransfer.files);
+    const files = Array.from(e.dataTransfer.files).filter(file => 
+      file.type === 'application/json' || file.name.endsWith('.json')
+    );
+    
     if (files.length > 0) {
-      handleFileProcess(files[0]);
+      handleFileProcess(files);
+    } else {
+      showError('Invalid Files', 'Please upload only JSON files');
     }
   }, [handleFileProcess]);
 
@@ -199,32 +218,22 @@ export function FileUploadArea({
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      handleFileProcess(files[0]);
+      const jsonFiles = Array.from(files).filter(file => 
+        file.type === 'application/json' || file.name.endsWith('.json')
+      );
+      
+      if (jsonFiles.length > 0) {
+        handleFileProcess(jsonFiles);
+      } else {
+        showError('Invalid Files', 'Please select only JSON files');
+      }
     }
   }, [handleFileProcess]);
 
   const clearUpload = () => {
-    setUploadedFile(null);
+    setUploadedFiles([]);
     setProcessingStatus('');
     onQuestionsExtracted([]);
-  };
-
-  const getFileIcon = (fileName: string) => {
-    if (fileName.endsWith('.json')) {
-      return <FileJson className="h-6 w-6 text-blue-500" />;
-    } else if (fileName.endsWith('.pdf')) {
-      return <FileText className="h-6 w-6 text-red-500" />;
-    }
-    return <FileText className="h-6 w-6 text-gray-500" />;
-  };
-
-  const getFileTypeText = (fileName: string) => {
-    if (fileName.endsWith('.json')) {
-      return 'JSON Quiz File';
-    } else if (fileName.endsWith('.pdf')) {
-      return 'PDF Document';
-    }
-    return 'Unknown File Type';
   };
 
   return (
@@ -242,7 +251,8 @@ export function FileUploadArea({
       >
         <input
           type="file"
-          accept=".pdf,.json"
+          accept=".json"
+          multiple
           onChange={handleFileSelect}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
@@ -254,21 +264,17 @@ export function FileUploadArea({
           
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Upload Quiz File
+              Upload JSON Quiz Files
             </h3>
             <p className="text-gray-600 mb-4">
-              Drag and drop your file here, or click to browse
+              Drag and drop JSON files here, or click to browse. You can upload multiple files at once.
             </p>
             
-            {/* Supported Formats */}
+            {/* Supported Format */}
             <div className="flex justify-center gap-6 text-sm text-gray-500">
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-red-500" />
-                <span>PDF Documents</span>
-              </div>
-              <div className="flex items-center gap-2">
                 <FileJson className="h-4 w-4 text-blue-500" />
-                <span>JSON Quiz Files</span>
+                <span>JSON Quiz Files (Multiple files supported)</span>
               </div>
             </div>
           </div>
@@ -278,7 +284,7 @@ export function FileUploadArea({
       {/* JSON Format Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="font-medium text-blue-900 text-lg">JSON Format Instructions</h4>
+          <h4 className="font-medium text-blue-900 text-lg">JSON Format Requirements</h4>
           <button
             onClick={downloadJSONTemplate}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
@@ -290,7 +296,7 @@ export function FileUploadArea({
         
         <div className="space-y-4">
           <p className="text-blue-800 text-sm">
-            Your JSON file should follow this structure. Click the download button above to get a complete template.
+            Your JSON files must follow this exact structure. Download the template above for a complete example.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -309,10 +315,11 @@ export function FileUploadArea({
           </div>
           
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-            <h6 className="font-medium text-yellow-900 mb-1 text-sm">Important Notes:</h6>
+            <h6 className="font-medium text-yellow-900 mb-1 text-sm">Upload Limits:</h6>
             <ul className="text-yellow-800 text-xs space-y-1">
-              <li>• Maximum file size: 10MB</li>
-              <li>• Maximum questions: 500</li>
+              <li>• Maximum file size: 10MB per file</li>
+              <li>• Maximum questions: 500 per file</li>
+              <li>• Maximum total questions: 1000 across all files</li>
               <li>• All question types must have a correctAnswer</li>
               <li>• Multiple-choice questions must have at least 2 options</li>
               <li>• Points are optional and default to 1</li>
@@ -331,36 +338,31 @@ export function FileUploadArea({
         </div>
       )}
 
-      {/* Uploaded File Display */}
-      {uploadedFile && !isProcessing && (
+      {/* Uploaded Files Display */}
+      {uploadedFiles.length > 0 && !isProcessing && (
         <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {getFileIcon(uploadedFile.name)}
-              <div>
-                <p className="font-medium text-gray-900">{uploadedFile.name}</p>
-                <p className="text-sm text-gray-500">{getFileTypeText(uploadedFile.name)}</p>
+          <div className="flex items-center justify-between mb-3">
+            <h5 className="font-medium text-gray-900">Uploaded Files ({uploadedFiles.length})</h5>
+            <button
+              onClick={clearUpload}
+              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          
+          <div className="space-y-2">
+            {uploadedFiles.map((file, index) => (
+              <div key={index} className="flex items-center gap-3 p-2 bg-white rounded border">
+                <FileJson className="h-4 w-4 text-blue-500" />
+                <span className="text-sm text-gray-900 flex-1">{file.name}</span>
+                <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
               </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {processingStatus.includes('✅') ? (
-                <CheckCircle className="h-5 w-5 text-green-500" />
-              ) : processingStatus.includes('❌') ? (
-                <AlertCircle className="h-5 w-5 text-red-500" />
-              ) : null}
-              
-              <button
-                onClick={clearUpload}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+            ))}
           </div>
           
           {processingStatus && (
-            <p className={`mt-2 text-sm ${
+            <p className={`mt-3 text-sm ${
               processingStatus.includes('✅') ? 'text-green-600' : 
               processingStatus.includes('❌') ? 'text-red-600' : 'text-gray-600'
             }`}>

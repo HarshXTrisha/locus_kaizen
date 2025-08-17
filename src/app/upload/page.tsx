@@ -10,7 +10,7 @@ import { ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { createQuiz } from '@/lib/firebase-quiz';
 import { getFirebaseAuth } from '@/lib/firebase-utils';
-import { Plus, ArrowRight, FileText, CheckCircle, Play } from 'lucide-react';
+import { Plus, ArrowRight, FileJson, CheckCircle, Play } from 'lucide-react';
 
 // Dynamically import FileUploadArea to prevent SSR issues
 const FileUploadArea = dynamic(
@@ -46,7 +46,7 @@ export default function UploadPage() {
     setQuizData(prev => ({
       ...prev,
       title: `Quiz with ${questions.length} Questions`,
-      description: `Quiz created from uploaded file with ${questions.length} questions`
+      description: `Quiz created from uploaded JSON file(s) with ${questions.length} questions`
     }));
   };
 
@@ -107,7 +107,7 @@ export default function UploadPage() {
       // Create a temporary quiz for immediate testing
       const tempQuizId = await createQuiz({
         title: quizData.title || `Quick Test - ${extractedQuestions.length} Questions`,
-        description: quizData.description || 'Quick test from uploaded file',
+        description: quizData.description || 'Quick test from uploaded JSON file(s)',
         subject: quizData.subject || 'General',
         timeLimit: quizData.timeLimit,
         passingScore: quizData.passingScore,
@@ -154,13 +154,14 @@ export default function UploadPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Upload & Create Quiz</h1>
           <p className="text-gray-600 mt-2">
-            Upload PDF or JSON files to create quizzes automatically. JSON files should follow the specified format.
+            Upload JSON files to create quizzes automatically. Support for multiple files and bulk upload.
           </p>
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-medium text-blue-900 mb-2">📋 Upload Guidelines:</h3>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• <strong>JSON files:</strong> Maximum 10MB, up to 500 questions</li>
-              <li>• <strong>PDF files:</strong> Maximum 50MB, questions extracted automatically</li>
+              <li>• <strong>JSON files only:</strong> Maximum 10MB per file, up to 500 questions per file</li>
+              <li>• <strong>Bulk upload:</strong> Upload multiple JSON files at once (max 1000 total questions)</li>
+              <li>• <strong>Required format:</strong> Download the template for exact JSON structure</li>
               <li>• <strong>Start Test:</strong> Begin immediately with uploaded questions</li>
               <li>• <strong>Create Quiz:</strong> Save as permanent quiz for future use</li>
             </ul>
@@ -169,7 +170,7 @@ export default function UploadPage() {
 
         {/* Upload Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Step 1: Upload File</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Step 1: Upload JSON Files</h2>
           <FileUploadArea 
             onQuestionsExtracted={handleQuestionsExtracted}
             onUploadStart={() => setExtractedQuestions([])}
