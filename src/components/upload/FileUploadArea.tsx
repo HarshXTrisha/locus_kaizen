@@ -79,6 +79,21 @@ export function FileUploadArea({
           options: ["Python", "Java", "JavaScript", "C++"],
           correctAnswer: "JavaScript",
           points: 2
+        },
+        {
+          id: "q6",
+          text: "The sun rises in the east.",
+          type: "true-false",
+          options: ["True", "False"],
+          correctAnswer: "True",
+          points: 1
+        },
+        {
+          id: "q7",
+          text: "What is the chemical symbol for gold?",
+          type: "short-answer",
+          correctAnswer: "Au",
+          points: 1
         }
       ]
     };
@@ -128,15 +143,37 @@ export function FileUploadArea({
         if (!q.correctAnswer || typeof q.correctAnswer !== 'string') {
           throw new Error(`Question ${index + 1}: Missing or invalid correct answer`);
         }
-        if (q.type === 'multiple-choice' && (!q.options || !Array.isArray(q.options) || q.options.length < 2)) {
-          throw new Error(`Question ${index + 1}: Multiple-choice questions must have at least 2 options`);
+
+        // Type-specific validation
+        if (q.type === 'multiple-choice') {
+          if (!q.options || !Array.isArray(q.options) || q.options.length < 2) {
+            throw new Error(`Question ${index + 1}: Multiple-choice questions must have at least 2 options`);
+          }
+          // Validate that correct answer is one of the options
+          if (!q.options.includes(q.correctAnswer)) {
+            throw new Error(`Question ${index + 1}: Correct answer must be one of the provided options`);
+          }
+        } else if (q.type === 'true-false') {
+          // For true-false, ensure correct answer is either "True" or "False"
+          if (!['True', 'False'].includes(q.correctAnswer)) {
+            throw new Error(`Question ${index + 1}: True/False questions must have correctAnswer as "True" or "False"`);
+          }
+          // Set default options for true-false if not provided
+          if (!q.options || !Array.isArray(q.options)) {
+            q.options = ['True', 'False'];
+          }
+        } else if (q.type === 'short-answer') {
+          // For short answer, no options are needed, just ensure correct answer exists
+          if (!q.correctAnswer.trim()) {
+            throw new Error(`Question ${index + 1}: Short answer questions must have a correct answer`);
+          }
         }
 
         return {
           id: q.id || `q${index + 1}`,
           text: q.text.trim(),
           type: q.type,
-          options: q.options ? q.options.map(opt => opt.trim()) : undefined,
+          options: q.type === 'short-answer' ? undefined : (q.options ? q.options.map(opt => opt.trim()) : undefined),
           correctAnswer: q.correctAnswer.trim(),
           points: q.points && q.points > 0 ? q.points : 1
         };

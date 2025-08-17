@@ -206,6 +206,16 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
     );
   };
 
+  const handleShortAnswerChange = (questionId: string, answer: string) => {
+    setAnswers(prev => 
+      prev.map(ans => 
+        ans.questionId === questionId 
+          ? { ...ans, selectedOption: answer }
+          : ans
+      )
+    );
+  };
+
   const handleFlagQuestion = (questionId: string) => {
     setAnswers(prev => 
       prev.map(answer => 
@@ -297,6 +307,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
                     isFlagged={answers[currentQuestionIndex]?.isFlagged || false}
                     onAnswerSelect={(option) => handleAnswerSelect(currentQuestion.id, option)}
                     onFlagQuestion={() => handleFlagQuestion(currentQuestion.id)}
+                    onShortAnswerChange={(answer) => handleShortAnswerChange(currentQuestion.id, answer)}
                   />
                 </div>
 

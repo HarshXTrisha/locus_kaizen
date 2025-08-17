@@ -20,6 +20,7 @@ interface QuestionDisplayProps {
   isFlagged: boolean;
   onAnswerSelect: (option: string) => void;
   onFlagQuestion: () => void;
+  onShortAnswerChange?: (answer: string) => void;
 }
 
 export function QuestionDisplay({
@@ -29,7 +30,8 @@ export function QuestionDisplay({
   selectedAnswer,
   isFlagged,
   onAnswerSelect,
-  onFlagQuestion
+  onFlagQuestion,
+  onShortAnswerChange
 }: QuestionDisplayProps) {
   return (
     <div className="space-y-8">
@@ -69,38 +71,60 @@ export function QuestionDisplay({
 
       {/* Enhanced Answer Options */}
       <div className="space-y-4">
-        {question.options && question.options.map((option, index) => {
-          const optionLetter = String.fromCharCode(65 + index); // A, B, C, D...
-          const isSelected = selectedAnswer === option;
-          
-          return (
-            <button
-              key={index}
-              onClick={() => onAnswerSelect(option)}
-              className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
-                isSelected
-                  ? 'border-[#20C997] bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`flex-shrink-0 w-12 h-12 rounded-full border-2 flex items-center justify-center text-lg font-bold transition-all duration-200 ${
+        {question.type === 'short-answer' ? (
+          // Short Answer Input
+          <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-sm">
+            <label htmlFor="short-answer" className="block text-sm font-medium text-gray-700 mb-3">
+              Your Answer:
+            </label>
+            <textarea
+              id="short-answer"
+              value={selectedAnswer}
+              onChange={(e) => onShortAnswerChange?.(e.target.value)}
+              placeholder="Type your answer here..."
+              className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent resize-none"
+              rows={4}
+              style={{ minHeight: '120px' }}
+            />
+            <p className="text-sm text-gray-500 mt-2">
+              Provide a clear and concise answer. Spelling and capitalization matter.
+            </p>
+          </div>
+        ) : (
+          // Multiple Choice and True/False Options
+          question.options && question.options.map((option, index) => {
+            const optionLetter = String.fromCharCode(65 + index); // A, B, C, D...
+            const isSelected = selectedAnswer === option;
+            
+            return (
+              <button
+                key={index}
+                onClick={() => onAnswerSelect(option)}
+                className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
                   isSelected
-                    ? 'border-[#20C997] bg-[#20C997] text-white shadow-lg'
-                    : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                }`}>
-                  {optionLetter}
+                    ? 'border-[#20C997] bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg'
+                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`flex-shrink-0 w-12 h-12 rounded-full border-2 flex items-center justify-center text-lg font-bold transition-all duration-200 ${
+                    isSelected
+                      ? 'border-[#20C997] bg-[#20C997] text-white shadow-lg'
+                      : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                  }`}>
+                    {optionLetter}
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-lg text-gray-900 leading-relaxed">{option}</span>
+                  </div>
+                  {isSelected && (
+                    <CheckCircle className="h-6 w-6 text-[#20C997] flex-shrink-0" />
+                  )}
                 </div>
-                <div className="flex-1">
-                  <span className="text-lg text-gray-900 leading-relaxed">{option}</span>
-                </div>
-                {isSelected && (
-                  <CheckCircle className="h-6 w-6 text-[#20C997] flex-shrink-0" />
-                )}
-              </div>
-            </button>
-          );
-        })}
+              </button>
+            );
+          })
+        )}
       </div>
 
       {/* Enhanced Navigation Hint */}
