@@ -11,10 +11,10 @@ interface AuthenticatedLayoutProps {
 }
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const { isAuthenticated, isLoading } = useAppStore();
+  const { user, isAuthenticated } = useAppStore();
 
   // Show loading while checking authentication
-  if (isLoading) {
+  if (isAuthenticated === null) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="xl" text="Loading..." />
@@ -22,18 +22,18 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     );
   }
 
-  // If not authenticated, just show children without header/sidebar
-  if (!isAuthenticated) {
+  // If not authenticated, render children without layout (for public pages)
+  if (!isAuthenticated || !user) {
     return <>{children}</>;
   }
 
-  // If authenticated, show the full layout with header and sidebar
+  // If authenticated, render with sidebar and header
   return (
-    <div className="flex h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 flex flex-col lg:ml-20 xl:ml-64 transition-all duration-300">
+      <div className="lg:pl-64">
         <Header />
-        <main className="flex-1 overflow-auto bg-gray-50">
+        <main className="min-h-screen">
           {children}
         </main>
       </div>

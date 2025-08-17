@@ -5,8 +5,9 @@ import { persist } from 'zustand/middleware';
 interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
   avatar?: string;
   createdAt: Date;
   lastLogin: Date;
@@ -88,6 +89,7 @@ interface AppState {
   setUser: (user: User | null) => void;
   setAuthenticated: (isAuthenticated: boolean) => void;
   setLoading: (isLoading: boolean) => void;
+  logout: () => void;
   
   // Quiz actions
   addQuiz: (quiz: Quiz) => void;
@@ -142,6 +144,13 @@ export const useAppStore = create<AppState>()(
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
       setLoading: (isLoading) => set({ isLoading }),
+      logout: () => set({ 
+        user: null, 
+        isAuthenticated: false, 
+        currentQuiz: null,
+        processedContent: null,
+        notifications: []
+      }),
 
       // Quiz actions
       addQuiz: (quiz) => set((state) => ({ 
