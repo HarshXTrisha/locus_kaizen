@@ -136,7 +136,7 @@ export function FileUploadArea({
     if (files.length > 0) {
       handleFileProcess(files[0]);
     }
-  }, []);
+  }, [handleFileProcess]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();

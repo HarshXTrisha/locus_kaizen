@@ -63,7 +63,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     console.log('🏠 Dashboard: Auth state:', { isAuthenticated, user: !!user, isLoading });

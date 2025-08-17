@@ -1,4 +1,3 @@
-import { getAuth, getFirestore, getStorage } from 'firebase/app';
 import { auth, db, storage } from './firebase';
 
 /**
