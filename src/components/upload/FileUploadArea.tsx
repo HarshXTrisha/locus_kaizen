@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Upload, FileText, FileJson, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, FileJson, X, CheckCircle, AlertCircle, Download } from 'lucide-react';
 import { processPDFFile, ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 
@@ -33,6 +33,58 @@ export function FileUploadArea({
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [processingStatus, setProcessingStatus] = useState<string>('');
+
+  const downloadJSONTemplate = () => {
+    const template = {
+      title: "Sample Quiz",
+      description: "A sample quiz for testing purposes",
+      questions: [
+        {
+          id: "q1",
+          text: "What is the capital of France?",
+          type: "multiple-choice",
+          options: ["London", "Berlin", "Paris", "Madrid"],
+          correctAnswer: "Paris",
+          points: 1
+        },
+        {
+          id: "q2",
+          text: "Which planet is known as the Red Planet?",
+          type: "multiple-choice",
+          options: ["Earth", "Mars", "Jupiter", "Venus"],
+          correctAnswer: "Mars",
+          points: 1
+        },
+        {
+          id: "q3",
+          text: "Is the Earth round?",
+          type: "true-false",
+          options: ["True", "False"],
+          correctAnswer: "True",
+          points: 1
+        },
+        {
+          id: "q4",
+          text: "What is 2 + 2?",
+          type: "short-answer",
+          correctAnswer: "4",
+          points: 1
+        }
+      ]
+    };
+
+    const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quiz-template.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showSuccess('Template Downloaded', 'JSON template has been downloaded successfully');
+  };
 
   const processJSONFile = async (file: File): Promise<ExtractedQuestion[]> => {
     try {
@@ -100,28 +152,24 @@ export function FileUploadArea({
         setProcessingStatus(`✅ Extracted ${questions.length} questions from JSON`);
       } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         setProcessingStatus('Processing PDF file...');
-          const result = await processPDFFile(file);
-          if (result.success) {
+        const result = await processPDFFile(file);
+        if (result.success) {
           questions = result.questions;
           setProcessingStatus(`✅ Extracted ${questions.length} questions from PDF`);
-            } else {
+        } else {
           throw new Error(result.error || 'Failed to process PDF');
-            }
-          } else {
+        }
+      } else {
         throw new Error('Unsupported file type. Please upload a PDF or JSON file.');
       }
 
-      if (questions.length === 0) {
-        throw new Error('No questions found in the uploaded file.');
-      }
-
       onQuestionsExtracted(questions);
-      showSuccess('Upload Successful', `Successfully extracted ${questions.length} questions from ${file.name}`);
-      
+      showSuccess('File Processed', `Successfully extracted ${questions.length} questions`);
     } catch (error) {
+      console.error('Error processing file:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to process file';
-      setProcessingStatus(`❌ Error: ${errorMessage}`);
-      showError('Upload Failed', errorMessage);
+      setProcessingStatus(`❌ ${errorMessage}`);
+      showError('Processing Failed', errorMessage);
     } finally {
       setIsProcessing(false);
       onUploadComplete?.();
@@ -136,7 +184,7 @@ export function FileUploadArea({
     if (files.length > 0) {
       handleFileProcess(files[0]);
     }
-  }, [handleFileProcess]);
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -148,60 +196,62 @@ export function FileUploadArea({
     setIsDragOver(false);
   }, []);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       handleFileProcess(files[0]);
     }
-  };
+  }, []);
 
   const clearUpload = () => {
     setUploadedFile(null);
     setProcessingStatus('');
+    onQuestionsExtracted([]);
   };
 
   const getFileIcon = (fileName: string) => {
     if (fileName.endsWith('.json')) {
-      return <FileJson className="h-8 w-8 text-blue-500" />;
+      return <FileJson className="h-6 w-6 text-blue-500" />;
+    } else if (fileName.endsWith('.pdf')) {
+      return <FileText className="h-6 w-6 text-red-500" />;
     }
-    return <FileText className="h-8 w-8 text-red-500" />;
+    return <FileText className="h-6 w-6 text-gray-500" />;
   };
 
   const getFileTypeText = (fileName: string) => {
     if (fileName.endsWith('.json')) {
       return 'JSON Quiz File';
+    } else if (fileName.endsWith('.pdf')) {
+      return 'PDF Document';
     }
-    return 'PDF Document';
+    return 'Unknown File Type';
   };
 
   return (
-    <div className="w-full">
+    <div className="space-y-6">
       {/* Upload Area */}
       <div
-        className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
+        className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
           isDragOver
             ? 'border-[#20C997] bg-[#20C997]/5'
-            : 'border-gray-300 hover:border-[#20C997] hover:bg-gray-50'
-        } ${isProcessing ? 'pointer-events-none opacity-75' : ''}`}
+            : 'border-gray-300 hover:border-gray-400'
+        }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-          <input
-            type="file"
+        <input
+          type="file"
           accept=".pdf,.json"
-            onChange={handleFileSelect}
+          onChange={handleFileSelect}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          disabled={isProcessing}
         />
         
-          <div className="space-y-4">
-          <div className="flex justify-center">
-            <div className="p-3 bg-[#20C997]/10 rounded-full">
-              <Upload className="h-8 w-8 text-[#20C997]" />
-                    </div>
-                  </div>
-                  
+        <div className="space-y-4">
+          <div className="p-3 bg-[#20C997]/10 rounded-full w-fit mx-auto">
+            <Upload className="h-8 w-8 text-[#20C997]" />
+          </div>
+          
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Upload Quiz File
@@ -220,40 +270,76 @@ export function FileUploadArea({
                 <FileJson className="h-4 w-4 text-blue-500" />
                 <span>JSON Quiz Files</span>
               </div>
-                  </div>
-                </div>
-                
-                     {/* JSON Format Example */}
-           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
-             <h4 className="font-medium text-blue-900 mb-2">JSON Format Example:</h4>
-             <pre className="text-xs text-blue-800 bg-blue-100 p-2 rounded overflow-x-auto">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* JSON Format Instructions */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="font-medium text-blue-900 text-lg">JSON Format Instructions</h4>
+          <button
+            onClick={downloadJSONTemplate}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            <Download className="h-4 w-4" />
+            Download Template
+          </button>
+        </div>
+        
+        <div className="space-y-4">
+          <p className="text-blue-800 text-sm">
+            Your JSON file should follow this structure. Click the download button above to get a complete template.
+          </p>
+          
+          <div className="bg-blue-100 p-4 rounded-lg">
+            <h5 className="font-medium text-blue-900 mb-2 text-sm">Required Structure:</h5>
+            <pre className="text-xs text-blue-800 overflow-x-auto">
 {`{
-  "title": "Sample Quiz",
-  "description": "A sample quiz for testing",
+  "title": "Your Quiz Title",
+  "description": "Quiz description (optional)",
   "questions": [
     {
-      "text": "What is the capital of France?",
-      "type": "multiple-choice",
-      "options": ["London", "Berlin", "Paris", "Madrid"],
-      "correctAnswer": "Paris",
-      "points": 1
+      "id": "q1",                    // Optional unique ID
+      "text": "Your question text",
+      "type": "multiple-choice",     // "multiple-choice", "true-false", or "short-answer"
+      "options": ["A", "B", "C", "D"], // Required for multiple-choice
+      "correctAnswer": "A",          // Must match one of the options
+      "points": 1                    // Optional, defaults to 1
     }
   ]
 }`}
-             </pre>
-             <div className="mt-3">
-               <a
-                 href="/quiz-template.json"
-                 download
-                 className="inline-flex items-center gap-2 text-sm text-blue-700 hover:text-blue-900 font-medium"
-               >
-                 <FileJson className="h-4 w-4" />
-                 Download JSON Template
-               </a>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
+            </pre>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="bg-white p-3 rounded border border-blue-200">
+              <h6 className="font-medium text-blue-900 mb-1">Multiple Choice</h6>
+              <p className="text-blue-700 text-xs">Include options array with correctAnswer matching one option</p>
+            </div>
+            <div className="bg-white p-3 rounded border border-blue-200">
+              <h6 className="font-medium text-blue-900 mb-1">True/False</h6>
+              <p className="text-blue-700 text-xs">Use options: ["True", "False"] with correctAnswer: "True" or "False"</p>
+            </div>
+            <div className="bg-white p-3 rounded border border-blue-200">
+              <h6 className="font-medium text-blue-900 mb-1">Short Answer</h6>
+              <p className="text-blue-700 text-xs">No options needed, just correctAnswer text</p>
+            </div>
+          </div>
+          
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <h6 className="font-medium text-yellow-900 mb-1 text-sm">Important Notes:</h6>
+            <ul className="text-yellow-800 text-xs space-y-1">
+              <li>• Maximum file size: 10MB</li>
+              <li>• Maximum questions: 500</li>
+              <li>• All question types must have a correctAnswer</li>
+              <li>• Multiple-choice questions must have at least 2 options</li>
+              <li>• Points are optional and default to 1</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       {/* Processing Status */}
       {isProcessing && (

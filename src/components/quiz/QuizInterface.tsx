@@ -169,7 +169,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-[#20C997] animate-spin mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Quiz...</h2>
@@ -181,7 +181,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
 
   if (!quiz) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Quiz Not Found</h2>
@@ -255,97 +255,109 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto p-4 lg:p-6">
-        {/* Quiz Header */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{quiz.title}</h1>
-              <p className="text-gray-600 mt-1">{quiz.description}</p>
-              <p className="text-sm text-gray-500 mt-1">Subject: {quiz.subject}</p>
-              <p className="text-sm text-gray-500">Total Questions: {totalQuestions}</p>
-            </div>
-            <div className="flex flex-col lg:flex-row gap-4">
-              <QuizTimer timeRemaining={timeRemaining} totalTime={quiz.timeLimit * 60} />
-              <QuizProgress 
-                current={currentQuestionIndex + 1} 
-                total={totalQuestions}
-                answered={answeredQuestions}
-                flagged={flaggedQuestions}
-              />
+      {/* Full Screen Container */}
+      <div className="w-full min-h-screen">
+        {/* Quiz Header - Full Width */}
+        <div className="w-full bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">{quiz.title}</h1>
+                <p className="text-gray-600 mt-1 lg:text-lg">{quiz.description}</p>
+                <p className="text-sm text-gray-500 mt-1">Subject: {quiz.subject}</p>
+                <p className="text-sm text-gray-500">Total Questions: {totalQuestions}</p>
+              </div>
+              <div className="flex flex-col lg:flex-row gap-4">
+                <QuizTimer timeRemaining={timeRemaining} totalTime={quiz.timeLimit * 60} />
+                <QuizProgress 
+                  current={currentQuestionIndex + 1} 
+                  total={totalQuestions}
+                  answered={answeredQuestions}
+                  flagged={flaggedQuestions}
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Quiz Area */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-              <QuestionDisplay
-                question={currentQuestion}
-                questionNumber={currentQuestionIndex + 1}
-                totalQuestions={totalQuestions}
-                selectedAnswer={answers[currentQuestionIndex]?.selectedOption || ''}
-                isFlagged={answers[currentQuestionIndex]?.isFlagged || false}
-                onAnswerSelect={(option) => handleAnswerSelect(currentQuestion.id, option)}
-                onFlagQuestion={() => handleFlagQuestion(currentQuestion.id)}
-              />
-            </div>
-
-            {/* Enhanced Navigation Buttons */}
-            <div className="flex items-center justify-between mt-6 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
-              <button
-                onClick={() => handleQuestionNavigation(currentQuestionIndex - 1)}
-                disabled={currentQuestionIndex === 0}
-                className="flex items-center gap-2 px-4 lg:px-6 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-              >
-                ← Previous
-              </button>
-
-              <div className="flex items-center gap-2 lg:gap-4">
-                <div className="text-sm text-gray-600 hidden sm:block">
-                  Question {currentQuestionIndex + 1} of {totalQuestions}
+        {/* Main Content Area - Full Width */}
+        <div className="w-full bg-gray-50 min-h-[calc(100vh-120px)]">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+              {/* Main Quiz Area */}
+              <div className="lg:col-span-3">
+                <div className="bg-white rounded-xl border border-gray-200 p-6 lg:p-8 shadow-sm min-h-[500px]">
+                  <QuestionDisplay
+                    question={currentQuestion}
+                    questionNumber={currentQuestionIndex + 1}
+                    totalQuestions={totalQuestions}
+                    selectedAnswer={answers[currentQuestionIndex]?.selectedOption || ''}
+                    isFlagged={answers[currentQuestionIndex]?.isFlagged || false}
+                    onAnswerSelect={(option) => handleAnswerSelect(currentQuestion.id, option)}
+                    onFlagQuestion={() => handleFlagQuestion(currentQuestion.id)}
+                  />
                 </div>
-                
-                {currentQuestionIndex < totalQuestions - 1 ? (
+
+                {/* Enhanced Navigation Buttons */}
+                <div className="flex items-center justify-between mt-6 p-6 lg:p-8 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
                   <button
-                    onClick={() => handleQuestionNavigation(currentQuestionIndex + 1)}
-                    className="flex items-center gap-2 px-6 lg:px-8 py-3 bg-gradient-to-r from-[#20C997] to-emerald-500 text-white rounded-lg hover:from-[#1BA085] hover:to-emerald-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                    onClick={() => handleQuestionNavigation(currentQuestionIndex - 1)}
+                    disabled={currentQuestionIndex === 0}
+                    className="flex items-center gap-2 px-4 lg:px-6 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
                   >
-                    Next →
+                    ← Previous
                   </button>
-                ) : (
-                  <button
-                    onClick={handleSubmitQuiz}
-                    disabled={isSubmitting}
-                    className="flex items-center gap-2 px-6 lg:px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <ButtonLoader text="Submitting..." />
+
+                  <div className="flex items-center gap-2 lg:gap-4">
+                    <div className="text-sm lg:text-base text-gray-600 hidden sm:block">
+                      Question {currentQuestionIndex + 1} of {totalQuestions}
+                    </div>
+                    
+                    {currentQuestionIndex < totalQuestions - 1 ? (
+                      <button
+                        onClick={() => handleQuestionNavigation(currentQuestionIndex + 1)}
+                        className="flex items-center gap-2 px-6 lg:px-8 py-3 bg-gradient-to-r from-[#20C997] to-emerald-500 text-white rounded-lg hover:from-[#1BA085] hover:to-emerald-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                      >
+                        Next →
+                      </button>
                     ) : (
-                      <>
-                        <CheckCircle className="h-5 w-5" />
-                        Submit Quiz
-                      </>
+                      <div className="w-24"></div> // Spacer for last question
                     )}
-                  </button>
-                )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Question Navigation Sidebar */}
+              <div className="hidden lg:block lg:col-span-1">
+                <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm sticky top-6">
+                  <QuestionNavigation
+                    questions={quiz.questions}
+                    answers={answers}
+                    currentQuestionIndex={currentQuestionIndex}
+                    onQuestionSelect={handleQuestionNavigation}
+                  />
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Desktop Question Navigation Sidebar */}
-          <div className="hidden lg:block lg:col-span-1">
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm sticky top-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Question Navigation</h3>
-              <QuestionNavigation
-                questions={quiz.questions}
-                answers={answers}
-                currentQuestionIndex={currentQuestionIndex}
-                onQuestionSelect={handleQuestionNavigation}
-              />
-            </div>
-          </div>
+        {/* Persistent Submit Button */}
+        <div className="fixed bottom-6 right-6 z-30">
+          <button
+            onClick={handleSubmitQuiz}
+            disabled={isSubmitting}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-full shadow-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium disabled:opacity-50 hover:shadow-xl"
+          >
+            {isSubmitting ? (
+              <ButtonLoader text="Submitting..." />
+            ) : (
+              <>
+                <CheckCircle className="h-5 w-5" />
+                Submit Quiz
+              </>
+            )}
+          </button>
         </div>
       </div>
 

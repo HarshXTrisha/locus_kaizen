@@ -1,36 +1,138 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { getFirebaseAuth } from '@/lib/firebase-utils';
+import { showSuccess, showError } from '@/components/common/NotificationSystem';
+import { User, Shield, Bell, Palette, Database, Key, Save, X, Check } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { ContentTable } from '@/components/common/ContentTable';
-import { User, Shield, Bell, Palette, Database, Key } from 'lucide-react';
 
 export default function SettingsPage() {
-  const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useAppStore();
-  const [contentItems, setContentItems] = useState<any[]>([]);
+  const { user } = useAppStore();
+  const [name, setName] = useState(user?.name || '');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [lastSavedName, setLastSavedName] = useState(user?.name || '');
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace('/login');
+    if (user?.name) {
+      setName(user.name);
+      setLastSavedName(user.name);
+    }
+  }, [user?.name]);
+
+  const handleNameUpdate = async () => {
+    if (!name.trim() || name === lastSavedName) {
+      setIsEditingName(false);
       return;
     }
 
-    // Set content table items
-    const items = [
-      { id: 'profile-settings', title: 'Profile Settings', level: 1 },
-      { id: 'security-settings', title: 'Security Settings', level: 1 },
-      { id: 'notification-settings', title: 'Notification Settings', level: 1 },
-      { id: 'appearance-settings', title: 'Appearance Settings', level: 1 },
-      { id: 'data-settings', title: 'Data & Privacy', level: 1 },
-      { id: 'api-settings', title: 'API & Integrations', level: 1 }
-    ];
-    setContentItems(items);
-  }, [user, isAuthenticated, isLoading, router]);
+    setIsAutoSaving(true);
+    try {
+      const auth = getFirebaseAuth();
+      if (!auth?.currentUser) {
+        return;
+      }
 
-  if (isLoading) {
+      // Update in Firebase Auth
+      await auth.currentUser.updateProfile({
+        displayName: name.trim()
+      });
+
+      // Update in our database
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: user?.email
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile in database');
+      }
+
+      // Update local state
+      useAppStore.getState().setUser({
+        ...user!,
+        name: name.trim()
+      });
+
+      setLastSavedName(name.trim());
+      setIsEditingName(false);
+      showSuccess('Profile Updated', 'Your name has been updated successfully');
+    } catch (error) {
+      console.error('Error updating name:', error);
+      showError('Update Failed', 'Failed to update your name. Please try again.');
+    } finally {
+      setIsAutoSaving(false);
+    }
+  };
+
+  const handleAutoSave = async () => {
+    if (!name.trim() || name === lastSavedName) {
+      return;
+    }
+
+    setIsAutoSaving(true);
+    try {
+      const auth = getFirebaseAuth();
+      if (!auth?.currentUser) {
+        return;
+      }
+
+      // Update in Firebase Auth
+      await auth.currentUser.updateProfile({
+        displayName: name.trim()
+      });
+
+      // Update in our database
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: user?.email
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile in database');
+      }
+
+      // Update local state
+      useAppStore.getState().setUser({
+        ...user!,
+        name: name.trim()
+      });
+
+      setLastSavedName(name.trim());
+      showSuccess('Auto-saved', 'Your name has been automatically updated');
+    } catch (error) {
+      console.error('Error auto-saving name:', error);
+      showError('Auto-save Failed', 'Failed to auto-save your name. Please try saving manually.');
+    } finally {
+      setIsAutoSaving(false);
+    }
+  };
+
+  // Debounced auto-save
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (name !== lastSavedName && name.trim()) {
+        handleAutoSave();
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [name, lastSavedName]);
+
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="xl" text="Loading settings..." />
@@ -39,204 +141,263 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Header */}
-            <div id="profile-settings" className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-              <p className="text-gray-600 mt-2">Manage your account preferences and security settings.</p>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+            Settings
+          </h1>
+          <p className="text-lg text-gray-600">
+            Manage your account preferences and security settings.
+          </p>
+        </div>
 
-            {/* Profile Settings */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <User className="h-6 w-6 text-[#20C997] mr-3" />
-                <h2 className="text-xl font-semibold text-gray-900">Profile Settings</h2>
+        <div className="space-y-8">
+          {/* Profile Settings */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <User className="h-6 w-6 text-blue-600" />
               </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    defaultValue={`${user?.firstName || ''} ${user?.lastName || ''}`}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]"
-                  />
+              <h2 className="text-2xl font-semibold text-gray-900">Profile Information</h2>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Display Name
+                </label>
+                <div className="flex items-center gap-3">
+                  {isEditingName ? (
+                    <>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
+                        placeholder="Enter your name"
+                      />
+                      <button
+                        onClick={handleNameUpdate}
+                        disabled={isAutoSaving}
+                        className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors disabled:opacity-50"
+                      >
+                        {isAutoSaving ? (
+                          <LoadingSpinner size="sm" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditingName(false);
+                          setName(lastSavedName);
+                        }}
+                        className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                        <span className="text-gray-900">{name || 'Not set'}</span>
+                      </div>
+                      <button
+                        onClick={() => setIsEditingName(true)}
+                        className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
+                      >
+                        Edit
+                      </button>
+                    </>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input
-                    type="email"
-                    defaultValue={user?.email || ''}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]"
-                  />
+                {isAutoSaving && (
+                  <div className="flex items-center gap-2 mt-2 text-sm text-blue-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    Auto-saving...
+                  </div>
+                )}
+                {!isAutoSaving && name === lastSavedName && name && (
+                  <div className="flex items-center gap-2 mt-2 text-sm text-green-600">
+                    <Check className="h-4 w-4" />
+                    Saved
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                  <span className="text-gray-900">{user.email}</span>
                 </div>
-                <button className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors">
-                  Update Profile
+                <p className="text-sm text-gray-500 mt-1">
+                  Email address cannot be changed. Contact support if needed.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Security Settings */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-red-100 rounded-xl">
+                <Shield className="h-6 w-6 text-red-600" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900">Security</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Change Password</h3>
+                  <p className="text-sm text-gray-600">Update your account password</p>
+                </div>
+                <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                  Change
                 </button>
               </div>
-            </div>
 
-            {/* Security Settings */}
-            <div id="security-settings" className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <Shield className="h-6 w-6 text-[#20C997] mr-3" />
-                <h2 className="text-xl font-semibold text-gray-900">Security Settings</h2>
-              </div>
-              <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                  <input
-                    type="password"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                  <input
-                    type="password"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                  <input
-                    type="password"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]"
-                  />
+                  <h3 className="font-medium text-gray-900">Two-Factor Authentication</h3>
+                  <p className="text-sm text-gray-600">Add an extra layer of security</p>
                 </div>
                 <button className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors">
-                  Change Password
-                </button>
-              </div>
-            </div>
-
-            {/* Notification Settings */}
-            <div id="notification-settings" className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <Bell className="h-6 w-6 text-[#20C997] mr-3" />
-                <h2 className="text-xl font-semibold text-gray-900">Notification Settings</h2>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">Email Notifications</h3>
-                    <p className="text-sm text-gray-500">Receive notifications via email</p>
-                  </div>
-                  <input type="checkbox" className="rounded border-gray-300 text-[#20C997] focus:ring-[#20C997]" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">Push Notifications</h3>
-                    <p className="text-sm text-gray-500">Receive push notifications in browser</p>
-                  </div>
-                  <input type="checkbox" className="rounded border-gray-300 text-[#20C997] focus:ring-[#20C997]" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">Quiz Reminders</h3>
-                    <p className="text-sm text-gray-500">Get reminded about upcoming quizzes</p>
-                  </div>
-                  <input type="checkbox" className="rounded border-gray-300 text-[#20C997] focus:ring-[#20C997]" />
-                </div>
-              </div>
-            </div>
-
-            {/* Appearance Settings */}
-            <div id="appearance-settings" className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <Palette className="h-6 w-6 text-[#20C997] mr-3" />
-                <h2 className="text-xl font-semibold text-gray-900">Appearance Settings</h2>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]">
-                    <option>Light</option>
-                    <option>Dark</option>
-                    <option>System</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Font Size</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]">
-                    <option>Small</option>
-                    <option>Medium</option>
-                    <option>Large</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Data & Privacy */}
-            <div id="data-settings" className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <Database className="h-6 w-6 text-[#20C997] mr-3" />
-                <h2 className="text-xl font-semibold text-gray-900">Data & Privacy</h2>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">Data Analytics</h3>
-                    <p className="text-sm text-gray-500">Allow us to collect usage data to improve the service</p>
-                  </div>
-                  <input type="checkbox" className="rounded border-gray-300 text-[#20C997] focus:ring-[#20C997]" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">Personalized Content</h3>
-                    <p className="text-sm text-gray-500">Show personalized quiz recommendations</p>
-                  </div>
-                  <input type="checkbox" className="rounded border-gray-300 text-[#20C997] focus:ring-[#20C997]" defaultChecked />
-                </div>
-                <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                  Export My Data
-                </button>
-              </div>
-            </div>
-
-            {/* API & Integrations */}
-            <div id="api-settings" className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <Key className="h-6 w-6 text-[#20C997] mr-3" />
-                <h2 className="text-xl font-semibold text-gray-900">API & Integrations</h2>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">API Key</label>
-                  <div className="flex">
-                    <input
-                      type="text"
-                      value="sk-...1234567890abcdef"
-                      readOnly
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg bg-gray-50"
-                    />
-                    <button className="px-4 py-2 bg-gray-600 text-white rounded-r-lg hover:bg-gray-700 transition-colors">
-                      Copy
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Webhook URL</label>
-                  <input
-                    type="url"
-                    placeholder="https://your-domain.com/webhook"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-[#20C997]"
-                  />
-                </div>
-                <button className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors">
-                  Regenerate API Key
+                  Enable
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Sidebar - Content Table */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-6">
-              <ContentTable items={contentItems} />
+          {/* Notification Settings */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-yellow-100 rounded-xl">
+                <Bell className="h-6 w-6 text-yellow-600" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900">Notifications</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Email Notifications</h3>
+                  <p className="text-sm text-gray-600">Receive updates via email</p>
+                </div>
+                <button className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors">
+                  Configure
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Push Notifications</h3>
+                  <p className="text-sm text-gray-600">Get instant notifications</p>
+                </div>
+                <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                  Enable
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Appearance Settings */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-purple-100 rounded-xl">
+                <Palette className="h-6 w-6 text-purple-600" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900">Appearance</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Theme</h3>
+                  <p className="text-sm text-gray-600">Choose your preferred theme</p>
+                </div>
+                <button className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors">
+                  Light
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Font Size</h3>
+                  <p className="text-sm text-gray-600">Adjust text size for better readability</p>
+                </div>
+                <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                  Medium
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Data & Privacy */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-green-100 rounded-xl">
+                <Database className="h-6 w-6 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900">Data & Privacy</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Export Data</h3>
+                  <p className="text-sm text-gray-600">Download your quiz data</p>
+                </div>
+                <button className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors">
+                  Export
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Delete Account</h3>
+                  <p className="text-sm text-gray-600">Permanently delete your account</p>
+                </div>
+                <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* API & Integrations */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-indigo-100 rounded-xl">
+                <Key className="h-6 w-6 text-indigo-600" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900">API & Integrations</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">API Keys</h3>
+                  <p className="text-sm text-gray-600">Manage your API access</p>
+                </div>
+                <button className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors">
+                  Manage
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <h3 className="font-medium text-gray-900">Third-party Integrations</h3>
+                  <p className="text-sm text-gray-600">Connect with other services</p>
+                </div>
+                <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                  Connect
+                </button>
+              </div>
             </div>
           </div>
         </div>

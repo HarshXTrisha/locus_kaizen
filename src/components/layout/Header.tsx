@@ -84,7 +84,11 @@ export function Header() {
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100"
             >
-              <User className="h-5 w-5 text-gray-600" />
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#20C997] to-[#1BA085] flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                </span>
+              </div>
               <span className="hidden sm:block text-sm font-medium text-gray-700">
                 {user.name || user.email}
               </span>

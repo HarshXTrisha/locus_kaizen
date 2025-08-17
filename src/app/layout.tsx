@@ -5,6 +5,7 @@ import { AuthProvider } from '@/lib/auth-context';
 import { NotificationProvider } from '@/components/common/NotificationSystem';
 import { ClientInit } from '@/components/common/ClientInit';
 import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
+import { PageTransition } from '@/components/common/PageTransition';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,9 +28,11 @@ export default function RootLayout({
         <AuthProvider>
           <NotificationProvider>
             <ClientInit />
-            <AuthenticatedLayout>
-              {children}
-            </AuthenticatedLayout>
+            <PageTransition>
+              <AuthenticatedLayout>
+                {children}
+              </AuthenticatedLayout>
+            </PageTransition>
           </NotificationProvider>
         </AuthProvider>
       </body>
