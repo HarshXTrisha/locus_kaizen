@@ -51,7 +51,7 @@ export default function ArchivePage() {
     }
 
     loadQuizzes();
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, loadQuizzes]);
 
   const loadQuizzes = async () => {
     try {

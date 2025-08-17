@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔐 AuthProvider: Cleaning up auth listener');
       unsubscribe();
     };
-  }, [setStoreUser, setAuthenticated, setStoreLoading]);
+  }, [setStoreUser, setAuthenticated, setStoreLoading, addNotification]);
 
   const signOut = async () => {
     try {
