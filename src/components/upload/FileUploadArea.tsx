@@ -310,9 +310,10 @@ export function FileUploadArea({
           
           <div className="bg-blue-100 p-4 rounded-lg">
             <h5 className="font-medium text-blue-900 mb-2 text-sm">Required Structure:</h5>
-            <pre className="text-xs text-blue-800 overflow-x-auto">
-              {jsonTemplate}
-            </pre>
+            <pre 
+              className="text-xs text-blue-800 overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: jsonTemplate }}
+            />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
