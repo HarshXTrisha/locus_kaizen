@@ -210,7 +210,7 @@ function ResultCard({
             <Trash2 className="h-12 w-12 text-red-500 mx-auto mb-2" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Quiz Result?</h3>
             <p className="text-gray-600">
-              Are you sure you want to delete your result for "{quiz?.title || 'Unknown Quiz'}"? 
+              Are you sure you want to delete your result for &quot;{quiz?.title || 'Unknown Quiz'}&quot;? 
               This action cannot be undone.
             </p>
           </div>
