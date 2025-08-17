@@ -49,49 +49,28 @@ export function QuizTimer({ timeRemaining, totalTime }: QuizTimerProps) {
   const progressPercentage = totalTime ? ((totalTime - timeRemaining) / totalTime) * 100 : 0;
 
   return (
-    <div className={`flex flex-col gap-2 p-4 rounded-xl border-2 ${getTimeBgColor(timeRemaining)} shadow-sm`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {getTimeIcon(timeRemaining)}
-          <div>
-            <p className="text-xs font-medium text-gray-600">Time Remaining</p>
-            <p className={`text-xl font-bold font-mono ${getTimeColor(timeRemaining)}`}>
-              {formatTime(timeRemaining)}
-            </p>
-          </div>
+    <div className={`flex flex-row items-center gap-4 p-2 rounded-lg border ${getTimeBgColor(timeRemaining)} shadow-sm w-full max-w-xs mx-auto`}>
+      <div className="flex items-center gap-2">
+        {getTimeIcon(timeRemaining)}
+        <div>
+          <p className="text-xs font-medium text-gray-600">Time Left</p>
+          <p className={`text-lg font-bold font-mono ${getTimeColor(timeRemaining)}`}>{formatTime(timeRemaining)}</p>
         </div>
-        {timeRemaining <= 300 && (
-          <div className="bg-red-100 px-3 py-1 rounded-full">
-            <span className="text-xs font-semibold text-red-700">URGENT</span>
-          </div>
-        )}
       </div>
-      
+      {timeRemaining <= 300 && (
+        <div className="bg-red-100 px-2 py-1 rounded-full">
+          <span className="text-xs font-semibold text-red-700">URGENT</span>
+        </div>
+      )}
       {/* Progress Bar */}
       {totalTime && (
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-24 bg-gray-200 rounded-full h-1 ml-2">
           <div 
-            className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(timeRemaining)}`}
+            className={`h-1 rounded-full transition-all duration-300 ${getProgressColor(timeRemaining)}`}
             style={{ width: `${Math.min(progressPercentage, 100)}%` }}
           />
         </div>
       )}
-      
-      {/* Time Status */}
-      <div className="text-xs text-gray-600">
-        {timeRemaining <= 300 && (
-          <p className="text-red-600 font-medium">⚠️ Time is running out!</p>
-        )}
-        {timeRemaining > 300 && timeRemaining <= 600 && (
-          <p className="text-yellow-600 font-medium">⏰ Less than 10 minutes remaining</p>
-        )}
-        {timeRemaining > 600 && timeRemaining <= 1800 && (
-          <p className="text-orange-600 font-medium">⏱️ Less than 30 minutes remaining</p>
-        )}
-        {timeRemaining > 1800 && (
-          <p className="text-green-600 font-medium">✅ Plenty of time remaining</p>
-        )}
-      </div>
     </div>
   );
 }

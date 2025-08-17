@@ -59,34 +59,32 @@ export function QuestionNavigation({
     <div className="space-y-4">
       {/* Status Legend */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs font-medium text-gray-600">
+        <div className="flex items-center justify-between text-sm font-semibold text-gray-700">
           <span>Question Status</span>
-          <span className="text-gray-400">
+          <span className="text-gray-500">
             {statusCounts.answered} / {questions.length}
           </span>
         </div>
-        
-        <div className="grid grid-cols-3 gap-2 text-xs">
+        <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-1">
-            <CheckCircle className="h-3 w-3 text-green-600" />
-            <span className="text-green-700">Answered</span>
-            <span className="text-gray-500">({statusCounts.answered})</span>
+            <CheckCircle className="h-4 w-4 text-green-700" />
+            <span className="font-bold text-green-800">Answered</span>
+            <span className="text-green-600 font-semibold">({statusCounts.answered})</span>
           </div>
           <div className="flex items-center gap-1">
-            <Flag className="h-3 w-3 text-yellow-600" />
-            <span className="text-yellow-700">Flagged</span>
-            <span className="text-gray-500">({statusCounts.flagged})</span>
+            <Flag className="h-4 w-4 text-yellow-700" />
+            <span className="font-bold text-yellow-800">Flagged</span>
+            <span className="text-yellow-600 font-semibold">({statusCounts.flagged})</span>
           </div>
           <div className="flex items-center gap-1">
-            <Circle className="h-3 w-3 text-gray-400" />
-            <span className="text-gray-600">Unanswered</span>
-            <span className="text-gray-500">({statusCounts.unanswered})</span>
+            <Circle className="h-4 w-4 text-gray-500" />
+            <span className="font-bold text-gray-700">Unanswered</span>
+            <span className="text-gray-600 font-semibold">({statusCounts.unanswered})</span>
           </div>
         </div>
       </div>
-
       {/* Scrollable Question Grid */}
-      <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <div className="max-h-[28rem] min-h-[10rem] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 p-2 bg-white rounded-xl border border-gray-200 shadow-md">
         <div className="grid grid-cols-5 gap-2 p-1">
           {questions.map((question, index) => {
             const status = getQuestionStatus(index);
@@ -97,14 +95,14 @@ export function QuestionNavigation({
                 key={question.id}
                 onClick={() => onQuestionSelect(index)}
                 className={`
-                  relative w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200
+                  relative w-12 h-12 rounded-xl text-base font-bold transition-all duration-200
                   ${isCurrent 
                     ? 'bg-[#20C997] text-white ring-2 ring-[#20C997] ring-offset-1 shadow-lg' 
                     : status === 'answered'
-                    ? 'bg-green-100 text-green-800 hover:bg-green-200 border border-green-200'
+                    ? 'bg-green-500 text-white hover:bg-green-600 border-2 border-green-600'
                     : status === 'flagged'
-                    ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                    ? 'bg-yellow-400 text-white hover:bg-yellow-500 border-2 border-yellow-600'
+                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400 border-2 border-gray-400'
                   }
                 `}
                 title={`Question ${index + 1}: ${status.charAt(0).toUpperCase() + status.slice(1)}`}

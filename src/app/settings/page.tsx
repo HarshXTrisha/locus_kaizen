@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
-import { getFirebaseAuth } from '@/lib/firebase-utils';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { User, Shield, Bell, Palette, Database, Key, Save, X, Check } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { updateProfile } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function SettingsPage() {
   const { user } = useAppStore();
@@ -29,16 +30,6 @@ export default function SettingsPage() {
 
     setIsAutoSaving(true);
     try {
-      const auth = getFirebaseAuth();
-      if (!auth?.currentUser) {
-        return;
-      }
-
-      // Update in Firebase Auth
-      await auth.currentUser.updateProfile({
-        displayName: name.trim()
-      });
-
       // Update in our database
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
@@ -60,6 +51,11 @@ export default function SettingsPage() {
         ...user!,
         name: name.trim()
       });
+
+      // Update Firebase Auth displayName
+      if (auth && auth.currentUser) {
+        await updateProfile(auth.currentUser, { displayName: name.trim() });
+      }
 
       setLastSavedName(name.trim());
       setIsEditingName(false);
@@ -79,16 +75,6 @@ export default function SettingsPage() {
 
     setIsAutoSaving(true);
     try {
-      const auth = getFirebaseAuth();
-      if (!auth?.currentUser) {
-        return;
-      }
-
-      // Update in Firebase Auth
-      await auth.currentUser.updateProfile({
-        displayName: name.trim()
-      });
-
       // Update in our database
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
@@ -110,6 +96,11 @@ export default function SettingsPage() {
         ...user!,
         name: name.trim()
       });
+
+      // Update Firebase Auth displayName
+      if (auth && auth.currentUser) {
+        await updateProfile(auth.currentUser, { displayName: name.trim() });
+      }
 
       setLastSavedName(name.trim());
       showSuccess('Auto-saved', 'Your name has been automatically updated');
