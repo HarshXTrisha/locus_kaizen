@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { getUserQuizzes, getUserQuizResults } from '@/lib/firebase-quiz';
+import { getFirebaseAuth } from '@/lib/firebase-utils';
 import { showError } from '@/components/common/NotificationSystem';
 import { Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -31,11 +32,12 @@ export default function DashboardPage() {
       setLoading(true);
       
       // Load user's quizzes
-      const userQuizzes = await getUserQuizzes(user!.id);
+      const auth = getFirebaseAuth();
+      const userQuizzes = await getUserQuizzes(auth.currentUser!.uid);
       setQuizzes(userQuizzes);
       
       // Load user's results
-      const userResults = await getUserQuizResults(user!.id);
+      const userResults = await getUserQuizResults(auth.currentUser!.uid);
       setResults(userResults);
       
       // Calculate stats

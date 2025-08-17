@@ -5,6 +5,7 @@ import { Search, Bell, User, Settings, LogOut, Users, Share2, Plus, Home, Menu }
 import { useUser, useAppStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
 import { getUserInvitations } from '@/lib/firebase-collaboration';
+import { getFirebaseAuth } from '@/lib/firebase-utils';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,10 +22,11 @@ export function Header() {
 
   useEffect(() => {
     const loadInvitations = async () => {
-      if (!user) return;
-      
       try {
-        const userInvitations = await getUserInvitations(user.id);
+        const auth = getFirebaseAuth();
+        if (!auth.currentUser) return;
+        
+        const userInvitations = await getUserInvitations(auth.currentUser.uid);
         setInvitations(userInvitations);
       } catch (error) {
         console.error('Error loading invitations:', error);
@@ -32,7 +34,7 @@ export function Header() {
     };
 
     loadInvitations();
-  }, [user]);
+  }, []);
 
   const handleSignOut = async () => {
     try {

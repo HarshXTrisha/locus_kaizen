@@ -100,14 +100,14 @@ export function FileUploadArea({
         setProcessingStatus(`✅ Extracted ${questions.length} questions from JSON`);
       } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         setProcessingStatus('Processing PDF file...');
-        const result = await processPDFFile(file);
-        if (result.success) {
+          const result = await processPDFFile(file);
+          if (result.success) {
           questions = result.questions;
           setProcessingStatus(`✅ Extracted ${questions.length} questions from PDF`);
-        } else {
+            } else {
           throw new Error(result.error || 'Failed to process PDF');
-        }
-      } else {
+            }
+          } else {
         throw new Error('Unsupported file type. Please upload a PDF or JSON file.');
       }
 
@@ -187,21 +187,21 @@ export function FileUploadArea({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-        <input
-          type="file"
+          <input
+            type="file"
           accept=".pdf,.json"
-          onChange={handleFileSelect}
+            onChange={handleFileSelect}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           disabled={isProcessing}
         />
         
-        <div className="space-y-4">
+          <div className="space-y-4">
           <div className="flex justify-center">
             <div className="p-3 bg-[#20C997]/10 rounded-full">
               <Upload className="h-8 w-8 text-[#20C997]" />
-            </div>
-          </div>
-          
+                    </div>
+                  </div>
+                  
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Upload Quiz File
@@ -220,9 +220,9 @@ export function FileUploadArea({
                 <FileJson className="h-4 w-4 text-blue-500" />
                 <span>JSON Quiz Files</span>
               </div>
-            </div>
-          </div>
-
+                  </div>
+                </div>
+                
                      {/* JSON Format Example */}
            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
              <h4 className="font-medium text-blue-900 mb-2">JSON Format Example:</h4>
@@ -250,10 +250,10 @@ export function FileUploadArea({
                  <FileJson className="h-4 w-4" />
                  Download JSON Template
                </a>
-             </div>
-           </div>
-        </div>
-      </div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
 
       {/* Processing Status */}
       {isProcessing && (
