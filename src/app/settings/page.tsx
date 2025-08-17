@@ -45,7 +45,12 @@ export default function SettingsPage() {
                    Display Name
                  </label>
                  <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-                   <span className="text-gray-900">{user.name || 'Not set'}</span>
+                   <span className="text-gray-900">
+                     {user.firstName && user.lastName 
+                       ? `${user.firstName} ${user.lastName}` 
+                       : user.firstName || user.name || 'Not set'
+                     }
+                   </span>
                  </div>
                  <p className="text-sm text-gray-500 mt-1">
                    Name is managed through your Google account. Update it in your Google profile if needed.

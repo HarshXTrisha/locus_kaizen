@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const { setUser: setStoreUser, setAuthenticated, setLoading: setStoreLoading } = useAppStore();
+  const { setUser: setStoreUser, setAuthenticated, setLoading: setStoreLoading, addNotification } = useAppStore();
 
   useEffect(() => {
     console.log('🔐 AuthProvider: Setting up auth state listener...');
@@ -43,6 +43,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('🔐 AuthProvider: Setting user in store:', appUser.firstName);
         setStoreUser(appUser);
         setAuthenticated(true);
+        
+        // Add welcome notification
+        addNotification({
+          id: Date.now().toString(),
+          type: 'success',
+          title: 'Welcome back!',
+          message: `Great to see you again, ${appUser.firstName || 'User'}! Ready to continue your learning journey?`,
+          createdAt: new Date(),
+          read: false
+        });
       } else {
         console.log('🔐 AuthProvider: Clearing user from store');
         setStoreUser(null);

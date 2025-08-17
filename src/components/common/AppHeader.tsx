@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bell, User } from 'lucide-react';
+import { User } from 'lucide-react';
+import { NotificationDropdown } from './NotificationDropdown';
 
 export function AppHeader() {
   return (
@@ -12,14 +13,12 @@ export function AppHeader() {
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Dashboard</a>
-            <a href="/archive" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Test Archive</a>
+            <a href="/archive" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Quiz Management</a>
             <a href="/results" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Results</a>
             <a href="/settings" className="text-sm font-medium text-green-600 border-b-2 border-green-600 pb-1">Profile</a>
           </nav>
           <div className="flex items-center gap-4">
-            <button className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
-              <Bell size={20} />
-            </button>
+            <NotificationDropdown />
             <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                 <User size={20} className="text-gray-500" />
             </div>

@@ -122,6 +122,7 @@ interface Notification {
   message: string;
   duration?: number;
   createdAt: Date;
+  read?: boolean;
 }
 
 // Create the store

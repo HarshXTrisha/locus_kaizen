@@ -30,7 +30,7 @@ export function WelcomeHeader() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            {greeting}, {user ? `${user.firstName} ${user.lastName}` : 'User'}! 👋
+            {greeting}, {user ? (user.firstName || user.name || 'User') : 'User'}! 👋
           </h1>
           <p className="text-gray-600 mt-1">
             Welcome back to your learning dashboard. Here&apos;s what&apos;s happening today.
