@@ -1,7 +1,7 @@
 // PDF Processing Utility for Quiz Creation
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set up PDF.js worker
+// Set up PDF.js worker only on client side
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 }
@@ -53,6 +53,17 @@ const CORRECT_ANSWER_INDICATORS = [
  */
 export async function processPDFFile(file: File): Promise<PDFProcessingResult> {
   const startTime = Date.now();
+  
+  // Check if we're on the client side
+  if (typeof window === 'undefined') {
+    return {
+      success: false,
+      questions: [],
+      error: 'PDF processing is only available on the client side',
+      totalQuestions: 0,
+      processingTime: 0
+    };
+  }
   
   try {
     console.log('🔍 Processing PDF file for questions...');

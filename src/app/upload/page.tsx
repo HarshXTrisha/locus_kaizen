@@ -1,10 +1,19 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { FileUploadArea } from '@/components/upload/FileUploadArea';
+
+// Dynamically import FileUploadArea to prevent SSR issues
+const FileUploadArea = dynamic(
+  () => import('@/components/upload/FileUploadArea').then(mod => ({ default: mod.FileUploadArea })),
+  { 
+    ssr: false,
+    loading: () => <LoadingSpinner size="xl" text="Loading upload component..." />
+  }
+);
 
 export default function UploadPage() {
   const router = useRouter();
