@@ -38,20 +38,16 @@ export function middleware(request: NextRequest) {
     pathname === route || pathname.startsWith(route)
   );
 
-  // Get the token from cookies
-  const token = request.cookies.get('auth-token')?.value;
-  const isAuthenticated = !!token;
-
-  // If it's a protected route and user is not authenticated
-  if (isProtectedRoute && !isAuthenticated) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // If user is authenticated and trying to access login page
-  if (isAuthenticated && pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  // For Firebase authentication, we can't check auth state in middleware
+  // because it requires client-side Firebase SDK. Instead, we'll let the
+  // client-side components handle authentication checks and redirects.
+  // This prevents infinite redirect loops.
+  
+  // Only handle basic redirects that don't require auth state
+  if (pathname === '/login' && request.cookies.get('locus-store')?.value) {
+    // If user has stored data, they might be authenticated
+    // Let the client-side handle the redirect
+    return NextResponse.next();
   }
 
   return NextResponse.next();

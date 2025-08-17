@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { getUserQuizzes, getUserQuizResults } from '@/lib/firebase-quiz';
 import { showError } from '@/components/common/NotificationSystem';
-import { Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, Loader2 } from 'lucide-react';
+import { Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAppStore();
+  const { user, isAuthenticated, isLoading } = useAppStore();
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authTimeout, setAuthTimeout] = useState(false);
   const [stats, setStats] = useState({
     totalQuizzes: 0,
     totalResults: 0,
@@ -23,48 +24,67 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    console.log('🏠 Dashboard: Auth state:', { isAuthenticated, user: !!user, isLoading });
+    
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('🏠 Dashboard: Auth timeout reached');
+      setAuthTimeout(true);
+    }, 5000); // 5 seconds timeout
+
+    if (!isLoading && !isAuthenticated) {
+      console.log('🏠 Dashboard: Not authenticated, redirecting to login');
+      clearTimeout(timeoutId);
       router.replace('/login');
       return;
     }
 
-    const loadDashboardData = async () => {
-      try {
-        setLoading(true);
-        
-        // Load user's quizzes
-        const userQuizzes = await getUserQuizzes(user.id);
-        setQuizzes(userQuizzes);
-        
-        // Load user's results
-        const userResults = await getUserQuizResults(user.id);
-        setResults(userResults);
-        
-        // Calculate stats
-        const totalQuizzes = userQuizzes.length;
-        const totalResults = userResults.length;
-        const averageScore = totalResults > 0 
-          ? Math.round(userResults.reduce((sum: number, result: any) => sum + result.score, 0) / totalResults)
-          : 0;
-        const totalTimeSpent = userResults.reduce((sum: number, result: any) => sum + result.timeTaken, 0);
-        
-        setStats({
-          totalQuizzes,
-          totalResults,
-          averageScore,
-          totalTimeSpent
-        });
-        
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
-        showError('Loading Failed', 'Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (isAuthenticated && user) {
+      console.log('🏠 Dashboard: Authenticated, loading data');
+      clearTimeout(timeoutId);
+      loadDashboardData();
+    }
 
-    loadDashboardData();
-  }, [user, isAuthenticated, router]);
+    return () => clearTimeout(timeoutId);
+  }, [user, isAuthenticated, isLoading, router]);
+
+  const loadDashboardData = async () => {
+    try {
+      console.log('🏠 Dashboard: Loading dashboard data...');
+      setLoading(true);
+      
+      // Load user's quizzes
+      const userQuizzes = await getUserQuizzes(user!.id);
+      setQuizzes(userQuizzes);
+      
+      // Load user's results
+      const userResults = await getUserQuizResults(user!.id);
+      setResults(userResults);
+      
+      // Calculate stats
+      const totalQuizzes = userQuizzes.length;
+      const totalResults = userResults.length;
+      const averageScore = totalResults > 0 
+        ? Math.round(userResults.reduce((sum: number, result: any) => sum + result.score, 0) / totalResults)
+        : 0;
+      const totalTimeSpent = userResults.reduce((sum: number, result: any) => sum + result.timeTaken, 0);
+      
+      setStats({
+        totalQuizzes,
+        totalResults,
+        averageScore,
+        totalTimeSpent
+      });
+      
+      console.log('🏠 Dashboard: Data loaded successfully');
+      
+    } catch (error) {
+      console.error('🏠 Dashboard: Error loading dashboard data:', error);
+      showError('Loading Failed', 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -76,7 +96,27 @@ export default function DashboardPage() {
     return `${minutes}m`;
   };
 
-  if (!isAuthenticated || !user) {
+  // Show timeout message if auth is taking too long
+  if (authTimeout && !isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Timeout</h2>
+          <p className="text-gray-600 mb-4">It's taking longer than expected to verify your authentication.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while checking authentication
+  if (isLoading || (!isAuthenticated && !authTimeout)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="xl" text="Checking authentication..." />
@@ -84,6 +124,7 @@ export default function DashboardPage() {
     );
   }
 
+  // Show loading while fetching data
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -190,7 +231,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Recent Quizzes</h2>
               <Link
-                href="/quizzes"
+                href="/quiz"
                 className="text-[#20C997] hover:text-[#1BA085] text-sm font-medium"
               >
                 View All
@@ -251,7 +292,7 @@ export default function DashboardPage() {
                 <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 mb-4">No quiz results yet</p>
                 <Link
-                  href="/quizzes"
+                  href="/quiz"
                   className="inline-flex items-center px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />

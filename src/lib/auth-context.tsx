@@ -20,7 +20,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser: setStoreUser, setAuthenticated, setLoading: setStoreLoading } = useAppStore();
 
   useEffect(() => {
+    console.log('🔐 AuthProvider: Setting up auth state listener...');
+    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('🔐 AuthProvider: Auth state changed:', user ? 'User logged in' : 'User logged out');
+      
       setUser(user);
       setLoading(false);
       
@@ -36,26 +40,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           lastLogin: new Date(user.metadata.lastSignInTime || Date.now()),
         };
         
+        console.log('🔐 AuthProvider: Setting user in store:', appUser.firstName);
         setStoreUser(appUser);
         setAuthenticated(true);
-        showSuccess('Welcome Back!', `Hello ${appUser.firstName}!`, 3000);
       } else {
+        console.log('🔐 AuthProvider: Clearing user from store');
         setStoreUser(null);
         setAuthenticated(false);
       }
       
       setStoreLoading(false);
+    }, (error) => {
+      console.error('🔐 AuthProvider: Auth state error:', error);
+      setLoading(false);
+      setStoreLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log('🔐 AuthProvider: Cleaning up auth listener');
+      unsubscribe();
+    };
   }, [setStoreUser, setAuthenticated, setStoreLoading]);
 
   const signOut = async () => {
     try {
+      console.log('🔐 AuthProvider: Signing out...');
       await auth.signOut();
-      showSuccess('Signed Out', 'You have been successfully signed out.', 3000);
+      console.log('🔐 AuthProvider: Sign out successful');
     } catch (error) {
-      showError('Sign Out Error', 'Failed to sign out. Please try again.');
+      console.error('🔐 AuthProvider: Sign out error:', error);
     }
   };
 
