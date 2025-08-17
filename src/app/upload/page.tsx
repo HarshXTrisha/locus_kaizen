@@ -9,6 +9,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { createQuiz } from '@/lib/firebase-quiz';
+import { getFirebaseAuth } from '@/lib/firebase-utils';
 import { Plus, ArrowRight, FileText, CheckCircle, Play } from 'lucide-react';
 
 // Dynamically import FileUploadArea to prevent SSR issues
@@ -23,7 +24,6 @@ const FileUploadArea = dynamic(
 export default function UploadPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAppStore();
-  const [auth, setAuth] = useState<any>(null);
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
   const [quizData, setQuizData] = useState({
@@ -34,13 +34,7 @@ export default function UploadPage() {
     passingScore: 70
   });
 
-  // Initialize Firebase auth on client side only
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const { getAuth } = require('firebase/auth');
-      setAuth(getAuth());
-    }
-  }, []);
+
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -59,10 +53,12 @@ export default function UploadPage() {
   };
 
   const handleCreateQuiz = async () => {
-    if (!auth?.currentUser) {
-      showError('Authentication Required', 'Please sign in to create quizzes');
-      return;
-    }
+    try {
+      const auth = getFirebaseAuth();
+      if (!auth?.currentUser) {
+        showError('Authentication Required', 'Please sign in to create quizzes');
+        return;
+      }
 
     if (extractedQuestions.length === 0) {
       showError('No Questions', 'No questions available to create quiz');
@@ -96,10 +92,12 @@ export default function UploadPage() {
   };
 
   const handleStartTest = async () => {
-    if (!auth?.currentUser) {
-      showError('Authentication Required', 'Please sign in to start tests');
-      return;
-    }
+    try {
+      const auth = getFirebaseAuth();
+      if (!auth?.currentUser) {
+        showError('Authentication Required', 'Please sign in to start tests');
+        return;
+      }
 
     if (extractedQuestions.length === 0) {
       showError('No Questions', 'No questions available to start test');
