@@ -363,3 +363,16 @@ export async function getQuizResult(resultId: string): Promise<QuizResult | null
     throw new Error('Failed to get quiz result');
   }
 }
+
+/**
+ * Delete a quiz result by ID
+ */
+export async function deleteQuizResult(resultId: string): Promise<void> {
+  try {
+    await deleteDoc(doc(db, 'quizResults', resultId));
+    console.log('✅ Quiz result deleted successfully:', resultId);
+  } catch (error) {
+    console.error('❌ Error deleting quiz result:', error);
+    throw new Error('Failed to delete quiz result');
+  }
+}

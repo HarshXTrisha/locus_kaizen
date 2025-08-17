@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { getUserQuizResults, QuizResult } from '@/lib/firebase-quiz';
+import { getUserQuizResults, QuizResult, deleteQuizResult } from '@/lib/firebase-quiz';
 import { getQuiz } from '@/lib/firebase-quiz';
-import { Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, AlertCircle, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ResultsPage() {
@@ -15,6 +15,8 @@ export default function ResultsPage() {
   const [results, setResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingResult, setDeletingResult] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -37,6 +39,22 @@ export default function ResultsPage() {
 
     fetchResults();
   }, [isAuthenticated, user, router]);
+
+  const handleDeleteResult = async (resultId: string) => {
+    try {
+      setDeletingResult(resultId);
+      await deleteQuizResult(resultId);
+      
+      // Remove the deleted result from the list
+      setResults(prev => prev.filter(result => result.id !== resultId));
+      setShowDeleteConfirm(null);
+    } catch (err) {
+      console.error('Error deleting result:', err);
+      setError('Failed to delete the quiz result');
+    } finally {
+      setDeletingResult(null);
+    }
+  };
 
   if (!isAuthenticated || !user) {
     return (
@@ -95,7 +113,15 @@ export default function ResultsPage() {
         ) : (
           <div className="grid gap-6">
             {results.map((result) => (
-              <ResultCard key={result.id} result={result} />
+              <ResultCard 
+                key={result.id} 
+                result={result} 
+                onDelete={() => setShowDeleteConfirm(result.id)}
+                isDeleting={deletingResult === result.id}
+                showDeleteConfirm={showDeleteConfirm === result.id}
+                onConfirmDelete={() => handleDeleteResult(result.id)}
+                onCancelDelete={() => setShowDeleteConfirm(null)}
+              />
             ))}
           </div>
         )}
@@ -106,9 +132,21 @@ export default function ResultsPage() {
 
 interface ResultCardProps {
   result: QuizResult;
+  onDelete: () => void;
+  isDeleting: boolean;
+  showDeleteConfirm: boolean;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
 }
 
-function ResultCard({ result }: ResultCardProps) {
+function ResultCard({ 
+  result, 
+  onDelete, 
+  isDeleting, 
+  showDeleteConfirm, 
+  onConfirmDelete, 
+  onCancelDelete 
+}: ResultCardProps) {
   const [quiz, setQuiz] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -164,38 +202,95 @@ function ResultCard({ result }: ResultCardProps) {
   }
 
   return (
-    <Link href={`/results/${result.id}`}>
-      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              {quiz?.title || 'Unknown Quiz'}
-            </h3>
-            <p className="text-sm text-gray-600">{quiz?.subject || 'No subject'}</p>
+    <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      {showDeleteConfirm ? (
+        // Delete confirmation view
+        <div className="text-center">
+          <div className="mb-4">
+            <Trash2 className="h-12 w-12 text-red-500 mx-auto mb-2" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Quiz Result?</h3>
+            <p className="text-gray-600">
+              Are you sure you want to delete your result for "{quiz?.title || 'Unknown Quiz'}"? 
+              This action cannot be undone.
+            </p>
           </div>
-          <div className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreBg(result.score)} ${getScoreColor(result.score)}`}>
-            {result.score}%
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={onCancelDelete}
+              disabled={isDeleting}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirmDelete}
+              disabled={isDeleting}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </button>
           </div>
         </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-green-500" />
-            <span>{result.correctAnswers}/{result.totalQuestions} correct</span>
+      ) : (
+        // Normal result card view
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1">
+              <Link href={`/results/${result.id}`}>
+                <div className="cursor-pointer">
+                  <h3 className="text-lg font-semibold text-gray-900 hover:text-[#20C997] transition-colors">
+                    {quiz?.title || 'Unknown Quiz'}
+                  </h3>
+                  <p className="text-sm text-gray-600">{quiz?.subject || 'No subject'}</p>
+                </div>
+              </Link>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreBg(result.score)} ${getScoreColor(result.score)}`}>
+                {result.score}%
+              </div>
+              <button
+                onClick={onDelete}
+                disabled={isDeleting}
+                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                title="Delete this result"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-blue-500" />
-            <span>{formatTime(result.timeTaken)}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gray-500" />
-            <span>{formatDate(result.completedAt)}</span>
-          </div>
-          <div className="text-right">
-            <span className="text-gray-500">View Details →</span>
-          </div>
-        </div>
-      </div>
-    </Link>
+          
+          <Link href={`/results/${result.id}`}>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm cursor-pointer">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span>{result.correctAnswers}/{result.totalQuestions} correct</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-500" />
+                <span>{formatTime(result.timeTaken)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <span>{formatDate(result.completedAt)}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-gray-500">View Details →</span>
+              </div>
+            </div>
+          </Link>
+        </>
+      )}
+    </div>
   );
 }
