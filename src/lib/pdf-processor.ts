@@ -3,13 +3,9 @@ import * as pdfjsLib from 'pdfjs-dist';
 
 // Set up PDF.js worker only on client side
 if (typeof window !== 'undefined') {
-  // Use a Vercel-compatible worker path with fallback
-  // This will work in both development and production
-  const workerSrc = process.env.NODE_ENV === 'production' 
-    ? `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`
-    : '/pdf.worker.min.js';
-    
-  pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+  // Always use local worker file for better reliability
+  // This works in both development and production on Vercel
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 }
 
 export interface ExtractedQuestion {
