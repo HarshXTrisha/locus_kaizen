@@ -34,6 +34,21 @@ export function FileUploadArea({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [processingStatus, setProcessingStatus] = useState<string>('');
 
+  const jsonTemplate = '{\n' +
+    '  "title": "Your Quiz Title",\n' +
+    '  "description": "Quiz description (optional)",\n' +
+    '  "questions": [\n' +
+    '    {\n' +
+    '      "id": "q1",                    // Optional unique ID\n' +
+    '      "text": "Your question text",\n' +
+    '      "type": "multiple-choice",     // multiple-choice, true-false, or short-answer\n' +
+    '      "options": ["A", "B", "C", "D"], // Required for multiple-choice\n' +
+    '      "correctAnswer": "A",          // Must match one of the options\n' +
+    '      "points": 1                    // Optional, defaults to 1\n' +
+    '    }\n' +
+    '  ]\n' +
+    '}';
+
   const downloadJSONTemplate = () => {
     const template = {
       title: 'Sample Quiz',
@@ -296,20 +311,7 @@ export function FileUploadArea({
           <div className="bg-blue-100 p-4 rounded-lg">
             <h5 className="font-medium text-blue-900 mb-2 text-sm">Required Structure:</h5>
             <pre className="text-xs text-blue-800 overflow-x-auto">
-{`{
-  "title": "Your Quiz Title",
-  "description": "Quiz description (optional)",
-  "questions": [
-    {
-      "id": "q1",                    // Optional unique ID
-      "text": "Your question text",
-      "type": "multiple-choice",     // "multiple-choice", "true-false", or "short-answer"
-      "options": ["A", "B", "C", "D"], // Required for multiple-choice
-      "correctAnswer": "A",          // Must match one of the options
-      "points": 1                    // Optional, defaults to 1
-    }
-  ]
-}`}
+              {jsonTemplate}
             </pre>
           </div>
           
