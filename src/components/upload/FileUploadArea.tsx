@@ -34,21 +34,6 @@ export function FileUploadArea({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [processingStatus, setProcessingStatus] = useState<string>('');
 
-  const jsonTemplate = '{\n' +
-    '  "title": "Your Quiz Title",\n' +
-    '  "description": "Quiz description (optional)",\n' +
-    '  "questions": [\n' +
-    '    {\n' +
-    '      "id": "q1",                    // Optional unique ID\n' +
-    '      "text": "Your question text",\n' +
-    '      "type": "multiple-choice",     // multiple-choice, true-false, or short-answer\n' +
-    '      "options": ["A", "B", "C", "D"], // Required for multiple-choice\n' +
-    '      "correctAnswer": "A",          // Must match one of the options\n' +
-    '      "points": 1                    // Optional, defaults to 1\n' +
-    '    }\n' +
-    '  ]\n' +
-    '}';
-
   const downloadJSONTemplate = () => {
     const template = {
       title: 'Sample Quiz',
@@ -308,14 +293,6 @@ export function FileUploadArea({
             Your JSON file should follow this structure. Click the download button above to get a complete template.
           </p>
           
-          <div className="bg-blue-100 p-4 rounded-lg">
-            <h5 className="font-medium text-blue-900 mb-2 text-sm">Required Structure:</h5>
-            <pre 
-              className="text-xs text-blue-800 overflow-x-auto"
-              dangerouslySetInnerHTML={{ __html: jsonTemplate }}
-            />
-          </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="bg-white p-3 rounded border border-blue-200">
               <h6 className="font-medium text-blue-900 mb-1">Multiple Choice</h6>
@@ -323,7 +300,7 @@ export function FileUploadArea({
             </div>
             <div className="bg-white p-3 rounded border border-blue-200">
               <h6 className="font-medium text-blue-900 mb-1">True/False</h6>
-              <p className="text-blue-700 text-xs">Use options: ["True", "False"] with correctAnswer: "True" or "False"</p>
+              <p className="text-blue-700 text-xs">Use options: [&quot;True&quot;, &quot;False&quot;] with correctAnswer: &quot;True&quot; or &quot;False&quot;</p>
             </div>
             <div className="bg-white p-3 rounded border border-blue-200">
               <h6 className="font-medium text-blue-900 mb-1">Short Answer</h6>
