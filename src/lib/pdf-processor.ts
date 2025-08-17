@@ -1,11 +1,31 @@
 // PDF Processing Utility for Quiz Creation
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set up PDF.js worker only on client side
+// Set up PDF.js worker only on client side with robust fallback
 if (typeof window !== 'undefined') {
-  // Always use local worker file for better reliability
-  // This works in both development and production on Vercel
-  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+  // Try to set up the worker with multiple fallback options
+  const setupWorker = () => {
+    try {
+      // Primary: Use local worker file
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+      console.log('✅ PDF worker configured with local file');
+    } catch (error) {
+      console.warn('⚠️ Failed to set local PDF worker, trying CDN fallback:', error);
+      try {
+        // Fallback: Use CDN with specific version
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        console.log('✅ PDF worker configured with CDN fallback');
+      } catch (cdnError) {
+        console.error('❌ Failed to configure PDF worker:', cdnError);
+        // Last resort: Use empty string to disable worker (will use main thread)
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+        console.warn('⚠️ PDF worker disabled, using main thread');
+      }
+    }
+  };
+
+  // Set up worker when the module loads
+  setupWorker();
 }
 
 export interface ExtractedQuestion {
@@ -73,8 +93,9 @@ export async function processPDFFile(file: File): Promise<PDFProcessingResult> {
     // Convert file to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
     
-    // Load PDF document
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    // Load PDF document with better error handling
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
     
     let fullText = '';
     

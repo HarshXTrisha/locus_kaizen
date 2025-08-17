@@ -45,6 +45,11 @@ export function Header() {
 
   const totalNotifications = notifications.length + invitations.length;
 
+  // If no user, don't render the header
+  if (!user) {
+    return null;
+  }
+
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 shadow-sm">
       {/* Left Side - Home Button and Mobile Menu */}
