@@ -53,7 +53,7 @@ export default function ArchivePage() {
       setQuizzes(userQuizzes);
     } catch (error) {
       console.error('Error loading quizzes:', error);
-      showError('Failed to load quizzes');
+      showError('Failed to load quizzes', 'An error occurred while loading your quizzes.');
     } finally {
       setLoading(false);
     }
