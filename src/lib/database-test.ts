@@ -481,7 +481,14 @@ export async function testPerformance(): Promise<SystemTestResult[]> {
 
     // Test 2: Check bundle size (approximate)
     if (typeof window !== 'undefined') {
-      const bundleSize = performance.memory ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0;
+      const performanceWithMemory = performance as Performance & {
+        memory?: {
+          usedJSHeapSize: number;
+          totalJSHeapSize: number;
+          jsHeapSizeLimit: number;
+        };
+      };
+      const bundleSize = performanceWithMemory.memory ? performanceWithMemory.memory.usedJSHeapSize / 1024 / 1024 : 0;
       results.push({
         success: bundleSize < 50, // Less than 50MB
         message: `Bundle size: ${bundleSize.toFixed(2)}MB`,
