@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { getUserQuizzes, getUserQuizResults } from '@/lib/firebase-quiz';
@@ -23,32 +23,7 @@ export default function DashboardPage() {
     totalTimeSpent: 0
   });
 
-  useEffect(() => {
-    console.log('🏠 Dashboard: Auth state:', { isAuthenticated, user: !!user, isLoading });
-    
-    // Set a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      console.log('🏠 Dashboard: Auth timeout reached');
-      setAuthTimeout(true);
-    }, 5000); // 5 seconds timeout
-
-    if (!isLoading && !isAuthenticated) {
-      console.log('🏠 Dashboard: Not authenticated, redirecting to login');
-      clearTimeout(timeoutId);
-      router.replace('/login');
-      return;
-    }
-
-    if (isAuthenticated && user) {
-      console.log('🏠 Dashboard: Authenticated, loading data');
-      clearTimeout(timeoutId);
-      loadDashboardData();
-    }
-
-    return () => clearTimeout(timeoutId);
-  }, [user, isAuthenticated, isLoading, router]);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       console.log('🏠 Dashboard: Loading dashboard data...');
       setLoading(true);
@@ -84,7 +59,32 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    console.log('🏠 Dashboard: Auth state:', { isAuthenticated, user: !!user, isLoading });
+    
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('🏠 Dashboard: Auth timeout reached');
+      setAuthTimeout(true);
+    }, 5000); // 5 seconds timeout
+
+    if (!isLoading && !isAuthenticated) {
+      console.log('🏠 Dashboard: Not authenticated, redirecting to login');
+      clearTimeout(timeoutId);
+      router.replace('/login');
+      return;
+    }
+
+    if (isAuthenticated && user) {
+      console.log('🏠 Dashboard: Authenticated, loading data');
+      clearTimeout(timeoutId);
+      loadDashboardData();
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [user, isAuthenticated, isLoading, router, loadDashboardData]);
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -103,7 +103,7 @@ export default function DashboardPage() {
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Timeout</h2>
-          <p className="text-gray-600 mb-4">It's taking longer than expected to verify your authentication.</p>
+          <p className="text-gray-600 mb-4">It&apos;s taking longer than expected to verify your authentication.</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
