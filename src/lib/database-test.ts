@@ -79,7 +79,7 @@ export async function testAuthentication(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'Anonymous authentication failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'auth'
       });
     }
@@ -97,7 +97,7 @@ export async function testAuthentication(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'Google Auth provider not available',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'auth'
       });
     }
@@ -106,7 +106,7 @@ export async function testAuthentication(): Promise<SystemTestResult[]> {
     results.push({
       success: false,
       message: 'Authentication test failed',
-      details: { error: error.message },
+      details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
       category: 'auth'
     });
   }
@@ -149,7 +149,7 @@ export async function testDatabaseOperations(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'Read operations failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'database'
       });
     }
@@ -188,7 +188,7 @@ export async function testDatabaseOperations(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'Write operations failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'database'
       });
     }
@@ -211,7 +211,7 @@ export async function testDatabaseOperations(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'Complex queries failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'database'
       });
     }
@@ -220,7 +220,7 @@ export async function testDatabaseOperations(): Promise<SystemTestResult[]> {
     results.push({
       success: false,
       message: 'Database operations test failed',
-      details: { error: error.message },
+      details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
       category: 'database'
     });
   }
@@ -342,7 +342,7 @@ export async function testQuizOperations(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'Quiz operations failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'quiz'
       });
     }
@@ -351,7 +351,7 @@ export async function testQuizOperations(): Promise<SystemTestResult[]> {
     results.push({
       success: false,
       message: 'Quiz operations test failed',
-      details: { error: error.message },
+      details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
       category: 'quiz'
     });
   }
@@ -434,7 +434,7 @@ export async function testUserSettings(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'User settings operations failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'settings'
       });
     }
@@ -443,7 +443,7 @@ export async function testUserSettings(): Promise<SystemTestResult[]> {
     results.push({
       success: false,
       message: 'User settings test failed',
-      details: { error: error.message },
+      details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
       category: 'settings'
     });
   }
@@ -474,7 +474,7 @@ export async function testPerformance(): Promise<SystemTestResult[]> {
       results.push({
         success: false,
         message: 'Performance test failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         category: 'performance'
       });
     }
@@ -494,7 +494,7 @@ export async function testPerformance(): Promise<SystemTestResult[]> {
     results.push({
       success: false,
       message: 'Performance test failed',
-      details: { error: error.message },
+      details: { error: error instanceof Error ? error.message : 'Unknown error occurred' },
       category: 'performance'
     });
   }

@@ -33,7 +33,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
 
-  const showSuccess = (title: string, message: string) => {
+  const showSuccess = useCallback((title: string, message: string) => {
     addNotification({
       id: Date.now().toString(),
       type: 'success',
@@ -42,9 +42,9 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
       duration: 5000,
       createdAt: new Date(),
     });
-  };
+  }, [addNotification]);
 
-  const showError = (title: string, message: string) => {
+  const showError = useCallback((title: string, message: string) => {
     addNotification({
       id: Date.now().toString(),
       type: 'error',
@@ -53,7 +53,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
       duration: 5000,
       createdAt: new Date(),
     });
-  };
+  }, [addNotification]);
 
   // Load quiz from Firebase
   useEffect(() => {
