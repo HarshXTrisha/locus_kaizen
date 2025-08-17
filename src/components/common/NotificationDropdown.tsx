@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Check, X, AlertCircle, Info, Clock } from 'lucide-react';
-import { useNotifications, removeNotification } from '@/lib/store';
+import { useNotifications, useAppStore } from '@/lib/store';
 
 interface NotificationDropdownProps {
   className?: string;
@@ -13,6 +13,7 @@ export function NotificationDropdown({ className = '' }: NotificationDropdownPro
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifications = useNotifications();
+  const removeNotification = useAppStore((state) => state.removeNotification);
 
   // Calculate unread notifications
   useEffect(() => {
