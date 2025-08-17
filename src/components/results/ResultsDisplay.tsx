@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { getQuizResult, getQuiz, Quiz, QuizResult } from '@/lib/firebase-quiz';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { AlertTriangle, Check, X, ArrowUp } from 'lucide-react';
+import { AlertTriangle, Check, X, ArrowUp, Filter } from 'lucide-react';
 import { ScoreSummaryCard } from './ScoreSummaryCard';
 import { KeyInsights } from './KeyInsights';
 import { AnalyticsCharts } from './AnalyticsCharts';
@@ -19,6 +19,7 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const [answerFilter, setAnswerFilter] = useState<'all' | 'correct' | 'incorrect' | 'skipped'>('all');
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -47,10 +48,15 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      setShowScrollToTop(scrollTop > 300);
+      setShowScrollToTop(scrollTop > 200); // Reduced threshold for earlier appearance
     };
 
-    window.addEventListener('scroll', handleScroll);
+    // Add event listener with passive option for better performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial check in case page is already scrolled
+    handleScroll();
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -59,6 +65,55 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
       top: 0,
       behavior: 'smooth'
     });
+  };
+
+  // Filter questions based on user's answer status
+  const getFilteredQuestions = () => {
+    if (!quiz || !result) return [];
+    
+    return quiz.questions.filter((question, index) => {
+      const userAnswer = result.answers.find(a => a.questionId === question.id);
+      const isCorrect = userAnswer?.isCorrect || false;
+      const isAnswered = userAnswer?.userAnswer && userAnswer.userAnswer.trim() !== '';
+      
+      switch (answerFilter) {
+        case 'correct':
+          return isCorrect;
+        case 'incorrect':
+          return !isCorrect && isAnswered;
+        case 'skipped':
+          return !isAnswered;
+        default:
+          return true; // 'all'
+      }
+    });
+  };
+
+  const getFilterCounts = () => {
+    if (!quiz || !result) return { all: 0, correct: 0, incorrect: 0, skipped: 0 };
+    
+    let correct = 0, incorrect = 0, skipped = 0;
+    
+    quiz.questions.forEach((question) => {
+      const userAnswer = result.answers.find(a => a.questionId === question.id);
+      const isCorrect = userAnswer?.isCorrect || false;
+      const isAnswered = userAnswer?.userAnswer && userAnswer.userAnswer.trim() !== '';
+      
+      if (isCorrect) {
+        correct++;
+      } else if (isAnswered) {
+        incorrect++;
+      } else {
+        skipped++;
+      }
+    });
+    
+    return {
+      all: quiz.questions.length,
+      correct,
+      incorrect,
+      skipped
+    };
   };
 
   if (loading) {
@@ -114,22 +169,66 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
       <QuestionTypeAnalysis result={result} quiz={quiz} />
 
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Detailed Answer Review</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900">Detailed Answer Review</h2>
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-gray-500" />
+            <span className="text-sm text-gray-600">Filter:</span>
+          </div>
+        </div>
+        
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {(() => {
+            const counts = getFilterCounts();
+            const filters = [
+              { key: 'all', label: 'All Questions', count: counts.all, color: 'bg-gray-100 text-gray-700 hover:bg-gray-200' },
+              { key: 'correct', label: 'Correct', count: counts.correct, color: 'bg-green-100 text-green-700 hover:bg-green-200' },
+              { key: 'incorrect', label: 'Incorrect', count: counts.incorrect, color: 'bg-red-100 text-red-700 hover:bg-red-200' },
+              { key: 'skipped', label: 'Skipped', count: counts.skipped, color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' }
+            ] as const;
+            
+            return filters.map(({ key, label, count, color }) => (
+              <button
+                key={key}
+                onClick={() => setAnswerFilter(key)}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                  answerFilter === key 
+                    ? 'ring-2 ring-blue-500 ring-offset-2' 
+                    : color
+                }`}
+              >
+                {label} ({count})
+              </button>
+            ));
+          })()}
+        </div>
+        
         <div className="space-y-6">
-          {quiz.questions.map((question, index) => {
+          {getFilteredQuestions().map((question, index) => {
             const userAnswer = result.answers.find(a => a.questionId === question.id);
             const isCorrect = userAnswer?.isCorrect || false;
+            const isAnswered = userAnswer?.userAnswer && userAnswer.userAnswer.trim() !== '';
+            
+            // Find the original question index for proper numbering
+            const originalIndex = quiz.questions.findIndex(q => q.id === question.id);
 
             return (
-              <div key={question.id} className={`p-6 rounded-lg border ${isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+              <div key={question.id} className={`p-6 rounded-lg border ${
+                isCorrect ? 'border-green-200 bg-green-50' : 
+                isAnswered ? 'border-red-200 bg-red-50' : 
+                'border-yellow-200 bg-yellow-50'
+              }`}>
                 <div className="flex items-start justify-between">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Question {index + 1}: {question.text}
+                    Question {originalIndex + 1}: {question.text}
                   </h3>
                   {isCorrect ? (
                     <Check className="h-6 w-6 text-green-600" />
-                  ) : (
+                  ) : isAnswered ? (
                     <X className="h-6 w-6 text-red-600" />
+                  ) : (
+                    <span className="text-yellow-600 font-medium text-sm">SKIPPED</span>
                   )}
                 </div>
                 <div className="space-y-3">
@@ -162,19 +261,26 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
               </div>
             );
           })}
-                 </div>
-       </div>
+        </div>
+        
+        {/* No results message */}
+        {getFilteredQuestions().length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500 text-lg">No questions match the selected filter.</p>
+          </div>
+        )}
+      </div>
 
-       {/* Floating Scroll to Top Button */}
-       {showScrollToTop && (
-         <button
-           onClick={scrollToTop}
-           className="fixed bottom-6 left-6 z-50 p-3 bg-[#20C997] text-white rounded-full shadow-lg hover:bg-[#1BA085] transition-all duration-200 hover:shadow-xl group"
-           title="Go to top"
-         >
-           <ArrowUp className="h-5 w-5 group-hover:animate-bounce" />
-         </button>
-       )}
+               {/* Floating Scroll to Top Button */}
+        {showScrollToTop && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 z-50 p-3 bg-[#20C997] text-white rounded-full shadow-lg hover:bg-[#1BA085] transition-all duration-200 hover:shadow-xl group"
+            title="Go to top"
+          >
+            <ArrowUp className="h-5 w-5 group-hover:animate-bounce" />
+          </button>
+        )}
      </div>
    );
  }
