@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useIsAuthenticated } from '@/lib/store';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LogIn } from '@/lib/icons';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -22,6 +23,14 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { loading } = useAuth();
   const isAuthenticated = useIsAuthenticated();
+  const router = useRouter();
+
+  // Auto-redirect authenticated users away from public-only routes
+  useEffect(() => {
+    if (!loading && !requireAuth && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [loading, requireAuth, isAuthenticated, router]);
 
   // Show loading spinner while checking authentication
   if (loading) {

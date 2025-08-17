@@ -1,5 +1,10 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { useAppStore } from '@/lib/store';
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
 import { 
   Target, 
   TrendingUp, 
@@ -9,6 +14,7 @@ import {
   Upload, 
   Settings, 
   LogIn,
+  LogOut,
   ArrowRight,
   CheckCircle,
   Star,
@@ -18,6 +24,27 @@ import {
 } from '@/lib/icons';
 
 export default function Home() {
+  const { user, isAuthenticated } = useAppStore();
+  const { signOut } = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push('/');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
+  const handleSignIn = () => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    } else {
+      router.push('/login');
+    }
+  };
+
   const features = [
     {
       icon: <Target className="h-8 w-8 text-[#20C997]" />,
@@ -105,12 +132,31 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/login"
-                className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-colors"
-              >
-                Sign In with Google
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <span className="text-gray-600">Welcome, {user?.firstName || 'User'}!</span>
+                  <Link 
+                    href="/dashboard"
+                    className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link 
+                  href="/login"
+                  className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-colors"
+                >
+                  Sign In with Google
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -120,21 +166,49 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-[#212529] mb-6">
-            Master Your Knowledge with
-            <span className="text-[#20C997]"> Locus</span>
+            {isAuthenticated ? (
+              <>
+                Welcome back, <span className="text-[#20C997]">{user?.firstName || 'User'}!</span>
+              </>
+            ) : (
+              <>
+                Master Your Knowledge with
+                <span className="text-[#20C997]"> Locus</span>
+              </>
+            )}
           </h1>
           <p className="text-xl text-[#6C757D] mb-8 max-w-3xl mx-auto">
-            A comprehensive quiz management platform that helps you create, take, and analyze quizzes 
-            with powerful analytics and beautiful insights. Sign in with your Google account to get started.
+            {isAuthenticated 
+              ? "Ready to continue your learning journey? Access your dashboard or explore our features."
+              : "A comprehensive quiz management platform that helps you create, take, and analyze quizzes with powerful analytics and beautiful insights. Sign in with your Google account to get started."
+            }
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/login"
-              className="bg-[#20C997] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1BA085] transition-colors flex items-center justify-center"
-            >
-              Sign In with Google
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link 
+                  href="/dashboard"
+                  className="bg-[#20C997] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1BA085] transition-colors flex items-center justify-center"
+                >
+                  Go to Dashboard
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+                <Link 
+                  href="/create"
+                  className="bg-white text-[#20C997] border-2 border-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#20C997] hover:text-white transition-colors"
+                >
+                  Create New Quiz
+                </Link>
+              </>
+            ) : (
+              <Link 
+                href="/login"
+                className="bg-[#20C997] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1BA085] transition-colors flex items-center justify-center"
+              >
+                Sign In with Google
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -283,13 +357,23 @@ export default function Home() {
               <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Settings</span>
             </Link>
             
-            <Link 
-              href="/login"
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
-            >
-              <LogIn className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign In</span>
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={handleSignOut}
+                className="bg-white p-6 rounded-lg border border-gray-200 hover:border-red-500 hover:shadow-md transition-all text-center group"
+              >
+                <LogOut className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                <span className="text-sm font-medium text-[#212529] group-hover:text-red-500">Sign Out</span>
+              </button>
+            ) : (
+              <Link 
+                href="/login"
+                className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+              >
+                <LogIn className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
+                <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign In</span>
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -298,18 +382,30 @@ export default function Home() {
       <section className="py-20 bg-[#20C997]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Get Started?
+            {isAuthenticated ? 'Ready to Continue Learning?' : 'Ready to Get Started?'}
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of users who are already using Locus to improve their learning and assessment experience.
+            {isAuthenticated 
+              ? "Access your dashboard to continue your learning journey and explore new features."
+              : "Join thousands of users who are already using Locus to improve their learning and assessment experience."
+            }
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/login"
-              className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Sign In with Google
-            </Link>
+            {isAuthenticated ? (
+              <Link 
+                href="/dashboard"
+                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link 
+                href="/login"
+                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+              >
+                Sign In with Google
+              </Link>
+            )}
           </div>
         </div>
       </section>

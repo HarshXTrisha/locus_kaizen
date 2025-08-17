@@ -8,7 +8,7 @@ export { Target, CheckCircle, TrendingUp, TrendingDown, Plus, BookOpen, Award, C
 export { Bell, User, Search, ChevronLeft, ChevronRight, MoreVertical, ArrowDown, ChevronsUpDown, ArrowLeft } from 'lucide-react';
 
 // Auth icons
-export { LogIn, Mail, ShieldCheck, UserPlus } from 'lucide-react';
+export { LogIn, LogOut, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 
 // Quiz icons
 export { Flag } from 'lucide-react';
