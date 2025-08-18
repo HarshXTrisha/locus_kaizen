@@ -341,7 +341,7 @@ export class PDFProcessor {
     
     // Determine question type
     let type: 'multiple-choice' | 'true-false' | 'short-answer' = 'multiple-choice';
-    if (options.length === 2 && options.every(opt => this.questionPatterns.trueFalse.test(opt))) {
+    if (options.length === 2 && options.every(opt => /^(True|False)$/i.test(opt))) {
       type = 'true-false';
     } else if (options.length === 0) {
       type = 'short-answer';
