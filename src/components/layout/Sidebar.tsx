@@ -14,7 +14,13 @@ import {
   Users,
   BookOpen,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Play,
+  FileText,
+  Globe,
+  Target,
+  Calendar,
+  Award
 } from 'lucide-react';
 
 export function Sidebar() {
@@ -28,9 +34,13 @@ export function Sidebar() {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Create Quiz', href: '/create', icon: Plus },
-    { name: 'Upload', href: '/upload', icon: Upload },
+    { name: 'Upload Files', href: '/upload', icon: Upload },
+    { name: 'Take Quiz', href: '/quiz', icon: Play },
+    { name: 'Live Quiz', href: '/live-quiz', icon: Target },
+    { name: 'Schedule Quiz', href: '/schedule', icon: Calendar },
     { name: 'Results', href: '/results', icon: BarChart3 },
     { name: 'Archive', href: '/archive', icon: Archive },
+    { name: 'IIM BBA DBE', href: '/iim-bba-dbe', icon: Globe },
     { name: 'Teams', href: '/teams', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
@@ -50,7 +60,7 @@ export function Sidebar() {
           <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center shadow-md">
             <BookOpen className="h-5 w-5 text-white" />
           </div>
-          {sidebarOpen && <span>Locus</span>}
+          {sidebarOpen && <span>IIM BBA DBE</span>}
         </Link>
         
         {/* Toggle Button */}
