@@ -270,26 +270,26 @@ export class PDFProcessor {
             console.log(`Marked D as correct:`, optionText);
           }
         } else if (trimmedLine && currentQuestion.text && !trimmedLine.match(/^[A-D]\)/)) {
-          // Check if this line contains multiple options (e.g., "B) Osaka C) Tokyo D) Hiroshima")
-          const multiOptionMatch = trimmedLine.match(/([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi);
-          if (multiOptionMatch && currentQuestion.options) {
-            console.log(`Found multiple options on same line:`, trimmedLine);
-            // Parse each option
-            multiOptionMatch.forEach(match => {
-              const optionMatch = match.match(/([A-D])[\.:\)]\s*(.+)/i);
-              if (optionMatch) {
-                const optionLetter = optionMatch[1];
-                const optionText = optionMatch[2].trim();
-                const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
-                
-                // Ensure we have enough options
-                while (currentQuestion.options!.length <= optionIndex) {
-                  currentQuestion.options!.push('');
-                }
-                currentQuestion.options![optionIndex] = optionText;
-                console.log(`Added option ${optionLetter}:`, optionText);
-              }
-            });
+                     // Check if this line contains multiple options (e.g., "B) Osaka C) Tokyo D) Hiroshima")
+           const multiOptionMatch = trimmedLine.match(/([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi);
+           if (multiOptionMatch && currentQuestion && currentQuestion.options) {
+             console.log(`Found multiple options on same line:`, trimmedLine);
+             // Parse each option
+             multiOptionMatch.forEach(match => {
+               const optionMatch = match.match(/([A-D])[\.:\)]\s*(.+)/i);
+               if (optionMatch && currentQuestion) {
+                 const optionLetter = optionMatch[1];
+                 const optionText = optionMatch[2].trim();
+                 const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+                 
+                 // Ensure we have enough options
+                 while (currentQuestion.options!.length <= optionIndex) {
+                   currentQuestion.options!.push('');
+                 }
+                 currentQuestion.options![optionIndex] = optionText;
+                 console.log(`Added option ${optionLetter}:`, optionText);
+               }
+             });
           } else {
             // Append to question text if it's not an option and not empty
             currentQuestion.text += ' ' + trimmedLine;
