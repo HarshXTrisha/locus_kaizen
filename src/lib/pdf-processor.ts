@@ -1,32 +1,8 @@
 // PDF Processing Utility for Quiz Creation
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set up PDF.js worker only on client side with robust fallback
-if (typeof window !== 'undefined') {
-  // Try to set up the worker with multiple fallback options
-  const setupWorker = () => {
-    try {
-      // Primary: Use local worker file
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-      console.log('✅ PDF worker configured with local file');
-    } catch (error) {
-      console.warn('⚠️ Failed to set local PDF worker, trying CDN fallback:', error);
-      try {
-        // Fallback: Use CDN with specific version
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-        console.log('✅ PDF worker configured with CDN fallback');
-      } catch (cdnError) {
-        console.error('❌ Failed to configure PDF worker:', cdnError);
-        // Last resort: Use empty string to disable worker (will use main thread)
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-        console.warn('⚠️ PDF worker disabled, using main thread');
-      }
-    }
-  };
-
-  // Set up worker when the module loads
-  setupWorker();
-}
+// Configure pdf.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export interface ExtractedQuestion {
   id: string;
@@ -37,303 +13,188 @@ export interface ExtractedQuestion {
   points: number;
 }
 
-export interface PDFProcessingResult {
-  success: boolean;
+export interface ExtractedQuiz {
+  title: string;
+  description?: string;
+  subject: string;
   questions: ExtractedQuestion[];
-  error?: string;
-  totalQuestions: number;
-  processingTime: number;
 }
 
-// Common question patterns to look for in PDF text
-const QUESTION_PATTERNS = [
-  /^\d+\.\s*(.+?)(?=\n\d+\.|$)/gm,  // "1. Question text"
-  /^Q\d+\.\s*(.+?)(?=\nQ\d+\.|$)/gm,  // "Q1. Question text"
-  /^Question\s*\d+\.\s*(.+?)(?=\nQuestion\s*\d+\.|$)/gm,  // "Question 1. Question text"
-  /^\(\d+\)\s*(.+?)(?=\n\(\d+\)|$)/gm,  // "(1) Question text"
-  /^[A-Z]\)\s*(.+?)(?=\n[A-Z]\)|$)/gm,  // "A) Question text"
-  /^[a-z]\)\s*(.+?)(?=\n[a-z]\)|$)/gm,  // "a) Question text"
-];
+export class PDFProcessor {
+  private static questionPatterns = {
+    questionNumber: /^Q(\d+)\.?\s*(.+)$/i,
+    optionA: /^A\)\s*(.+)$/i,
+    optionB: /^B\)\s*(.+)$/i,
+    optionC: /^C\)\s*(.+)$/i,
+    optionD: /^D\)\s*(.+)$/i,
+    trueFalse: /^(True|False)$/i,
+  };
 
-// Answer option patterns
-const ANSWER_PATTERNS = [
-  /^[A-D]\)\s*(.+?)(?=\n[A-D]\)|$)/gm, // "A) Option text"
-  /^[A-D]\.\s*(.+?)(?=\n[A-D]\.|$)/gm, // "A. Option text"
-  /^[A-D]\s*(.+?)(?=\n[A-D]\s|$)/gm, // "A Option text"
-];
-
-// Correct answer indicators
-const CORRECT_ANSWER_INDICATORS = [
-  /correct.*answer.*is.*([A-D])/i,
-  /answer.*is.*([A-D])/i,
-  /([A-D]).*correct/i,
-  /([A-D]).*right/i,
-];
-
-/**
- * Process PDF file to extract questions and answers
- */
-export async function processPDFFile(file: File): Promise<PDFProcessingResult> {
-  const startTime = Date.now();
-  
-  // Check if we're on the client side
-  if (typeof window === 'undefined') {
-    return {
-      success: false,
-      questions: [],
-      error: 'PDF processing is only available on the client side',
-      totalQuestions: 0,
-      processingTime: 0
-    };
-  }
-  
-  try {
-    console.log('🔍 Processing PDF file for questions...');
-    
-    // Convert file to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    
-    // Load PDF document with better error handling
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-    const pdf = await loadingTask.promise;
-    
-    let fullText = '';
-    
-    // Extract text from all pages
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
+  /**
+   * Process PDF file and extract quiz data
+   */
+  static async processPDF(file: File): Promise<ExtractedQuiz> {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       
-      // Combine text items
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ');
+      let allText = '';
       
-      fullText += pageText + '\n';
+      // Extract text from all pages
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        allText += pageText + '\n';
+      }
+
+      return this.parseQuizText(allText, file.name);
+    } catch (error) {
+      console.error('Error processing PDF:', error);
+      throw new Error('Failed to process PDF file');
     }
-    
-    // Clean the text
-    const cleanedText = cleanText(fullText);
-    
-    // Extract questions
-    const questions = extractQuestions(cleanedText);
-    
-    const processingTime = Date.now() - startTime;
-    
-    console.log(`✅ Extracted ${questions.length} questions in ${processingTime}ms`);
-    
-    return {
-      success: true,
-      questions,
-      totalQuestions: questions.length,
-      processingTime
-    };
-    
-  } catch (error) {
-    console.error('❌ Error processing PDF:', error);
-    return {
-      success: false,
-      questions: [],
-      error: error instanceof Error ? error.message : 'Unknown error',
-      totalQuestions: 0,
-      processingTime: Date.now() - startTime
-    };
   }
-}
 
-/**
- * Process PDF text to extract questions and answers (for backward compatibility)
- */
-export async function processPDFText(pdfText: string): Promise<PDFProcessingResult> {
-  const startTime = Date.now();
-  
-  try {
-    console.log('🔍 Processing PDF text for questions...');
-    
-    // Clean the text
-    const cleanedText = cleanText(pdfText);
-    
-    // Extract questions
-    const questions = extractQuestions(cleanedText);
-    
-    const processingTime = Date.now() - startTime;
-    
-    console.log(`✅ Extracted ${questions.length} questions in ${processingTime}ms`);
-    
-    return {
-      success: true,
-      questions,
-      totalQuestions: questions.length,
-      processingTime
-    };
-    
-  } catch (error) {
-    console.error('❌ Error processing PDF:', error);
-    return {
-      success: false,
-      questions: [],
-      error: error instanceof Error ? error.message : 'Unknown error',
-      totalQuestions: 0,
-      processingTime: Date.now() - startTime
-    };
-  }
-}
+  /**
+   * Parse extracted text into structured quiz data
+   */
+  private static parseQuizText(text: string, fileName: string): ExtractedQuiz {
+    const lines = text.split('\n').filter(line => line.trim());
+    const questions: ExtractedQuestion[] = [];
+    let currentQuestion: Partial<ExtractedQuestion> | null = null;
+    let questionCounter = 1;
 
-/**
- * Clean and normalize text from PDF
- */
-function cleanText(text: string): string {
-  return text
-    .replace(/\r\n/g, '\n') // Normalize line endings
-    .replace(/\t/g, ' ') // Replace tabs with spaces
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim();
-}
-
-/**
- * Extract questions from cleaned text
- */
-function extractQuestions(text: string): ExtractedQuestion[] {
-  const questions: ExtractedQuestion[] = [];
-  let questionIndex = 1;
-  
-  // Try different question patterns
-  for (const pattern of QUESTION_PATTERNS) {
-    const matches = text.matchAll(pattern);
-    
-    for (const match of matches) {
-      const questionText = match[1]?.trim();
-      if (!questionText) continue;
+    for (const line of lines) {
+      const trimmedLine = line.trim();
       
-      // Extract answer options for this question
-      const options = extractAnswerOptions(questionText);
-      const correctAnswer = extractCorrectAnswer(questionText);
-      
-      const question: ExtractedQuestion = {
-        id: `q${questionIndex}`,
-        text: cleanQuestionText(questionText),
-        type: options.length > 0 ? 'multiple-choice' : 'short-answer',
-        options: options.length > 0 ? options : undefined,
-        correctAnswer: correctAnswer || options[0] || '',
-        points: 1
-      };
-      
-      questions.push(question);
-      questionIndex++;
-    }
-    
-    // If we found questions with this pattern, break
-    if (questions.length > 0) break;
-  }
-  
-  // If no questions found with patterns, try to split by common delimiters
-  if (questions.length === 0) {
-    const questionBlocks = text.split(/\n\s*\n/);
-    
-    for (const block of questionBlocks) {
-      const trimmedBlock = block.trim();
-      if (trimmedBlock.length > 20) { // Minimum question length
-        const question: ExtractedQuestion = {
-          id: `q${questionIndex}`,
-          text: trimmedBlock,
-          type: 'short-answer',
+      // Check for question number
+      const questionMatch = trimmedLine.match(this.questionPatterns.questionNumber);
+      if (questionMatch) {
+        // Save previous question if exists
+        if (currentQuestion && currentQuestion.text) {
+          questions.push(this.finalizeQuestion(currentQuestion, questionCounter - 1));
+        }
+        
+        // Start new question
+        currentQuestion = {
+          id: `q${questionCounter}`,
+          text: questionMatch[2].trim(),
+          type: 'multiple-choice',
+          options: [],
           correctAnswer: '',
           points: 1
         };
-        
-        questions.push(question);
-        questionIndex++;
+        questionCounter++;
+        continue;
+      }
+
+      // Check for options
+      if (currentQuestion) {
+        const optionAMatch = trimmedLine.match(this.questionPatterns.optionA);
+        const optionBMatch = trimmedLine.match(this.questionPatterns.optionB);
+        const optionCMatch = trimmedLine.match(this.questionPatterns.optionC);
+        const optionDMatch = trimmedLine.match(this.questionPatterns.optionD);
+
+        if (optionAMatch) {
+          currentQuestion.options = currentQuestion.options || [];
+          currentQuestion.options.push(optionAMatch[1].trim());
+        } else if (optionBMatch) {
+          currentQuestion.options = currentQuestion.options || [];
+          currentQuestion.options.push(optionBMatch[1].trim());
+        } else if (optionCMatch) {
+          currentQuestion.options = currentQuestion.options || [];
+          currentQuestion.options.push(optionCMatch[1].trim());
+        } else if (optionDMatch) {
+          currentQuestion.options = currentQuestion.options || [];
+          currentQuestion.options.push(optionDMatch[1].trim());
+        } else if (trimmedLine && currentQuestion.text) {
+          // Append to question text if it's not an option
+          currentQuestion.text += ' ' + trimmedLine;
+        }
       }
     }
-  }
-  
-  return questions;
-}
 
-/**
- * Extract answer options from question text
- */
-function extractAnswerOptions(questionText: string): string[] {
-  const options: string[] = [];
-  
-  // Look for answer options in the question text
-  for (const pattern of ANSWER_PATTERNS) {
-    const matches = questionText.matchAll(pattern);
+    // Add the last question
+    if (currentQuestion && currentQuestion.text) {
+      questions.push(this.finalizeQuestion(currentQuestion, questionCounter - 1));
+    }
+
+    return {
+      title: this.extractTitle(fileName),
+      description: `Quiz extracted from ${fileName}`,
+      subject: 'General',
+      questions: questions
+    };
+  }
+
+  /**
+   * Finalize question structure and set default correct answer
+   */
+  private static finalizeQuestion(question: Partial<ExtractedQuestion>, index: number): ExtractedQuestion {
+    const options = question.options || [];
     
-    for (const match of matches) {
-      const optionText = match[1]?.trim();
-      if (optionText && optionText.length > 1) {
-        options.push(optionText);
+    // Set default correct answer to first option if available
+    const correctAnswer = options.length > 0 ? options[0] : '';
+    
+    // Determine question type
+    let type: 'multiple-choice' | 'true-false' | 'short-answer' = 'multiple-choice';
+    if (options.length === 2 && options.every(opt => this.questionPatterns.trueFalse.test(opt))) {
+      type = 'true-false';
+    } else if (options.length === 0) {
+      type = 'short-answer';
+    }
+
+    return {
+      id: question.id || `q${index}`,
+      text: question.text || '',
+      type,
+      options: options.length > 0 ? options : undefined,
+      correctAnswer,
+      points: question.points || 1
+    };
+  }
+
+  /**
+   * Extract title from filename
+   */
+  private static extractTitle(fileName: string): string {
+    const nameWithoutExt = fileName.replace(/\.pdf$/i, '');
+    return nameWithoutExt.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  /**
+   * Validate extracted quiz data
+   */
+  static validateQuiz(quiz: ExtractedQuiz): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    if (!quiz.title.trim()) {
+      errors.push('Quiz title is required');
+    }
+
+    if (quiz.questions.length === 0) {
+      errors.push('No questions found in PDF');
+    }
+
+    quiz.questions.forEach((question, index) => {
+      if (!question.text.trim()) {
+        errors.push(`Question ${index + 1} has no text`);
       }
-    }
-    
-    if (options.length > 0) break;
-  }
-  
-  return options;
-}
 
-/**
- * Extract correct answer from question text
- */
-function extractCorrectAnswer(questionText: string): string {
-  for (const pattern of CORRECT_ANSWER_INDICATORS) {
-    const match = questionText.match(pattern);
-    if (match && match[1]) {
-      return match[1];
-    }
-  }
-  
-  return '';
-}
+      if (question.type === 'multiple-choice' && (!question.options || question.options.length < 2)) {
+        errors.push(`Question ${index + 1} needs at least 2 options`);
+      }
 
-/**
- * Clean question text by removing answer options and indicators
- */
-function cleanQuestionText(questionText: string): string {
-  let cleanedText = questionText;
-  
-  // Remove answer options
-  for (const pattern of ANSWER_PATTERNS) {
-    cleanedText = cleanedText.replace(pattern, '');
-  }
-  
-  // Remove correct answer indicators
-  for (const pattern of CORRECT_ANSWER_INDICATORS) {
-    cleanedText = cleanedText.replace(pattern, '');
-  }
-  
-  // Clean up extra whitespace
-  cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
-  
-  return cleanedText;
-}
+      if (!question.correctAnswer.trim()) {
+        errors.push(`Question ${index + 1} has no correct answer`);
+      }
+    });
 
-/**
- * Validate extracted questions
- */
-export function validateQuestions(questions: ExtractedQuestion[]): {
-  valid: boolean;
-  errors: string[];
-} {
-  const errors: string[] = [];
-  
-  if (questions.length === 0) {
-    errors.push('No questions were extracted from the PDF');
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
   }
-  
-  questions.forEach((question, index) => {
-    if (!question.text || question.text.length < 10) {
-      errors.push(`Question ${index + 1} has insufficient text`);
-    }
-    
-    if (question.type === 'multiple-choice' && (!question.options || question.options.length < 2)) {
-      errors.push(`Question ${index + 1} is marked as multiple-choice but has insufficient options`);
-    }
-  });
-  
-  return {
-    valid: errors.length === 0,
-    errors
-  };
 }

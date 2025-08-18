@@ -1,0 +1,55 @@
+Sample Quiz - Geography
+
+Q1. What is the capital of France?
+A) London
+B) Berlin
+C) Paris
+D) Madrid
+
+Q2. Which planet is closest to the Sun?
+A) Venus
+B) Mercury
+C) Earth
+D) Mars
+
+Q3. What is the largest ocean on Earth?
+A) Atlantic Ocean
+B) Indian Ocean
+C) Pacific Ocean
+D) Arctic Ocean
+
+Q4. Which country has the largest population in the world?
+A) India
+B) China
+C) United States
+D) Russia
+
+Q5. What is the chemical symbol for gold?
+A) Ag
+B) Au
+C) Fe
+D) Cu
+
+Instructions for testing:
+1. Copy this text
+2. Create a new document in Word/Google Docs
+3. Paste the text
+4. Save as PDF
+5. Upload the PDF to test the processing
+
+Expected JSON output:
+{
+  "title": "Sample Quiz Geography",
+  "subject": "General",
+  "questions": [
+    {
+      "id": "q1",
+      "text": "What is the capital of France?",
+      "type": "multiple-choice",
+      "options": ["London", "Berlin", "Paris", "Madrid"],
+      "correctAnswer": "Paris",
+      "points": 1
+    }
+    // ... more questions
+  ]
+}

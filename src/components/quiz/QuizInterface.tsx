@@ -248,7 +248,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
       {/* Mobile Navigation Overlay */}
       {showMobileNav && (
         <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setShowMobileNav(false)}>
-          <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-xl p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute right-0 top-0 h-full w-96 bg-white shadow-xl p-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-900">Question Navigation</h3>
               <button onClick={() => setShowMobileNav(false)}>
@@ -294,11 +294,11 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
 
         {/* Main Content Area - Compact */}
         <div className="w-full bg-gray-50 min-h-[calc(100vh-100px)]">
-          <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               {/* Main Quiz Area */}
               <div className="lg:col-span-4">
-                <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6 shadow-sm">
+                <div className="bg-white rounded-lg border border-gray-200 p-3 lg:p-4 shadow-sm">
                   <QuestionDisplay
                     question={currentQuestion}
                     questionNumber={currentQuestionIndex + 1}
@@ -312,7 +312,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
                 </div>
 
                 {/* Compact Navigation Buttons */}
-                <div className="flex items-center justify-between mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <button
                     onClick={() => handleQuestionNavigation(currentQuestionIndex - 1)}
                     disabled={currentQuestionIndex === 0}
@@ -340,9 +340,9 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
                 </div>
               </div>
 
-              {/* Desktop Question Navigation Sidebar - Compact */}
+              {/* Desktop Question Navigation Sidebar - Larger size */}
               <div className="hidden lg:block lg:col-span-1">
-                <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm sticky top-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm sticky top-4 w-full">
                   <QuestionNavigation
                     questions={quiz.questions}
                     answers={answers}
