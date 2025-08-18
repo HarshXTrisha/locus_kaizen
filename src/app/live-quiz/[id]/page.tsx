@@ -148,8 +148,9 @@ export default function LiveQuizPage() {
         {!isRegistered ? (
           <div className="container mx-auto px-4 py-8">
             <ShareableLinkRegistration
-              quiz={quiz}
+              quizId={quizId}
               onRegistrationComplete={handleRegistrationComplete}
+              onError={(error) => setError(error)}
             />
           </div>
         ) : (
