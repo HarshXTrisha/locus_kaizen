@@ -12,7 +12,8 @@ interface QuizProgressProps {
 
 export function QuizProgress({ current, total, answered, flagged }: QuizProgressProps) {
   const progressPercentage = (answered / total) * 100;
-  const remaining = total - answered;
+  // Calculate remaining the same way as unanswered in QuestionNavigation
+  const remaining = total - answered; // This is the same as unanswered questions
 
   return (
     <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
@@ -62,7 +63,7 @@ export function QuizProgress({ current, total, answered, flagged }: QuizProgress
         <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
           <div className="flex items-center gap-2 mb-1">
             <Clock className="h-4 w-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-800">Remaining</span>
+            <span className="text-sm font-medium text-gray-800">Unanswered</span>
           </div>
           <div className="text-2xl font-bold text-gray-700">{remaining}</div>
           <div className="text-xs text-gray-600">questions left</div>
