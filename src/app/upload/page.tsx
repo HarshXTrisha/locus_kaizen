@@ -44,7 +44,7 @@ export default function UploadPage() {
     description: '',
     subject: '',
     timeLimit: 30,
-    passingScore: 70
+            passingScore: 0
   });
 
   useEffect(() => {
@@ -280,7 +280,7 @@ export default function UploadPage() {
                       <input
                         type="number"
                         value={quizData.passingScore}
-                        onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 70 }))}
+                        onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 0 }))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         min="0"
                         max="100"

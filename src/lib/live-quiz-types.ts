@@ -2,6 +2,7 @@
 
 export interface LiveQuiz {
   id: string;
+  portal?: string; // e.g., 'personal' | 'bba-dbe'
   title: string;
   description: string;
   category: string;
@@ -56,6 +57,7 @@ export interface ParticipantAnswer {
 
 export interface LiveQuizResult {
   quizId: string;
+  portal?: string; // e.g., 'personal' | 'bba-dbe'
   quizTitle: string;
   category: string;
   date: Date;

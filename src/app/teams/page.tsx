@@ -54,9 +54,11 @@ export default function TeamsPage() {
           setUserRole(roleData?.role || 'user');
         }
 
-        // Get all team members
-        const members = await getTeamMembers();
-        setTeamMembers(members);
+        // Only admins are allowed to list team members per Firestore rules
+        if ((userRole || 'user') === 'admin') {
+          const members = await getTeamMembers();
+          setTeamMembers(members);
+        }
       } catch (err) {
         console.error('Error loading team data:', err);
         setError('Failed to load team data');
@@ -184,6 +186,29 @@ export default function TeamsPage() {
   const admins = teamMembers.filter(member => member.role === 'admin');
   const moderators = teamMembers.filter(member => member.role === 'moderator');
   const users = teamMembers.filter(member => member.role === 'user');
+
+  // Non-admins: show limited view (no listing to avoid permission errors)
+  if (!canManageRoles) {
+    return (
+      <ResponsiveLayout>
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-3xl mx-auto px-4 lg:px-8 py-8">
+            <div className="mb-8">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Team</h1>
+              <p className="text-lg text-gray-600">Your current role and access.</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                {getRoleIcon(userRole)}
+                <h2 className="text-xl font-semibold text-gray-900">Your Role</h2>
+              </div>
+              <p className="text-gray-700">You are a <span className="font-semibold">{userRole}</span>. Only admins can view and manage the full team list.</p>
+            </div>
+          </div>
+        </div>
+      </ResponsiveLayout>
+    );
+  }
 
   return (
     <ResponsiveLayout>

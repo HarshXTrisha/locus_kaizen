@@ -4,8 +4,44 @@ service cloud.firestore {
     // Helper functions
     function isAuthenticated() {
       return request.auth != null;
+        }
+ 
+    // Live quizzes collection
+    match /liveQuizzes/{quizId} {
+      // Allow read for all authenticated users (for public live quiz participation)
+      allow read, list: if isAuthenticated();
+      
+      // Allow create if user is authenticated
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.createdBy;
+      
+      // Allow update if user is creator, admin, or moderator
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.createdBy || 
+        isAdmin() ||
+        isModerator()
+      );
+      
+      // Allow delete if user is creator or admin
+      allow delete: if isAuthenticated() && (
+        request.auth.uid == resource.data.createdBy || 
+        isAdmin()
+      );
     }
-    
+ 
+    // Live quiz results (separate from regular quizResults)
+    match /liveQuizResults/{resultId} {
+      // Allow anyone to read leaderboard/results summaries
+      allow read, list: if true;
+
+      // Allow creation from clients (used by live quiz completion flow)
+      // NOTE: tighten later to require auth or Cloud Functions if needed
+      allow create: if true;
+
+      // Only admins can modify or delete existing results
+      allow update, delete: if isAuthenticated() && isAdmin();
+    }
+
     function isOwner(userId) {
       return request.auth.uid == userId;
     }

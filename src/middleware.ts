@@ -17,11 +17,6 @@ const protectedRoutes = [
 const publicRoutes = [
   '/',
   '/login',
-  '/login-simple',
-  '/signup',
-  '/forgot-password',
-  '/reset-password',
-  '/verify-otp',
   '/test-db'
 ];
 

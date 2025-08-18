@@ -153,7 +153,7 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
       subject: (quizData.subject || 'Spreadsheets for Business Decisions') as AllowedSubject,
       questions: cleanedQuestions,
       timeLimit: quizData.timeLimit || 30,
-      passingScore: quizData.passingScore || 70,
+      passingScore: quizData.passingScore || 0,
       createdBy: quizData.createdBy,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),

@@ -46,7 +46,7 @@ export function CreateQuizForm() {
     description: '',
     subject: 'General',
     timeLimit: 60,
-    passingScore: 70,
+            passingScore: 0,
     questions: []
   });
   

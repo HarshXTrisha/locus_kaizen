@@ -18,7 +18,7 @@ import { showError, showSuccess } from '@/components/common/NotificationSystem';
 import { Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { QuizAdminControls } from '@/components/dashboard/QuizAdminControls';
+// import { QuizAdminControls } from '@/components/dashboard/QuizAdminControls';
 import { 
   NoQuizzesEmptyState, 
   NoResultsEmptyState, 
@@ -376,17 +376,6 @@ export default function DashboardPage() {
                         >
                           {quiz.isTemporary ? 'Retake' : 'Start Quiz'}
                         </Link>
-                                                 <QuizAdminControls
-                           quizId={quiz.id}
-                           userId={user!.id}
-                           adminControls={quiz.adminControls}
-                           isPublished={quiz.isPublished}
-                           onEdit={() => handleEditQuiz(quiz.id)}
-                           onViewAnalytics={() => handleViewAnalytics(quiz.id)}
-                           onPublish={() => handlePublishQuiz(quiz.id)}
-                           onUnpublish={() => handleUnpublishQuiz(quiz.id)}
-                           onDelete={() => handleDeleteQuiz(quiz.id, quiz.title)}
-                         />
                       </div>
                     </div>
                   </div>
