@@ -1,73 +1,99 @@
-SAMPLE QUIZ - MATHEMATICS
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
 
-Q1. What is the result of 5 + 3?
-A) 6
-B) 7
-C) 8 ✓
-D) 9
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
 
-Q2. Which of the following is an even number?
-A) 7
-B) 9
-C) 11
-D) 12 ✓
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+/Resources <<
+/Font <<
+/F1 5 0 R
+>>
+>>
+>>
+endobj
 
-Q3. What is the square root of 16?
-A) 2
-B) 3
-C) 4 ✓
-D) 5
+4 0 obj
+<<
+/Length 200
+>>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(SAMPLE QUIZ - MATHEMATICS) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(Q1. What is the result of 5 + 3?) Tj
+0 -15 Td
+(A) 6) Tj
+0 -15 Td
+(B) 7) Tj
+0 -15 Td
+(C) 8 ✓) Tj
+0 -15 Td
+(D) 9) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(Q2. Which of the following is an even number?) Tj
+0 -15 Td
+(A) 7) Tj
+0 -15 Td
+(B) 9) Tj
+0 -15 Td
+(C) 11) Tj
+0 -15 Td
+(D) 12 ✓) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(ANSWER KEY:) Tj
+0 -15 Td
+(Q1: C) Tj
+0 -15 Td
+(Q2: D) Tj
+ET
+endstream
+endobj
 
-Q4. Which operation comes first in PEMDAS?
-A) Addition
-B) Subtraction
-C) Parentheses ✓
-D) Multiplication
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
 
-Q5. What is 10% of 50?
-A) 5 ✓
-B) 10
-C) 15
-D) 20
-
-Q6. What is the value of π (pi) to two decimal places?
-A) 3.12
-B) 3.14 ✓
-C) 3.16
-D) 3.18
-
-Q7. Which of these is a prime number?
-A) 4
-B) 6
-C) 7 ✓
-D) 8
-
-Q8. What is 2 to the power of 3?
-A) 4
-B) 6
-C) 8 ✓
-D) 10
-
-Q9. What is the area of a square with sides of length 5?
-A) 10
-B) 15
-C) 20
-D) 25 ✓
-
-Q10. What is the sum of angles in a triangle?
-A) 90 degrees
-B) 180 degrees ✓
-C) 270 degrees
-D) 360 degrees
-
-ANSWER KEY:
-Q1: C
-Q2: D
-Q3: C
-Q4: C
-Q5: A
-Q6: B
-Q7: C
-Q8: C
-Q9: D
-Q10: B
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000250 00000 n 
+0000000450 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+550
+%%EOF
