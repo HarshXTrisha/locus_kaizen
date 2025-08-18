@@ -9,6 +9,7 @@ interface FileUploadAreaProps {
   onQuestionsExtracted: (questions: ExtractedQuestion[]) => void;
   onUploadStart?: () => void;
   onUploadComplete?: () => void;
+  accept?: string;
 }
 
 interface QuizJSON {
@@ -28,7 +29,8 @@ interface QuizJSON {
 export function FileUploadArea({ 
   onQuestionsExtracted, 
   onUploadStart, 
-  onUploadComplete 
+  onUploadComplete,
+  accept = ".json"
 }: FileUploadAreaProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -288,7 +290,7 @@ export function FileUploadArea({
       >
           <input
             type="file"
-          accept=".json"
+                          accept={accept}
             multiple
             onChange={handleFileSelect}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"

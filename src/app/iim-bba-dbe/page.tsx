@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, Users, Trophy, Play, Settings, BarChart3, Clock, Target, Link as LinkIcon, Copy, Plus, CheckCircle } from 'lucide-react';
+import { Calendar, Users, Trophy, Play, Settings, BarChart3, Clock, Target, Link as LinkIcon, Copy, Plus, CheckCircle, Upload, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { ResponsiveLayout } from '@/components/layout/ResponsiveLayout';
 import { IIMSidebar } from '@/components/layout/IIMSidebar';
@@ -9,12 +9,17 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { liveQuizService } from '@/lib/live-quiz-service';
+import { createQuiz } from '@/lib/firebase-quiz';
+import { useAppStore } from '@/lib/store';
 import LiveQuizManager from '@/components/live-quiz/LiveQuizManager';
 import LiveQuizCreator from '@/components/live-quiz/LiveQuizCreator';
 import ResultsDashboard from '@/components/live-quiz/ResultsDashboard';
 import Leaderboard from '@/components/live-quiz/Leaderboard';
+import { FileUploadArea } from '@/components/upload/FileUploadArea';
+import { PDFUploadArea } from '@/components/upload/PDFUploadArea';
 
 export default function IIMBBADBEPage() {
+  const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showQuizCreator, setShowQuizCreator] = useState(false);
   const [lastCreatedQuiz, setLastCreatedQuiz] = useState<{ id: string; link: string } | null>(null);
@@ -26,6 +31,18 @@ export default function IIMBBADBEPage() {
     averageScore: 0
   });
   const [upcomingQuizzes, setUpcomingQuizzes] = useState<any[]>([]);
+  
+  // Upload state
+  const [activeUploadTab, setActiveUploadTab] = useState<'json' | 'pdf' | 'txt'>('json');
+  const [extractedQuestions, setExtractedQuestions] = useState<any[]>([]);
+  const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
+  const [quizData, setQuizData] = useState({
+    title: '',
+    description: '',
+    subject: '',
+    timeLimit: 30,
+    passingScore: 0
+  });
 
   // Load initial data and initialize schedule checking
   useEffect(() => {
@@ -114,6 +131,77 @@ export default function IIMBBADBEPage() {
     showSuccess('Quiz Created', 'Live quiz created successfully!');
   };
 
+  // Upload handlers
+  const handleQuestionsExtracted = (questions: any[]) => {
+    setExtractedQuestions(questions);
+    showSuccess('Questions Extracted', `Successfully extracted ${questions.length} questions from the file.`);
+  };
+
+  const handlePDFQuizExtracted = (quizData: any) => {
+    setQuizData(prev => ({
+      ...prev,
+      title: quizData.title || prev.title,
+      description: quizData.description || prev.description,
+      subject: quizData.subject || prev.subject
+    }));
+    setExtractedQuestions(quizData.questions || []);
+    showSuccess('PDF Processed', 'Successfully extracted quiz data from PDF.');
+  };
+
+  const handleTXTQuizExtracted = (questions: any[]) => {
+    setExtractedQuestions(questions);
+    showSuccess('TXT Processed', `Successfully extracted ${questions.length} questions from TXT file.`);
+  };
+
+  const handleCreateQuiz = async () => {
+    if (!user?.id) {
+      showError('Authentication Required', 'Please sign in to create quizzes.');
+      return;
+    }
+
+    if (extractedQuestions.length === 0) {
+      showError('No Questions', 'Please upload a file with questions first.');
+      return;
+    }
+
+    if (!quizData.title.trim()) {
+      showError('Missing Title', 'Please enter a quiz title.');
+      return;
+    }
+
+    setIsCreatingQuiz(true);
+    try {
+      const quizToSave = {
+        title: quizData.title,
+        description: quizData.description,
+        subject: quizData.subject,
+        questions: extractedQuestions,
+        timeLimit: quizData.timeLimit,
+        passingScore: quizData.passingScore,
+        createdBy: user.id
+      };
+
+      const quizId = await createQuiz(quizToSave);
+      showSuccess('Quiz Created', 'Quiz created successfully from uploaded file!');
+      
+      // Reset form
+      setQuizData({
+        title: '',
+        description: '',
+        subject: '',
+        timeLimit: 30,
+        passingScore: 0
+      });
+      setExtractedQuestions([]);
+      
+    } catch (error) {
+      console.error('Error creating quiz:', error);
+      showError('Creation Failed', 'Failed to create quiz. Please try again.');
+    } finally {
+      setIsCreatingQuiz(false);
+    }
+  };
+
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -144,6 +232,7 @@ export default function IIMBBADBEPage() {
 
   const tabs = [
     { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
+    { id: 'upload', name: 'Upload Files', icon: Upload },
     { id: 'create', name: 'Create Quiz', icon: Plus },
     { id: 'manage', name: 'Manage Quizzes', icon: Settings },
     { id: 'results', name: 'Results', icon: Trophy },
@@ -303,6 +392,154 @@ export default function IIMBBADBEPage() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Upload Files Tab */}
+          {activeTab === 'upload' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">Upload Quiz Files</h2>
+                <p className="text-gray-600">Upload JSON, PDF, or TXT files to create quizzes automatically.</p>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+                <button
+                  onClick={() => setActiveUploadTab('json')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeUploadTab === 'json'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>JSON Upload</span>
+                </button>
+                <button
+                  onClick={() => setActiveUploadTab('pdf')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeUploadTab === 'pdf'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>PDF Upload</span>
+                </button>
+                <button
+                  onClick={() => setActiveUploadTab('txt')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeUploadTab === 'txt'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>TXT Upload</span>
+                </button>
+              </div>
+
+              {/* Upload Areas */}
+              <div className="space-y-6">
+                {activeUploadTab === 'json' && (
+                  <FileUploadArea onQuestionsExtracted={handleQuestionsExtracted} />
+                )}
+                {activeUploadTab === 'pdf' && (
+                  <PDFUploadArea onQuizExtracted={handlePDFQuizExtracted} />
+                )}
+                {activeUploadTab === 'txt' && (
+                  <FileUploadArea onQuestionsExtracted={handleTXTQuizExtracted} accept=".txt" />
+                )}
+              </div>
+
+              {/* Quiz Creation Form */}
+              {extractedQuestions.length > 0 && (
+                <div className="mt-8 border-t pt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Quiz from Extracted Questions</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Quiz Title *
+                      </label>
+                      <input
+                        type="text"
+                        value={quizData.title}
+                        onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter quiz title"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Subject
+                      </label>
+                      <input
+                        type="text"
+                        value={quizData.subject}
+                        onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter subject"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Time Limit (minutes)
+                      </label>
+                      <input
+                        type="number"
+                        value={quizData.timeLimit}
+                        onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 30 }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        min="1"
+                        max="180"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Passing Score (%)
+                      </label>
+                      <input
+                        type="number"
+                        value={quizData.passingScore}
+                        onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        min="0"
+                        max="100"
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={quizData.description}
+                      onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Enter quiz description"
+                    />
+                  </div>
+                  <button
+                    onClick={handleCreateQuiz}
+                    disabled={isCreatingQuiz || !quizData.title.trim()}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {isCreatingQuiz ? (
+                      <>
+                        <LoadingSpinner size="sm" className="mr-2" />
+                        Creating Quiz...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Quiz from {extractedQuestions.length} Questions
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
