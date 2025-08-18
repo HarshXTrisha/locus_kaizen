@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { getUserQuizzes, getUserQuizResults } from '@/lib/firebase-quiz';
+import { getUserQuizzes, getUserQuizResults, deleteQuiz, deleteQuizResult } from '@/lib/firebase-quiz';
 import { getFirebaseAuth } from '@/lib/firebase-utils';
-import { showError } from '@/components/common/NotificationSystem';
-import { Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
+import { showError, showSuccess } from '@/components/common/NotificationSystem';
+import { Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
@@ -23,6 +23,8 @@ export default function DashboardPage() {
     averageScore: 0,
     totalTimeSpent: 0
   });
+  const [deletingQuiz, setDeletingQuiz] = useState<string | null>(null);
+  const [deletingResult, setDeletingResult] = useState<string | null>(null);
 
   const loadDashboardData = useCallback(async () => {
     try {
@@ -96,6 +98,48 @@ export default function DashboardPage() {
       return `${hours}h ${minutes}m`;
     }
     return `${minutes}m`;
+  };
+
+  const handleDeleteQuiz = async (quizId: string, quizTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${quizTitle}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeletingQuiz(quizId);
+      await deleteQuiz(quizId);
+      
+      // Remove from local state
+      setQuizzes(prev => prev.filter(quiz => quiz.id !== quizId));
+      
+      showSuccess('Quiz Deleted', `"${quizTitle}" has been successfully deleted.`);
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
+      showError('Failed to delete quiz', 'An error occurred while deleting the quiz.');
+    } finally {
+      setDeletingQuiz(null);
+    }
+  };
+
+  const handleDeleteResult = async (resultId: string, quizTitle: string) => {
+    if (!confirm(`Are you sure you want to delete the result for "${quizTitle}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeletingResult(resultId);
+      await deleteQuizResult(resultId);
+      
+      // Remove from local state
+      setResults(prev => prev.filter(result => result.id !== resultId));
+      
+      showSuccess('Result Deleted', `Result for "${quizTitle}" has been successfully deleted.`);
+    } catch (error) {
+      console.error('Error deleting result:', error);
+      showError('Failed to delete result', 'An error occurred while deleting the result.');
+    } finally {
+      setDeletingResult(null);
+    }
   };
 
   if (loading) {
@@ -263,16 +307,30 @@ export default function DashboardPage() {
                           )}
                         </p>
                       </div>
-                      <Link
-                        href={`/quiz/${quiz.id}`}
-                        className={`px-6 py-2 text-white text-sm font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${
-                          quiz.isTemporary 
-                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800' 
-                            : 'bg-gradient-to-r from-[#20C997] to-[#1BA085] hover:from-[#1BA085] hover:to-[#20C997]'
-                        }`}
-                      >
-                        {quiz.isTemporary ? 'Retake' : 'Start Quiz'}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/quiz/${quiz.id}`}
+                          className={`px-6 py-2 text-white text-sm font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${
+                            quiz.isTemporary 
+                              ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800' 
+                              : 'bg-gradient-to-r from-[#20C997] to-[#1BA085] hover:from-[#1BA085] hover:to-[#20C997]'
+                          }`}
+                        >
+                          {quiz.isTemporary ? 'Retake' : 'Start Quiz'}
+                        </Link>
+                        <button
+                          onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}
+                          disabled={deletingQuiz === quiz.id}
+                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Delete quiz"
+                        >
+                          {deletingQuiz === quiz.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -336,12 +394,26 @@ export default function DashboardPage() {
                           }`}>
                             {result.score}%
                           </div>
-                          <Link
-                            href={`/results/${result.id}`}
-                            className="text-sm text-[#20C997] hover:text-[#1BA085] hover:underline"
-                          >
-                            View Details
-                          </Link>
+                          <div className="flex items-center gap-2 justify-end mt-2">
+                            <Link
+                              href={`/results/${result.id}`}
+                              className="text-sm text-[#20C997] hover:text-[#1BA085] hover:underline"
+                            >
+                              View Details
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteResult(result.id, quiz?.title || 'Unknown Quiz')}
+                              disabled={deletingResult === result.id}
+                              className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Delete result"
+                            >
+                              {deletingResult === result.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-3 w-3" />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>

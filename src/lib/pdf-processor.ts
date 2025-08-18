@@ -29,11 +29,13 @@ export interface ExtractedQuiz {
 export class PDFProcessor {
   private static questionPatterns = {
     questionNumber: /^Q(\d+)\.?\s*(.+)$/i,
-    optionA: /^A\)\s*(.+)$/i,
-    optionB: /^B\)\s*(.+)$/i,
-    optionC: /^C\)\s*(.+)$/i,
-    optionD: /^D\)\s*(.+)$/i,
+    optionA: /^A\)\s*(.+?)(?:\s*[✓*]|$)/i,
+    optionB: /^B\)\s*(.+?)(?:\s*[✓*]|$)/i,
+    optionC: /^C\)\s*(.+?)(?:\s*[✓*]|$)/i,
+    optionD: /^D\)\s*(.+?)(?:\s*[✓*]|$)/i,
     trueFalse: /^(True|False)$/i,
+    answerKey: /^(?:ANSWERS?|ANSWER KEY):\s*$/i,
+    answerKeyEntry: /^Q(\d+):\s*([A-D])$/i,
   };
 
   /**
@@ -59,8 +61,13 @@ export class PDFProcessor {
     }
 
     try {
+      console.log('Processing PDF file:', file.name, 'Size:', file.size);
+      
       const arrayBuffer = await file.arrayBuffer();
+      console.log('File converted to ArrayBuffer, size:', arrayBuffer.byteLength);
+      
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      console.log('PDF loaded, pages:', pdf.numPages);
       
       let allText = '';
       
@@ -72,12 +79,24 @@ export class PDFProcessor {
           .map((item: any) => item.str)
           .join(' ');
         allText += pageText + '\n';
+        console.log(`Page ${pageNum} text length:`, pageText.length);
       }
 
-      return this.parseQuizText(allText, file.name);
+      console.log('Total extracted text length:', allText.length);
+      console.log('First 500 characters:', allText.substring(0, 500));
+
+      const result = this.parseQuizText(allText, file.name);
+      console.log('Parsed quiz:', result);
+      
+      return result;
     } catch (error) {
       console.error('Error processing PDF:', error);
-      throw new Error('Failed to process PDF file');
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      throw new Error(`Failed to process PDF file: ${error.message}`);
     }
   }
 
@@ -85,20 +104,52 @@ export class PDFProcessor {
    * Parse extracted text into structured quiz data
    */
   private static parseQuizText(text: string, fileName: string): ExtractedQuiz {
+    console.log('Parsing text with length:', text.length);
+    
     const lines = text.split('\n').filter(line => line.trim());
+    console.log('Number of non-empty lines:', lines.length);
+    
     const questions: ExtractedQuestion[] = [];
     let currentQuestion: Partial<ExtractedQuestion> | null = null;
     let questionCounter = 1;
+    let answerKey: { [key: number]: string } = {};
+    let inAnswerKey = false;
 
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       const trimmedLine = line.trim();
+      
+      console.log(`Line ${i + 1}:`, trimmedLine);
+      
+      // Check for answer key section
+      if (this.questionPatterns.answerKey.test(trimmedLine)) {
+        console.log('Found answer key section');
+        inAnswerKey = true;
+        continue;
+      }
+
+      // Parse answer key entries
+      if (inAnswerKey) {
+        const answerMatch = trimmedLine.match(this.questionPatterns.answerKeyEntry);
+        if (answerMatch) {
+          const questionNum = parseInt(answerMatch[1]);
+          const correctOption = answerMatch[2];
+          answerKey[questionNum] = correctOption;
+          console.log(`Answer key: Q${questionNum} = ${correctOption}`);
+        }
+        continue;
+      }
       
       // Check for question number
       const questionMatch = trimmedLine.match(this.questionPatterns.questionNumber);
       if (questionMatch) {
+        console.log(`Found question ${questionCounter}:`, questionMatch[2]);
+        
         // Save previous question if exists
         if (currentQuestion && currentQuestion.text) {
-          questions.push(this.finalizeQuestion(currentQuestion, questionCounter - 1));
+          const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
+          questions.push(finalizedQuestion);
+          console.log(`Added question ${questionCounter - 1}:`, finalizedQuestion);
         }
         
         // Start new question
@@ -123,44 +174,91 @@ export class PDFProcessor {
 
         if (optionAMatch) {
           currentQuestion.options = currentQuestion.options || [];
-          currentQuestion.options.push(optionAMatch[1].trim());
+          const optionText = optionAMatch[1].trim();
+          currentQuestion.options.push(optionText);
+          console.log(`Added option A:`, optionText);
+          // Check if this option is marked as correct
+          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+            currentQuestion.correctAnswer = optionText;
+            console.log(`Marked A as correct:`, optionText);
+          }
         } else if (optionBMatch) {
           currentQuestion.options = currentQuestion.options || [];
-          currentQuestion.options.push(optionBMatch[1].trim());
+          const optionText = optionBMatch[1].trim();
+          currentQuestion.options.push(optionText);
+          console.log(`Added option B:`, optionText);
+          // Check if this option is marked as correct
+          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+            currentQuestion.correctAnswer = optionText;
+            console.log(`Marked B as correct:`, optionText);
+          }
         } else if (optionCMatch) {
           currentQuestion.options = currentQuestion.options || [];
-          currentQuestion.options.push(optionCMatch[1].trim());
+          const optionText = optionCMatch[1].trim();
+          currentQuestion.options.push(optionText);
+          console.log(`Added option C:`, optionText);
+          // Check if this option is marked as correct
+          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+            currentQuestion.correctAnswer = optionText;
+            console.log(`Marked C as correct:`, optionText);
+          }
         } else if (optionDMatch) {
           currentQuestion.options = currentQuestion.options || [];
-          currentQuestion.options.push(optionDMatch[1].trim());
-        } else if (trimmedLine && currentQuestion.text) {
-          // Append to question text if it's not an option
+          const optionText = optionDMatch[1].trim();
+          currentQuestion.options.push(optionText);
+          console.log(`Added option D:`, optionText);
+          // Check if this option is marked as correct
+          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+            currentQuestion.correctAnswer = optionText;
+            console.log(`Marked D as correct:`, optionText);
+          }
+        } else if (trimmedLine && currentQuestion.text && !trimmedLine.match(/^[A-D]\)/)) {
+          // Append to question text if it's not an option and not empty
           currentQuestion.text += ' ' + trimmedLine;
+          console.log(`Appended to question text:`, trimmedLine);
         }
       }
     }
 
     // Add the last question
     if (currentQuestion && currentQuestion.text) {
-      questions.push(this.finalizeQuestion(currentQuestion, questionCounter - 1));
+      const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
+      questions.push(finalizedQuestion);
+      console.log(`Added final question:`, finalizedQuestion);
     }
 
-    return {
+    const result = {
       title: this.extractTitle(fileName),
       description: `Quiz extracted from ${fileName}`,
       subject: 'General',
       questions: questions
     };
+    
+    console.log('Final parsed result:', result);
+    return result;
   }
 
   /**
    * Finalize question structure and set default correct answer
    */
-  private static finalizeQuestion(question: Partial<ExtractedQuestion>, index: number): ExtractedQuestion {
+  private static finalizeQuestion(question: Partial<ExtractedQuestion>, index: number, answerKeyOption?: string): ExtractedQuestion {
     const options = question.options || [];
     
-    // Set default correct answer to first option if available
-    const correctAnswer = options.length > 0 ? options[0] : '';
+    // Determine correct answer
+    let correctAnswer = question.correctAnswer || '';
+    
+    // If we have an answer key option, use it to find the correct answer
+    if (answerKeyOption && options.length > 0) {
+      const optionIndex = answerKeyOption.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+      if (optionIndex >= 0 && optionIndex < options.length) {
+        correctAnswer = options[optionIndex];
+      }
+    }
+    
+    // If still no correct answer, default to first option
+    if (!correctAnswer && options.length > 0) {
+      correctAnswer = options[0];
+    }
     
     // Determine question type
     let type: 'multiple-choice' | 'true-false' | 'short-answer' = 'multiple-choice';

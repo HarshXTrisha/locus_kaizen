@@ -10,7 +10,7 @@ import { ExtractedQuestion, ExtractedQuiz } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { createQuiz } from '@/lib/firebase-quiz';
 import { getFirebaseAuth } from '@/lib/firebase-utils';
-import { Plus, ArrowRight, FileJson, CheckCircle, Play, FileText } from 'lucide-react';
+import { Plus, ArrowRight, FileJson, CheckCircle, Play, FileText, Download } from 'lucide-react';
 
 // Dynamically import FileUploadArea to prevent SSR issues
 const FileUploadArea = dynamic(
@@ -220,7 +220,29 @@ export default function UploadPage() {
 
           {/* Upload Guidelines */}
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-medium text-blue-900 mb-2">📋 Upload Guidelines:</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-blue-900">📋 Upload Guidelines:</h3>
+              {activeTab === 'pdf' && (
+                <div className="flex gap-2">
+                  <a
+                    href="/pdf-format-guide.md"
+                    download
+                    className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                  >
+                    <Download className="h-3 w-3" />
+                    Format Guide
+                  </a>
+                  <a
+                    href="/sample-quiz.pdf"
+                    download
+                    className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                  >
+                    <Download className="h-3 w-3" />
+                    Sample PDF
+                  </a>
+                </div>
+              )}
+            </div>
             {activeTab === 'json' ? (
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• <strong>JSON files only:</strong> Maximum 10MB per file, up to 500 questions per file</li>
@@ -236,6 +258,7 @@ export default function UploadPage() {
                 <li>• <strong>Automatic extraction:</strong> Questions and options are automatically detected</li>
                 <li>• <strong>Client-side processing:</strong> PDF never leaves your device</li>
                 <li>• <strong>Preview available:</strong> Review extracted questions before creating quiz</li>
+                <li>• <strong>Download guides:</strong> Get format guide and sample PDF above</li>
               </ul>
             )}
           </div>
