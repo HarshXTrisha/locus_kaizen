@@ -250,53 +250,81 @@ export class PDFProcessor {
         continue;
       }
 
-      // ENHANCED: Handle continuous text by splitting on question patterns
-      if (lines.length <= 3 && text.length > 100) {
-        // Try to split the entire text into questions
-        const questionSplits = trimmedLine.split(/(?=Q\d+\.|Question\d+\.|\d+\.)/i);
-        if (questionSplits.length > 1) {
-          console.log(`🔧 Found ${questionSplits.length} potential questions in continuous text`);
-          parsingStrategy = 'continuous-text';
-          
-          for (const split of questionSplits) {
-            if (split.trim().length < 10) continue; // Skip very short splits
-            
-            // Process each split as a potential question
-            const questionText = split.trim();
-            console.log(`🔍 Processing split:`, questionText.substring(0, 50) + '...');
-            
-            // Extract question number and text
-            const qMatch = questionText.match(/^(?:Q|Question)?(\d+)[\.:\)]?\s*(.+)$/i);
-            if (qMatch) {
-              const qNum = parseInt(qMatch[1]);
-              const qText = qMatch[2];
-              
-              // Save previous question if exists
-              if (currentQuestion && currentQuestion.text) {
-                const validation = this.validateQuestion(currentQuestion, questionCounter - 1);
-                if (validation.isValid) {
-                  const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
-                  questions.push(finalizedQuestion);
-                  console.log(`✅ Added validated question ${questionCounter - 1}:`, finalizedQuestion);
-                }
-              }
-              
-              // Start new question
-              currentQuestion = {
-                id: `q${qNum}`,
-                text: qText.trim(),
-                type: 'multiple-choice',
-                options: [],
-                correctAnswer: '',
-                points: 1
-              };
-              questionCounter = qNum + 1;
-              parsingStats.questionsFound++;
-            }
-          }
-          continue;
-        }
-      }
+             // ENHANCED: Handle continuous text by splitting on question patterns
+       if (lines.length <= 3 && text.length > 100) {
+         console.log(`🔧 Detected continuous text - processing entire line:`, trimmedLine.substring(0, 100) + '...');
+         
+         // Split the entire text into questions using regex
+         const questionMatches = trimmedLine.match(/Q\d+\.\s*[^Q]+?(?=Q\d+\.|$)/gi);
+         if (questionMatches && questionMatches.length > 0) {
+           console.log(`🔧 Found ${questionMatches.length} questions in continuous text`);
+           parsingStrategy = 'continuous-text';
+           
+           for (let i = 0; i < questionMatches.length; i++) {
+             const questionBlock = questionMatches[i].trim();
+             console.log(`🔍 Processing question block ${i + 1}:`, questionBlock.substring(0, 50) + '...');
+             
+             // Extract question number and text
+             const qMatch = questionBlock.match(/Q(\d+)\.\s*(.+?)(?=\s*A\)|$)/i);
+             if (qMatch) {
+               const qNum = parseInt(qMatch[1]);
+               const qText = qMatch[2].trim();
+               
+               console.log(`✅ Found question ${qNum}:`, qText);
+               
+               // Save previous question if exists
+               if (currentQuestion && currentQuestion.text) {
+                 const validation = this.validateQuestion(currentQuestion, questionCounter - 1);
+                 if (validation.isValid) {
+                   const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
+                   questions.push(finalizedQuestion);
+                   console.log(`✅ Added validated question ${questionCounter - 1}:`, finalizedQuestion);
+                 }
+               }
+               
+               // Start new question
+               currentQuestion = {
+                 id: `q${qNum}`,
+                 text: qText,
+                 type: 'multiple-choice',
+                 options: [],
+                 correctAnswer: '',
+                 points: 1
+               };
+               questionCounter = qNum + 1;
+               parsingStats.questionsFound++;
+               
+               // Now extract options from the same block
+               const optionMatches = questionBlock.match(/[A-D]\)\s*[^A-D]+?(?=\s*[A-D]\)|$)/gi);
+               if (optionMatches) {
+                 console.log(`🔍 Found ${optionMatches.length} options in question ${qNum}`);
+                 
+                 optionMatches.forEach((optionMatch, optionIndex) => {
+                   const optionLetter = optionMatch.charAt(0); // A, B, C, or D
+                   let optionText = optionMatch.substring(2).trim(); // Remove "A) " part
+                   
+                   // Remove trailing checkmarks and clean up
+                   optionText = optionText.replace(/\s*[✓*]\s*$/, '');
+                   
+                   // Add option to current question
+                   if (currentQuestion && currentQuestion.options) {
+                     currentQuestion.options.push(optionText);
+                     parsingStats.optionsFound++;
+                     console.log(`✅ Added option ${optionLetter}:`, optionText);
+                     
+                     // Check if this option is marked as correct
+                     if (optionMatch.includes('✓') || optionMatch.includes('*')) {
+                       currentQuestion.correctAnswer = optionText;
+                       console.log(`🎯 Marked ${optionLetter} as correct:`, optionText);
+                     }
+                   }
+                 });
+               }
+             }
+           }
+           continue;
+         }
+       }
 
       // Check for question number without text (e.g., "Q1." on one line, question text on next)
       const questionStartMatch = trimmedLine.match(this.questionPatterns.questionStart);
