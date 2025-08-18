@@ -1,8 +1,14 @@
-// PDF Processing Utility for Quiz Creation
-import * as pdfjsLib from 'pdfjs-dist';
+// Conditional import for pdf.js to avoid SSR issues
+let pdfjsLib: any = null;
 
-// Configure pdf.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+if (typeof window !== 'undefined') {
+  // Only import pdf.js on the client side
+  import('pdfjs-dist').then((module) => {
+    pdfjsLib = module;
+    // Configure pdf.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  });
+}
 
 export interface ExtractedQuestion {
   id: string;
@@ -34,6 +40,24 @@ export class PDFProcessor {
    * Process PDF file and extract quiz data
    */
   static async processPDF(file: File): Promise<ExtractedQuiz> {
+    if (typeof window === 'undefined') {
+      throw new Error('PDF processing is only available on the client side');
+    }
+
+    if (!pdfjsLib) {
+      // Wait for pdf.js to load
+      await new Promise(resolve => {
+        const checkPdfJs = () => {
+          if (pdfjsLib) {
+            resolve(true);
+          } else {
+            setTimeout(checkPdfJs, 100);
+          }
+        };
+        checkPdfJs();
+      });
+    }
+
     try {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
