@@ -150,7 +150,7 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
     const quizDoc: DatabaseQuiz = {
       title: quizData.title || 'Untitled Quiz',
       description: quizData.description || 'Quiz description not provided',
-      subject: quizData.subject || 'Spreadsheets for Business Decisions',
+      subject: (quizData.subject || 'Spreadsheets for Business Decisions') as AllowedSubject,
       questions: cleanedQuestions,
       timeLimit: quizData.timeLimit || 30,
       passingScore: quizData.passingScore || 70,
