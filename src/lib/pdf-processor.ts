@@ -5,8 +5,11 @@ if (typeof window !== 'undefined') {
   // Only import pdf.js on the client side
   import('pdfjs-dist').then((module) => {
     pdfjsLib = module;
-    // Disable worker to avoid CDN issues - use main thread instead
-    pdfjsLib.GlobalWorkerOptions.workerSrc = false;
+    // Set worker source to local file to avoid CDN issues
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+    console.log('PDF.js initialized with worker:', pdfjsLib.GlobalWorkerOptions.workerSrc);
+  }).catch((error) => {
+    console.error('Failed to load PDF.js:', error);
   });
 }
 
@@ -58,6 +61,18 @@ export class PDFProcessor {
         };
         checkPdfJs();
       });
+    }
+
+    // Ensure worker is properly configured - use a more reliable approach
+    try {
+      // Try to set worker to local file first
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+      console.log('PDF.js library loaded:', !!pdfjsLib);
+      console.log('Worker source set to:', pdfjsLib.GlobalWorkerOptions.workerSrc);
+    } catch (error) {
+      // If that fails, disable worker
+      console.log('Worker setup failed, disabling worker');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = false;
     }
 
     try {
