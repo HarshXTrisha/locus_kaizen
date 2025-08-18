@@ -5,8 +5,8 @@ if (typeof window !== 'undefined') {
   // Only import pdf.js on the client side
   import('pdfjs-dist').then((module) => {
     pdfjsLib = module;
-    // Configure pdf.js worker
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+    // Disable worker to avoid CDN issues - this works fine for most PDF processing
+    pdfjsLib.GlobalWorkerOptions.workerSrc = false;
   });
 }
 
