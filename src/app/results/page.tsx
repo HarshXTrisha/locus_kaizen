@@ -86,7 +86,8 @@ export default function ResultsPage() {
             type="error"
             title="Error Loading Results"
             description={error}
-            onRetry={() => window.location.reload()}
+            actionLabel="Retry"
+            onAction={() => window.location.reload()}
           />
         </div>
       </ResponsiveLayout>
