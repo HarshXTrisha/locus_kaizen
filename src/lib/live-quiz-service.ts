@@ -13,11 +13,14 @@ import {
   onSnapshot,
   serverTimestamp,
   Timestamp,
-  writeBatch
+  writeBatch,
+  runTransaction,
+  Transaction
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { 
   LiveQuiz, 
+  LiveQuizQuestion,
   LiveQuizParticipant, 
   ParticipantAnswer, 
   LiveQuizResult, 
@@ -42,7 +45,19 @@ export class LiveQuizService {
   }
 
   // Create a new live quiz
-  async createLiveQuiz(quizData: Omit<LiveQuiz, 'id' | 'createdAt' | 'shareableLink' | 'currentParticipants'>, userId: string): Promise<string> {
+  async createLiveQuiz(quizData: {
+    title: string;
+    description: string;
+    category: string;
+    questions: LiveQuizQuestion[];
+    scheduledAt: Date;
+    duration: number;
+    maxParticipants: number;
+    scoringConfig: {
+      correctPoints: number;
+      incorrectPoints: number;
+    };
+  }, userId: string): Promise<string> {
     try {
       // Validate quiz data
       if (!validateQuizJSON(quizData)) {
@@ -55,6 +70,7 @@ export class LiveQuizService {
         createdBy: userId,
         currentParticipants: 0,
         participants: [],
+        currentQuestionIndex: 0,
         status: 'draft' as const
       };
 
@@ -168,40 +184,104 @@ export class LiveQuizService {
     }
   }
 
+  // Start a quiz
+  async startQuiz(quizId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'liveQuizzes', quizId);
+      await updateDoc(docRef, { 
+        status: 'live',
+        startedAt: serverTimestamp(),
+        currentQuestionIndex: 0
+      });
+    } catch (error) {
+      console.error('Error starting quiz:', error);
+      throw error;
+    }
+  }
+
+  // Stop a quiz
+  async stopQuiz(quizId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'liveQuizzes', quizId);
+      await updateDoc(docRef, { 
+        status: 'completed',
+        endedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error stopping quiz:', error);
+      throw error;
+    }
+  }
+
+  // Pause a quiz
+  async pauseQuiz(quizId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'liveQuizzes', quizId);
+      await updateDoc(docRef, { 
+        status: 'paused',
+        pausedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error pausing quiz:', error);
+      throw error;
+    }
+  }
+
+  // Resume a quiz
+  async resumeQuiz(quizId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'liveQuizzes', quizId);
+      await updateDoc(docRef, { 
+        status: 'live',
+        resumedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error resuming quiz:', error);
+      throw error;
+    }
+  }
+
+  // Publish a quiz (make it available for registration)
+  async publishQuiz(quizId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'liveQuizzes', quizId);
+      await updateDoc(docRef, { 
+        status: 'published',
+        publishedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error publishing quiz:', error);
+      throw error;
+    }
+  }
+
   // Register participant for a quiz
   async registerParticipant(quizId: string, userId: string, name: string): Promise<void> {
     try {
-      const quiz = await this.getLiveQuiz(quizId);
-      if (!quiz) throw new Error('Quiz not found');
-      
-      if (quiz.currentParticipants >= quiz.maxParticipants) {
-        throw new Error('Quiz is full');
-      }
+      const quizRef = doc(db, 'liveQuizzes', quizId);
+      await runTransaction(db, async (tx: Transaction) => {
+        const snap = await tx.get(quizRef);
+        if (!snap.exists()) throw new Error('Quiz not found');
+        const data = snap.data() as any;
 
-      if (quiz.status !== 'published') {
-        throw new Error('Quiz is not open for registration');
-      }
+        if (data.status !== 'published') throw new Error('Quiz is not open for registration');
+        if ((data.currentParticipants || 0) >= data.maxParticipants) throw new Error('Quiz is full');
+        if ((data.participants || []).some((p: any) => p.userId === userId)) throw new Error('Already registered for this quiz');
 
-      // Check if already registered
-      const existingParticipant = quiz.participants.find(p => p.userId === userId);
-      if (existingParticipant) {
-        throw new Error('Already registered for this quiz');
-      }
+        const newParticipant: LiveQuizParticipant = {
+          userId,
+          name,
+          score: 0,
+          rank: 0,
+          answers: [],
+          joinedAt: new Date(),
+          isActive: true
+        };
 
-      const newParticipant: LiveQuizParticipant = {
-        userId,
-        name,
-        score: 0,
-        rank: 0,
-        answers: [],
-        joinedAt: new Date(),
-        isActive: true
-      };
-
-      const docRef = doc(db, 'liveQuizzes', quizId);
-      await updateDoc(docRef, {
-        participants: [...quiz.participants, newParticipant],
-        currentParticipants: quiz.currentParticipants + 1
+        tx.update(quizRef, {
+          participants: [...(data.participants || []), newParticipant],
+          currentParticipants: (data.currentParticipants || 0) + 1
+        });
       });
     } catch (error) {
       console.error('Error registering participant:', error);
@@ -301,6 +381,17 @@ export class LiveQuizService {
     }
   }
 
+  // Change current question index (host control)
+  async setCurrentQuestion(quizId: string, index: number): Promise<void> {
+    try {
+      const quizRef = doc(db, 'liveQuizzes', quizId);
+      await updateDoc(quizRef, { currentQuestionIndex: index });
+    } catch (error) {
+      console.error('Error setting current question:', error);
+      throw error;
+    }
+  }
+
   // Get user's completed quizzes
   async getUserResults(userId: string): Promise<LiveQuizResult[]> {
     try {
@@ -311,11 +402,23 @@ export class LiveQuizService {
       );
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        date: doc.data().date?.toDate()
-      })) as LiveQuizResult[];
+      return querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          quizId: data.quizId || '',
+          quizTitle: data.quizTitle || '',
+          category: data.category || '',
+          date: data.date?.toDate() || new Date(),
+          participantName: data.participantName || '',
+          score: data.score || 0,
+          rank: data.rank || 0,
+          totalParticipants: data.totalParticipants || 0,
+          duration: data.duration || 0,
+          accuracy: data.accuracy || 0,
+          averageTimePerQuestion: data.averageTimePerQuestion || 0
+        } as LiveQuizResult;
+      });
     } catch (error) {
       console.error('Error getting user results:', error);
       throw error;

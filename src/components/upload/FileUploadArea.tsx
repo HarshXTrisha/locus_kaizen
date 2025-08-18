@@ -286,20 +286,20 @@ export function FileUploadArea({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-        <input
-          type="file"
+          <input
+            type="file"
           accept=".json"
-          multiple
-          onChange={handleFileSelect}
+            multiple
+            onChange={handleFileSelect}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         
         <div className="space-y-4">
           <div className="p-3 bg-[#20C997]/10 rounded-full w-fit mx-auto">
             <Upload className="h-8 w-8 text-[#20C997]" />
-          </div>
-          
-          <div>
+      </div>
+
+                    <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Upload JSON Quiz Files
             </h3>
@@ -315,20 +315,20 @@ export function FileUploadArea({
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
+                    </div>
+                  </div>
+                  
       {/* JSON Format Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-medium text-blue-900 text-lg">JSON Format Requirements</h4>
-          <button
+                      <button
             onClick={downloadJSONTemplate}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
+                      >
             <Download className="h-4 w-4" />
             Download Template
-          </button>
+                      </button>
         </div>
         
         <div className="space-y-4">
@@ -348,9 +348,9 @@ export function FileUploadArea({
             <div className="bg-white p-3 rounded border border-blue-200">
               <h6 className="font-medium text-blue-900 mb-1">Short Answer</h6>
               <p className="text-blue-700 text-xs">No options needed, just correctAnswer text</p>
-            </div>
-          </div>
-          
+                  </div>
+                </div>
+                
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
             <h6 className="font-medium text-yellow-900 mb-1 text-sm">Upload Limits:</h6>
             <ul className="text-yellow-800 text-xs space-y-1">
@@ -361,9 +361,9 @@ export function FileUploadArea({
               <li>• Multiple-choice questions must have at least 2 options</li>
               <li>• Points are optional and default to 1</li>
             </ul>
-          </div>
-        </div>
-      </div>
+                        </div>
+                    </div>
+                  </div>
 
       {/* Processing Status */}
       {isProcessing && (
@@ -386,8 +386,8 @@ export function FileUploadArea({
             >
               <X className="h-4 w-4" />
             </button>
-          </div>
-          
+              </div>
+              
           <div className="space-y-2">
             {uploadedFiles.map((file, index) => (
               <div key={index} className="flex items-center gap-3 p-2 bg-white rounded border">
@@ -396,8 +396,8 @@ export function FileUploadArea({
                 <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
               </div>
             ))}
-          </div>
-          
+              </div>
+              
           {processingStatus && (
             <p className={`mt-3 text-sm ${
               processingStatus.includes('✅') ? 'text-green-600' : 

@@ -9,7 +9,8 @@ export interface LiveQuiz {
   duration: number; // minutes
   maxParticipants: number;
   currentParticipants: number;
-  status: 'draft' | 'published' | 'live' | 'completed';
+  status: 'draft' | 'published' | 'live' | 'paused' | 'completed';
+  currentQuestionIndex: number;
   questions: LiveQuizQuestion[];
   participants: LiveQuizParticipant[];
   scoringConfig: {
@@ -19,6 +20,10 @@ export interface LiveQuiz {
   shareableLink: string;
   createdAt: Date;
   createdBy: string;
+  startedAt?: Date;
+  endedAt?: Date;
+  pausedAt?: Date;
+  resumedAt?: Date;
 }
 
 export interface LiveQuizQuestion {
