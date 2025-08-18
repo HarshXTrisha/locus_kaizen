@@ -1,0 +1,3769 @@
+{
+  "testDate": "2025-08-18T16:46:53.556Z",
+  "testType": "Simple Load Test - 250 Concurrent Users",
+  "totalUsers": 250,
+  "successfulUsers": 250,
+  "failedUsers": 0,
+  "successRate": "100.00%",
+  "duration": "117.61 seconds",
+  "averageResponseTime": "15684.47ms",
+  "minResponseTime": "8892ms",
+  "maxResponseTime": "23461ms",
+  "medianResponseTime": "15843ms",
+  "p95ResponseTime": "20226ms",
+  "requestsPerSecond": "2.13",
+  "maxConcurrentUsers": 50,
+  "systemPerformance": "Fair",
+  "detailedResults": [
+    {
+      "userId": 6,
+      "success": true,
+      "responseTime": 9285,
+      "networkLatency": 73,
+      "joinTime": 71,
+      "questionTimes": [
+        2304,
+        2520,
+        4163
+      ],
+      "submitTime": 109,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 32,
+      "success": true,
+      "responseTime": 9578,
+      "networkLatency": 96,
+      "joinTime": 79,
+      "questionTimes": [
+        2589,
+        4377,
+        2197
+      ],
+      "submitTime": 189,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 16,
+      "success": true,
+      "responseTime": 10292,
+      "networkLatency": 148,
+      "joinTime": 72,
+      "questionTimes": [
+        5093,
+        2587,
+        2238
+      ],
+      "submitTime": 110,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 1,
+      "success": true,
+      "responseTime": 10468,
+      "networkLatency": 180,
+      "joinTime": 73,
+      "questionTimes": [
+        2073,
+        5560,
+        2379
+      ],
+      "submitTime": 168,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 22,
+      "success": true,
+      "responseTime": 11404,
+      "networkLatency": 118,
+      "joinTime": 94,
+      "questionTimes": [
+        3480,
+        5445,
+        2061
+      ],
+      "submitTime": 156,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 15,
+      "success": true,
+      "responseTime": 11894,
+      "networkLatency": 88,
+      "joinTime": 84,
+      "questionTimes": [
+        2541,
+        5633,
+        3321
+      ],
+      "submitTime": 178,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 33,
+      "success": true,
+      "responseTime": 12141,
+      "networkLatency": 194,
+      "joinTime": 56,
+      "questionTimes": [
+        3804,
+        3159,
+        4688
+      ],
+      "submitTime": 207,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 35,
+      "success": true,
+      "responseTime": 12452,
+      "networkLatency": 176,
+      "joinTime": 83,
+      "questionTimes": [
+        2174,
+        2619,
+        7151
+      ],
+      "submitTime": 195,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 10,
+      "success": true,
+      "responseTime": 12664,
+      "networkLatency": 135,
+      "joinTime": 135,
+      "questionTimes": [
+        5036,
+        2466,
+        4578
+      ],
+      "submitTime": 245,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 20,
+      "success": true,
+      "responseTime": 12894,
+      "networkLatency": 136,
+      "joinTime": 114,
+      "questionTimes": [
+        4018,
+        2143,
+        6314
+      ],
+      "submitTime": 133,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 43,
+      "success": true,
+      "responseTime": 13527,
+      "networkLatency": 60,
+      "joinTime": 81,
+      "questionTimes": [
+        7889,
+        2255,
+        3048
+      ],
+      "submitTime": 150,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 18,
+      "success": true,
+      "responseTime": 13669,
+      "networkLatency": 84,
+      "joinTime": 127,
+      "questionTimes": [
+        5667,
+        3708,
+        3896
+      ],
+      "submitTime": 155,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 28,
+      "success": true,
+      "responseTime": 13850,
+      "networkLatency": 198,
+      "joinTime": 114,
+      "questionTimes": [
+        5995,
+        2139,
+        5124
+      ],
+      "submitTime": 240,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 11,
+      "success": true,
+      "responseTime": 13929,
+      "networkLatency": 56,
+      "joinTime": 82,
+      "questionTimes": [
+        4501,
+        6599,
+        2362
+      ],
+      "submitTime": 294,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 7,
+      "success": true,
+      "responseTime": 14145,
+      "networkLatency": 87,
+      "joinTime": 88,
+      "questionTimes": [
+        5770,
+        3790,
+        4116
+      ],
+      "submitTime": 239,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 27,
+      "success": true,
+      "responseTime": 14269,
+      "networkLatency": 120,
+      "joinTime": 99,
+      "questionTimes": [
+        2681,
+        6745,
+        4340
+      ],
+      "submitTime": 250,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 41,
+      "success": true,
+      "responseTime": 14569,
+      "networkLatency": 77,
+      "joinTime": 120,
+      "questionTimes": [
+        4596,
+        2225,
+        7389
+      ],
+      "submitTime": 135,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 48,
+      "success": true,
+      "responseTime": 14670,
+      "networkLatency": 134,
+      "joinTime": 99,
+      "questionTimes": [
+        7753,
+        3374,
+        3039
+      ],
+      "submitTime": 247,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 49,
+      "success": true,
+      "responseTime": 14976,
+      "networkLatency": 190,
+      "joinTime": 82,
+      "questionTimes": [
+        7985,
+        2203,
+        4352
+      ],
+      "submitTime": 117,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 3,
+      "success": true,
+      "responseTime": 15044,
+      "networkLatency": 199,
+      "joinTime": 74,
+      "questionTimes": [
+        4335,
+        2458,
+        7654
+      ],
+      "submitTime": 289,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 47,
+      "success": true,
+      "responseTime": 15295,
+      "networkLatency": 130,
+      "joinTime": 127,
+      "questionTimes": [
+        6307,
+        3405,
+        5168
+      ],
+      "submitTime": 111,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 37,
+      "success": true,
+      "responseTime": 15460,
+      "networkLatency": 95,
+      "joinTime": 57,
+      "questionTimes": [
+        3736,
+        5412,
+        5973
+      ],
+      "submitTime": 156,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 38,
+      "success": true,
+      "responseTime": 15460,
+      "networkLatency": 84,
+      "joinTime": 147,
+      "questionTimes": [
+        7379,
+        3497,
+        4053
+      ],
+      "submitTime": 265,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 23,
+      "success": true,
+      "responseTime": 15477,
+      "networkLatency": 189,
+      "joinTime": 107,
+      "questionTimes": [
+        4312,
+        6185,
+        4432
+      ],
+      "submitTime": 218,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 5,
+      "success": true,
+      "responseTime": 15531,
+      "networkLatency": 175,
+      "joinTime": 119,
+      "questionTimes": [
+        3101,
+        7123,
+        4830
+      ],
+      "submitTime": 156,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 31,
+      "success": true,
+      "responseTime": 15843,
+      "networkLatency": 65,
+      "joinTime": 132,
+      "questionTimes": [
+        5168,
+        7356,
+        2960
+      ],
+      "submitTime": 109,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 29,
+      "success": true,
+      "responseTime": 15925,
+      "networkLatency": 163,
+      "joinTime": 107,
+      "questionTimes": [
+        2801,
+        4770,
+        7881
+      ],
+      "submitTime": 162,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 26,
+      "success": true,
+      "responseTime": 16265,
+      "networkLatency": 139,
+      "joinTime": 106,
+      "questionTimes": [
+        3532,
+        7974,
+        4292
+      ],
+      "submitTime": 165,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 44,
+      "success": true,
+      "responseTime": 16325,
+      "networkLatency": 106,
+      "joinTime": 101,
+      "questionTimes": [
+        3114,
+        5549,
+        7130
+      ],
+      "submitTime": 277,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 34,
+      "success": true,
+      "responseTime": 16431,
+      "networkLatency": 69,
+      "joinTime": 126,
+      "questionTimes": [
+        3371,
+        6135,
+        6501
+      ],
+      "submitTime": 180,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 9,
+      "success": true,
+      "responseTime": 16733,
+      "networkLatency": 80,
+      "joinTime": 95,
+      "questionTimes": [
+        5570,
+        3510,
+        7334
+      ],
+      "submitTime": 112,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 12,
+      "success": true,
+      "responseTime": 16986,
+      "networkLatency": 175,
+      "joinTime": 121,
+      "questionTimes": [
+        6016,
+        7525,
+        2813
+      ],
+      "submitTime": 291,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 14,
+      "success": true,
+      "responseTime": 17005,
+      "networkLatency": 183,
+      "joinTime": 98,
+      "questionTimes": [
+        6231,
+        7371,
+        2896
+      ],
+      "submitTime": 180,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 36,
+      "success": true,
+      "responseTime": 17070,
+      "networkLatency": 151,
+      "joinTime": 58,
+      "questionTimes": [
+        7728,
+        5632,
+        3340
+      ],
+      "submitTime": 103,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 8,
+      "success": true,
+      "responseTime": 17564,
+      "networkLatency": 113,
+      "joinTime": 65,
+      "questionTimes": [
+        4530,
+        7494,
+        5093
+      ],
+      "submitTime": 200,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 2,
+      "success": true,
+      "responseTime": 17581,
+      "networkLatency": 120,
+      "joinTime": 77,
+      "questionTimes": [
+        3375,
+        6434,
+        7377
+      ],
+      "submitTime": 149,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 19,
+      "success": true,
+      "responseTime": 17597,
+      "networkLatency": 170,
+      "joinTime": 109,
+      "questionTimes": [
+        5538,
+        4305,
+        7190
+      ],
+      "submitTime": 258,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 45,
+      "success": true,
+      "responseTime": 17833,
+      "networkLatency": 185,
+      "joinTime": 50,
+      "questionTimes": [
+        6733,
+        5914,
+        4809
+      ],
+      "submitTime": 102,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 39,
+      "success": true,
+      "responseTime": 17960,
+      "networkLatency": 169,
+      "joinTime": 69,
+      "questionTimes": [
+        6734,
+        3731,
+        7078
+      ],
+      "submitTime": 138,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 17,
+      "success": true,
+      "responseTime": 18011,
+      "networkLatency": 137,
+      "joinTime": 123,
+      "questionTimes": [
+        7721,
+        2030,
+        7802
+      ],
+      "submitTime": 145,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 24,
+      "success": true,
+      "responseTime": 18380,
+      "networkLatency": 154,
+      "joinTime": 109,
+      "questionTimes": [
+        6913,
+        4735,
+        6242
+      ],
+      "submitTime": 168,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 40,
+      "success": true,
+      "responseTime": 18463,
+      "networkLatency": 93,
+      "joinTime": 149,
+      "questionTimes": [
+        6639,
+        5636,
+        5685
+      ],
+      "submitTime": 223,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 13,
+      "success": true,
+      "responseTime": 18467,
+      "networkLatency": 158,
+      "joinTime": 78,
+      "questionTimes": [
+        3509,
+        7294,
+        7247
+      ],
+      "submitTime": 140,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 21,
+      "success": true,
+      "responseTime": 18988,
+      "networkLatency": 193,
+      "joinTime": 53,
+      "questionTimes": [
+        6338,
+        6206,
+        5914
+      ],
+      "submitTime": 255,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 4,
+      "success": true,
+      "responseTime": 19153,
+      "networkLatency": 199,
+      "joinTime": 100,
+      "questionTimes": [
+        6348,
+        7745,
+        4532
+      ],
+      "submitTime": 180,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 46,
+      "success": true,
+      "responseTime": 19319,
+      "networkLatency": 188,
+      "joinTime": 75,
+      "questionTimes": [
+        5905,
+        5473,
+        7471
+      ],
+      "submitTime": 162,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 30,
+      "success": true,
+      "responseTime": 19482,
+      "networkLatency": 60,
+      "joinTime": 134,
+      "questionTimes": [
+        7557,
+        4013,
+        7549
+      ],
+      "submitTime": 123,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 25,
+      "success": true,
+      "responseTime": 19952,
+      "networkLatency": 146,
+      "joinTime": 73,
+      "questionTimes": [
+        7067,
+        6193,
+        6238
+      ],
+      "submitTime": 197,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 50,
+      "success": true,
+      "responseTime": 21326,
+      "networkLatency": 183,
+      "joinTime": 72,
+      "questionTimes": [
+        6507,
+        6396,
+        7968
+      ],
+      "submitTime": 174,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 42,
+      "success": true,
+      "responseTime": 23461,
+      "networkLatency": 50,
+      "joinTime": 138,
+      "questionTimes": [
+        7453,
+        7595,
+        7894
+      ],
+      "submitTime": 288,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 21,
+      "success": true,
+      "responseTime": 8892,
+      "networkLatency": 115,
+      "joinTime": 128,
+      "questionTimes": [
+        2494,
+        3527,
+        2347
+      ],
+      "submitTime": 246,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 38,
+      "success": true,
+      "responseTime": 9991,
+      "networkLatency": 116,
+      "joinTime": 84,
+      "questionTimes": [
+        2122,
+        3673,
+        3661
+      ],
+      "submitTime": 296,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 48,
+      "success": true,
+      "responseTime": 11470,
+      "networkLatency": 64,
+      "joinTime": 62,
+      "questionTimes": [
+        3606,
+        5231,
+        2274
+      ],
+      "submitTime": 207,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 27,
+      "success": true,
+      "responseTime": 11984,
+      "networkLatency": 192,
+      "joinTime": 119,
+      "questionTimes": [
+        3571,
+        2069,
+        5861
+      ],
+      "submitTime": 120,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 3,
+      "success": true,
+      "responseTime": 12439,
+      "networkLatency": 117,
+      "joinTime": 65,
+      "questionTimes": [
+        6510,
+        2157,
+        3397
+      ],
+      "submitTime": 139,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 28,
+      "success": true,
+      "responseTime": 12719,
+      "networkLatency": 194,
+      "joinTime": 69,
+      "questionTimes": [
+        5893,
+        2117,
+        4129
+      ],
+      "submitTime": 259,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 43,
+      "success": true,
+      "responseTime": 12826,
+      "networkLatency": 182,
+      "joinTime": 93,
+      "questionTimes": [
+        3959,
+        5117,
+        3272
+      ],
+      "submitTime": 168,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 24,
+      "success": true,
+      "responseTime": 12960,
+      "networkLatency": 148,
+      "joinTime": 55,
+      "questionTimes": [
+        2719,
+        7152,
+        2726
+      ],
+      "submitTime": 109,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 7,
+      "success": true,
+      "responseTime": 12987,
+      "networkLatency": 98,
+      "joinTime": 68,
+      "questionTimes": [
+        3742,
+        5324,
+        3609
+      ],
+      "submitTime": 112,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 47,
+      "success": true,
+      "responseTime": 13021,
+      "networkLatency": 119,
+      "joinTime": 143,
+      "questionTimes": [
+        3655,
+        3548,
+        5301
+      ],
+      "submitTime": 222,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 32,
+      "success": true,
+      "responseTime": 13060,
+      "networkLatency": 81,
+      "joinTime": 98,
+      "questionTimes": [
+        6162,
+        2505,
+        4000
+      ],
+      "submitTime": 185,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 42,
+      "success": true,
+      "responseTime": 13651,
+      "networkLatency": 77,
+      "joinTime": 107,
+      "questionTimes": [
+        4460,
+        6466,
+        2394
+      ],
+      "submitTime": 110,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 29,
+      "success": true,
+      "responseTime": 13924,
+      "networkLatency": 71,
+      "joinTime": 104,
+      "questionTimes": [
+        6823,
+        3826,
+        2867
+      ],
+      "submitTime": 185,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 13,
+      "success": true,
+      "responseTime": 14204,
+      "networkLatency": 53,
+      "joinTime": 122,
+      "questionTimes": [
+        5661,
+        4122,
+        3994
+      ],
+      "submitTime": 202,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 46,
+      "success": true,
+      "responseTime": 14453,
+      "networkLatency": 184,
+      "joinTime": 123,
+      "questionTimes": [
+        2256,
+        7137,
+        4477
+      ],
+      "submitTime": 237,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 15,
+      "success": true,
+      "responseTime": 14519,
+      "networkLatency": 75,
+      "joinTime": 141,
+      "questionTimes": [
+        6124,
+        3285,
+        4646
+      ],
+      "submitTime": 199,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 11,
+      "success": true,
+      "responseTime": 14657,
+      "networkLatency": 93,
+      "joinTime": 124,
+      "questionTimes": [
+        2388,
+        4852,
+        6946
+      ],
+      "submitTime": 209,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 5,
+      "success": true,
+      "responseTime": 14719,
+      "networkLatency": 121,
+      "joinTime": 123,
+      "questionTimes": [
+        3504,
+        5027,
+        5622
+      ],
+      "submitTime": 274,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 39,
+      "success": true,
+      "responseTime": 14769,
+      "networkLatency": 116,
+      "joinTime": 124,
+      "questionTimes": [
+        3296,
+        4921,
+        5990
+      ],
+      "submitTime": 279,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 30,
+      "success": true,
+      "responseTime": 15081,
+      "networkLatency": 150,
+      "joinTime": 115,
+      "questionTimes": [
+        2826,
+        5625,
+        6185
+      ],
+      "submitTime": 145,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 10,
+      "success": true,
+      "responseTime": 15082,
+      "networkLatency": 55,
+      "joinTime": 118,
+      "questionTimes": [
+        2697,
+        5722,
+        6254
+      ],
+      "submitTime": 215,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 1,
+      "success": true,
+      "responseTime": 15365,
+      "networkLatency": 91,
+      "joinTime": 111,
+      "questionTimes": [
+        2548,
+        5837,
+        6522
+      ],
+      "submitTime": 207,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 6,
+      "success": true,
+      "responseTime": 15517,
+      "networkLatency": 100,
+      "joinTime": 111,
+      "questionTimes": [
+        5249,
+        4706,
+        5078
+      ],
+      "submitTime": 240,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 23,
+      "success": true,
+      "responseTime": 16283,
+      "networkLatency": 162,
+      "joinTime": 93,
+      "questionTimes": [
+        6068,
+        3179,
+        6585
+      ],
+      "submitTime": 159,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 17,
+      "success": true,
+      "responseTime": 16351,
+      "networkLatency": 145,
+      "joinTime": 79,
+      "questionTimes": [
+        4944,
+        4940,
+        5923
+      ],
+      "submitTime": 282,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 33,
+      "success": true,
+      "responseTime": 16382,
+      "networkLatency": 65,
+      "joinTime": 63,
+      "questionTimes": [
+        6967,
+        5742,
+        3235
+      ],
+      "submitTime": 250,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 25,
+      "success": true,
+      "responseTime": 16502,
+      "networkLatency": 184,
+      "joinTime": 90,
+      "questionTimes": [
+        3900,
+        5924,
+        6110
+      ],
+      "submitTime": 261,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 9,
+      "success": true,
+      "responseTime": 16587,
+      "networkLatency": 65,
+      "joinTime": 73,
+      "questionTimes": [
+        4013,
+        7199,
+        4932
+      ],
+      "submitTime": 230,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 35,
+      "success": true,
+      "responseTime": 16625,
+      "networkLatency": 75,
+      "joinTime": 78,
+      "questionTimes": [
+        3620,
+        5277,
+        7369
+      ],
+      "submitTime": 167,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 37,
+      "success": true,
+      "responseTime": 16650,
+      "networkLatency": 153,
+      "joinTime": 85,
+      "questionTimes": [
+        7557,
+        6291,
+        2315
+      ],
+      "submitTime": 200,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 41,
+      "success": true,
+      "responseTime": 16659,
+      "networkLatency": 123,
+      "joinTime": 145,
+      "questionTimes": [
+        4765,
+        5920,
+        5367
+      ],
+      "submitTime": 283,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 31,
+      "success": true,
+      "responseTime": 16718,
+      "networkLatency": 62,
+      "joinTime": 119,
+      "questionTimes": [
+        2098,
+        7265,
+        6864
+      ],
+      "submitTime": 277,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 40,
+      "success": true,
+      "responseTime": 16895,
+      "networkLatency": 165,
+      "joinTime": 56,
+      "questionTimes": [
+        5625,
+        7892,
+        2874
+      ],
+      "submitTime": 223,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 16,
+      "success": true,
+      "responseTime": 16969,
+      "networkLatency": 150,
+      "joinTime": 71,
+      "questionTimes": [
+        5204,
+        4635,
+        6722
+      ],
+      "submitTime": 148,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 4,
+      "success": true,
+      "responseTime": 17136,
+      "networkLatency": 127,
+      "joinTime": 75,
+      "questionTimes": [
+        3138,
+        5870,
+        7603
+      ],
+      "submitTime": 280,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 14,
+      "success": true,
+      "responseTime": 17166,
+      "networkLatency": 82,
+      "joinTime": 135,
+      "questionTimes": [
+        6804,
+        3109,
+        6746
+      ],
+      "submitTime": 231,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 18,
+      "success": true,
+      "responseTime": 17171,
+      "networkLatency": 91,
+      "joinTime": 129,
+      "questionTimes": [
+        6740,
+        4953,
+        5026
+      ],
+      "submitTime": 179,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 8,
+      "success": true,
+      "responseTime": 17480,
+      "networkLatency": 97,
+      "joinTime": 112,
+      "questionTimes": [
+        5680,
+        6228,
+        5120
+      ],
+      "submitTime": 189,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 2,
+      "success": true,
+      "responseTime": 17683,
+      "networkLatency": 140,
+      "joinTime": 105,
+      "questionTimes": [
+        7879,
+        5490,
+        3920
+      ],
+      "submitTime": 110,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 34,
+      "success": true,
+      "responseTime": 17750,
+      "networkLatency": 165,
+      "joinTime": 141,
+      "questionTimes": [
+        4977,
+        6705,
+        5469
+      ],
+      "submitTime": 246,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 19,
+      "success": true,
+      "responseTime": 17769,
+      "networkLatency": 164,
+      "joinTime": 80,
+      "questionTimes": [
+        6424,
+        6742,
+        4104
+      ],
+      "submitTime": 210,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 45,
+      "success": true,
+      "responseTime": 17966,
+      "networkLatency": 144,
+      "joinTime": 98,
+      "questionTimes": [
+        6141,
+        4021,
+        7278
+      ],
+      "submitTime": 241,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 20,
+      "success": true,
+      "responseTime": 18314,
+      "networkLatency": 134,
+      "joinTime": 78,
+      "questionTimes": [
+        6111,
+        4352,
+        7284
+      ],
+      "submitTime": 294,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 26,
+      "success": true,
+      "responseTime": 18429,
+      "networkLatency": 85,
+      "joinTime": 79,
+      "questionTimes": [
+        7192,
+        3088,
+        7742
+      ],
+      "submitTime": 203,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 44,
+      "success": true,
+      "responseTime": 18482,
+      "networkLatency": 73,
+      "joinTime": 81,
+      "questionTimes": [
+        4061,
+        7717,
+        6359
+      ],
+      "submitTime": 151,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 36,
+      "success": true,
+      "responseTime": 19666,
+      "networkLatency": 82,
+      "joinTime": 72,
+      "questionTimes": [
+        7316,
+        6564,
+        5404
+      ],
+      "submitTime": 196,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 50,
+      "success": true,
+      "responseTime": 20161,
+      "networkLatency": 125,
+      "joinTime": 58,
+      "questionTimes": [
+        7945,
+        5659,
+        6138
+      ],
+      "submitTime": 204,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 12,
+      "success": true,
+      "responseTime": 20261,
+      "networkLatency": 160,
+      "joinTime": 57,
+      "questionTimes": [
+        7052,
+        6506,
+        6258
+      ],
+      "submitTime": 185,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 22,
+      "success": true,
+      "responseTime": 20409,
+      "networkLatency": 57,
+      "joinTime": 108,
+      "questionTimes": [
+        5850,
+        7110,
+        7061
+      ],
+      "submitTime": 170,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 49,
+      "success": true,
+      "responseTime": 20831,
+      "networkLatency": 183,
+      "joinTime": 74,
+      "questionTimes": [
+        6689,
+        7624,
+        6072
+      ],
+      "submitTime": 155,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 6,
+      "success": true,
+      "responseTime": 9580,
+      "networkLatency": 100,
+      "joinTime": 103,
+      "questionTimes": [
+        3750,
+        3432,
+        2062
+      ],
+      "submitTime": 112,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 46,
+      "success": true,
+      "responseTime": 10712,
+      "networkLatency": 184,
+      "joinTime": 98,
+      "questionTimes": [
+        2628,
+        3849,
+        3623
+      ],
+      "submitTime": 293,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 47,
+      "success": true,
+      "responseTime": 10798,
+      "networkLatency": 122,
+      "joinTime": 101,
+      "questionTimes": [
+        4561,
+        2510,
+        3198
+      ],
+      "submitTime": 259,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 22,
+      "success": true,
+      "responseTime": 11376,
+      "networkLatency": 54,
+      "joinTime": 58,
+      "questionTimes": [
+        2505,
+        6328,
+        2175
+      ],
+      "submitTime": 222,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 29,
+      "success": true,
+      "responseTime": 11680,
+      "networkLatency": 166,
+      "joinTime": 82,
+      "questionTimes": [
+        5364,
+        2108,
+        3812
+      ],
+      "submitTime": 102,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 25,
+      "success": true,
+      "responseTime": 11829,
+      "networkLatency": 195,
+      "joinTime": 84,
+      "questionTimes": [
+        7182,
+        2055,
+        2085
+      ],
+      "submitTime": 203,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 2,
+      "success": true,
+      "responseTime": 12128,
+      "networkLatency": 155,
+      "joinTime": 95,
+      "questionTimes": [
+        3133,
+        6256,
+        2272
+      ],
+      "submitTime": 169,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 32,
+      "success": true,
+      "responseTime": 12679,
+      "networkLatency": 133,
+      "joinTime": 137,
+      "questionTimes": [
+        2323,
+        3677,
+        6230
+      ],
+      "submitTime": 141,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 17,
+      "success": true,
+      "responseTime": 12972,
+      "networkLatency": 118,
+      "joinTime": 77,
+      "questionTimes": [
+        4088,
+        3750,
+        4605
+      ],
+      "submitTime": 279,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 40,
+      "success": true,
+      "responseTime": 12982,
+      "networkLatency": 86,
+      "joinTime": 142,
+      "questionTimes": [
+        2349,
+        2288,
+        7926
+      ],
+      "submitTime": 155,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 9,
+      "success": true,
+      "responseTime": 13191,
+      "networkLatency": 123,
+      "joinTime": 99,
+      "questionTimes": [
+        6488,
+        2384,
+        3812
+      ],
+      "submitTime": 229,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 23,
+      "success": true,
+      "responseTime": 13828,
+      "networkLatency": 84,
+      "joinTime": 115,
+      "questionTimes": [
+        4740,
+        5163,
+        3496
+      ],
+      "submitTime": 180,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 45,
+      "success": true,
+      "responseTime": 13844,
+      "networkLatency": 191,
+      "joinTime": 99,
+      "questionTimes": [
+        3148,
+        5394,
+        4728
+      ],
+      "submitTime": 244,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 30,
+      "success": true,
+      "responseTime": 13845,
+      "networkLatency": 76,
+      "joinTime": 90,
+      "questionTimes": [
+        2056,
+        7522,
+        3803
+      ],
+      "submitTime": 250,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 39,
+      "success": true,
+      "responseTime": 14142,
+      "networkLatency": 137,
+      "joinTime": 98,
+      "questionTimes": [
+        5232,
+        2069,
+        6435
+      ],
+      "submitTime": 114,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 49,
+      "success": true,
+      "responseTime": 14257,
+      "networkLatency": 162,
+      "joinTime": 115,
+      "questionTimes": [
+        5966,
+        3893,
+        3806
+      ],
+      "submitTime": 270,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 15,
+      "success": true,
+      "responseTime": 14506,
+      "networkLatency": 102,
+      "joinTime": 130,
+      "questionTimes": [
+        6544,
+        4405,
+        3065
+      ],
+      "submitTime": 238,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 7,
+      "success": true,
+      "responseTime": 14632,
+      "networkLatency": 167,
+      "joinTime": 122,
+      "questionTimes": [
+        5651,
+        4936,
+        3577
+      ],
+      "submitTime": 140,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 28,
+      "success": true,
+      "responseTime": 15077,
+      "networkLatency": 96,
+      "joinTime": 142,
+      "questionTimes": [
+        4391,
+        5479,
+        4774
+      ],
+      "submitTime": 138,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 5,
+      "success": true,
+      "responseTime": 15158,
+      "networkLatency": 54,
+      "joinTime": 112,
+      "questionTimes": [
+        4528,
+        2357,
+        7814
+      ],
+      "submitTime": 257,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 3,
+      "success": true,
+      "responseTime": 15245,
+      "networkLatency": 90,
+      "joinTime": 121,
+      "questionTimes": [
+        6960,
+        2816,
+        4916
+      ],
+      "submitTime": 270,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 31,
+      "success": true,
+      "responseTime": 15292,
+      "networkLatency": 163,
+      "joinTime": 85,
+      "questionTimes": [
+        6240,
+        4295,
+        4206
+      ],
+      "submitTime": 282,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 41,
+      "success": true,
+      "responseTime": 15389,
+      "networkLatency": 197,
+      "joinTime": 134,
+      "questionTimes": [
+        7436,
+        5191,
+        2277
+      ],
+      "submitTime": 126,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 37,
+      "success": true,
+      "responseTime": 15521,
+      "networkLatency": 80,
+      "joinTime": 75,
+      "questionTimes": [
+        6953,
+        3327,
+        4836
+      ],
+      "submitTime": 220,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 14,
+      "success": true,
+      "responseTime": 15622,
+      "networkLatency": 96,
+      "joinTime": 83,
+      "questionTimes": [
+        5575,
+        7422,
+        2275
+      ],
+      "submitTime": 134,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 48,
+      "success": true,
+      "responseTime": 15891,
+      "networkLatency": 117,
+      "joinTime": 97,
+      "questionTimes": [
+        6006,
+        3612,
+        5835
+      ],
+      "submitTime": 178,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 21,
+      "success": true,
+      "responseTime": 16538,
+      "networkLatency": 175,
+      "joinTime": 67,
+      "questionTimes": [
+        6099,
+        5757,
+        4108
+      ],
+      "submitTime": 290,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 4,
+      "success": true,
+      "responseTime": 16590,
+      "networkLatency": 169,
+      "joinTime": 104,
+      "questionTimes": [
+        3033,
+        6737,
+        6354
+      ],
+      "submitTime": 161,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 12,
+      "success": true,
+      "responseTime": 16657,
+      "networkLatency": 113,
+      "joinTime": 103,
+      "questionTimes": [
+        4754,
+        3732,
+        7727
+      ],
+      "submitTime": 194,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 19,
+      "success": true,
+      "responseTime": 16661,
+      "networkLatency": 165,
+      "joinTime": 121,
+      "questionTimes": [
+        7008,
+        2703,
+        6451
+      ],
+      "submitTime": 160,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 27,
+      "success": true,
+      "responseTime": 16756,
+      "networkLatency": 113,
+      "joinTime": 105,
+      "questionTimes": [
+        3345,
+        6767,
+        6276
+      ],
+      "submitTime": 101,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 35,
+      "success": true,
+      "responseTime": 16974,
+      "networkLatency": 67,
+      "joinTime": 67,
+      "questionTimes": [
+        6205,
+        7421,
+        2963
+      ],
+      "submitTime": 198,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 42,
+      "success": true,
+      "responseTime": 16978,
+      "networkLatency": 152,
+      "joinTime": 146,
+      "questionTimes": [
+        5181,
+        4603,
+        6729
+      ],
+      "submitTime": 102,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 8,
+      "success": true,
+      "responseTime": 17013,
+      "networkLatency": 198,
+      "joinTime": 119,
+      "questionTimes": [
+        6486,
+        2912,
+        7114
+      ],
+      "submitTime": 158,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 20,
+      "success": true,
+      "responseTime": 17089,
+      "networkLatency": 113,
+      "joinTime": 149,
+      "questionTimes": [
+        6173,
+        7719,
+        2763
+      ],
+      "submitTime": 138,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 13,
+      "success": true,
+      "responseTime": 17289,
+      "networkLatency": 123,
+      "joinTime": 70,
+      "questionTimes": [
+        2722,
+        6926,
+        7127
+      ],
+      "submitTime": 277,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 18,
+      "success": true,
+      "responseTime": 17470,
+      "networkLatency": 182,
+      "joinTime": 132,
+      "questionTimes": [
+        6174,
+        4215,
+        6610
+      ],
+      "submitTime": 107,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 33,
+      "success": true,
+      "responseTime": 17496,
+      "networkLatency": 79,
+      "joinTime": 84,
+      "questionTimes": [
+        6729,
+        4529,
+        5809
+      ],
+      "submitTime": 233,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 10,
+      "success": true,
+      "responseTime": 17657,
+      "networkLatency": 135,
+      "joinTime": 95,
+      "questionTimes": [
+        4616,
+        6978,
+        5664
+      ],
+      "submitTime": 112,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 44,
+      "success": true,
+      "responseTime": 17675,
+      "networkLatency": 100,
+      "joinTime": 132,
+      "questionTimes": [
+        5563,
+        6231,
+        5481
+      ],
+      "submitTime": 126,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 36,
+      "success": true,
+      "responseTime": 18236,
+      "networkLatency": 84,
+      "joinTime": 54,
+      "questionTimes": [
+        3369,
+        7916,
+        6626
+      ],
+      "submitTime": 124,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 24,
+      "success": true,
+      "responseTime": 18339,
+      "networkLatency": 117,
+      "joinTime": 96,
+      "questionTimes": [
+        7268,
+        6771,
+        3910
+      ],
+      "submitTime": 146,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 11,
+      "success": true,
+      "responseTime": 18372,
+      "networkLatency": 95,
+      "joinTime": 120,
+      "questionTimes": [
+        5653,
+        5652,
+        6651
+      ],
+      "submitTime": 149,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 26,
+      "success": true,
+      "responseTime": 18656,
+      "networkLatency": 188,
+      "joinTime": 125,
+      "questionTimes": [
+        5925,
+        6050,
+        6191
+      ],
+      "submitTime": 128,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 34,
+      "success": true,
+      "responseTime": 18969,
+      "networkLatency": 120,
+      "joinTime": 102,
+      "questionTimes": [
+        7635,
+        5104,
+        5775
+      ],
+      "submitTime": 170,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 1,
+      "success": true,
+      "responseTime": 19126,
+      "networkLatency": 179,
+      "joinTime": 119,
+      "questionTimes": [
+        5699,
+        6372,
+        6427
+      ],
+      "submitTime": 298,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 38,
+      "success": true,
+      "responseTime": 19284,
+      "networkLatency": 119,
+      "joinTime": 95,
+      "questionTimes": [
+        6126,
+        7999,
+        4743
+      ],
+      "submitTime": 156,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 50,
+      "success": true,
+      "responseTime": 19627,
+      "networkLatency": 187,
+      "joinTime": 77,
+      "questionTimes": [
+        7182,
+        7977,
+        3857
+      ],
+      "submitTime": 297,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 43,
+      "success": true,
+      "responseTime": 20873,
+      "networkLatency": 75,
+      "joinTime": 98,
+      "questionTimes": [
+        6309,
+        7214,
+        6868
+      ],
+      "submitTime": 249,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 16,
+      "success": true,
+      "responseTime": 21209,
+      "networkLatency": 125,
+      "joinTime": 119,
+      "questionTimes": [
+        7132,
+        6072,
+        7486
+      ],
+      "submitTime": 241,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 35,
+      "success": true,
+      "responseTime": 10306,
+      "networkLatency": 104,
+      "joinTime": 130,
+      "questionTimes": [
+        2724,
+        2952,
+        4083
+      ],
+      "submitTime": 267,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 3,
+      "success": true,
+      "responseTime": 11965,
+      "networkLatency": 138,
+      "joinTime": 64,
+      "questionTimes": [
+        2381,
+        6795,
+        2269
+      ],
+      "submitTime": 272,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 13,
+      "success": true,
+      "responseTime": 12177,
+      "networkLatency": 101,
+      "joinTime": 134,
+      "questionTimes": [
+        6589,
+        2873,
+        2273
+      ],
+      "submitTime": 155,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 30,
+      "success": true,
+      "responseTime": 12477,
+      "networkLatency": 108,
+      "joinTime": 58,
+      "questionTimes": [
+        3959,
+        4908,
+        3255
+      ],
+      "submitTime": 134,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 46,
+      "success": true,
+      "responseTime": 13342,
+      "networkLatency": 189,
+      "joinTime": 120,
+      "questionTimes": [
+        5460,
+        2337,
+        4948
+      ],
+      "submitTime": 178,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 42,
+      "success": true,
+      "responseTime": 13457,
+      "networkLatency": 146,
+      "joinTime": 142,
+      "questionTimes": [
+        2675,
+        5735,
+        4517
+      ],
+      "submitTime": 200,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 33,
+      "success": true,
+      "responseTime": 13476,
+      "networkLatency": 183,
+      "joinTime": 133,
+      "questionTimes": [
+        3786,
+        2545,
+        6554
+      ],
+      "submitTime": 227,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 5,
+      "success": true,
+      "responseTime": 13514,
+      "networkLatency": 109,
+      "joinTime": 67,
+      "questionTimes": [
+        2539,
+        7803,
+        2689
+      ],
+      "submitTime": 258,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 48,
+      "success": true,
+      "responseTime": 13764,
+      "networkLatency": 137,
+      "joinTime": 113,
+      "questionTimes": [
+        4644,
+        5825,
+        2854
+      ],
+      "submitTime": 162,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 10,
+      "success": true,
+      "responseTime": 13796,
+      "networkLatency": 115,
+      "joinTime": 130,
+      "questionTimes": [
+        4202,
+        2243,
+        6811
+      ],
+      "submitTime": 255,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 38,
+      "success": true,
+      "responseTime": 13884,
+      "networkLatency": 160,
+      "joinTime": 128,
+      "questionTimes": [
+        6913,
+        4457,
+        2037
+      ],
+      "submitTime": 151,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 20,
+      "success": true,
+      "responseTime": 13963,
+      "networkLatency": 154,
+      "joinTime": 110,
+      "questionTimes": [
+        3953,
+        2781,
+        6751
+      ],
+      "submitTime": 165,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 45,
+      "success": true,
+      "responseTime": 13971,
+      "networkLatency": 104,
+      "joinTime": 110,
+      "questionTimes": [
+        3014,
+        5531,
+        4920
+      ],
+      "submitTime": 237,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 37,
+      "success": true,
+      "responseTime": 14090,
+      "networkLatency": 199,
+      "joinTime": 130,
+      "questionTimes": [
+        3912,
+        3474,
+        6183
+      ],
+      "submitTime": 138,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 44,
+      "success": true,
+      "responseTime": 14282,
+      "networkLatency": 103,
+      "joinTime": 136,
+      "questionTimes": [
+        4355,
+        6647,
+        2702
+      ],
+      "submitTime": 291,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 39,
+      "success": true,
+      "responseTime": 14511,
+      "networkLatency": 155,
+      "joinTime": 98,
+      "questionTimes": [
+        3101,
+        6352,
+        4472
+      ],
+      "submitTime": 299,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 19,
+      "success": true,
+      "responseTime": 14537,
+      "networkLatency": 126,
+      "joinTime": 125,
+      "questionTimes": [
+        4072,
+        2003,
+        7941
+      ],
+      "submitTime": 234,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 22,
+      "success": true,
+      "responseTime": 14595,
+      "networkLatency": 115,
+      "joinTime": 98,
+      "questionTimes": [
+        2189,
+        7897,
+        4034
+      ],
+      "submitTime": 205,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 41,
+      "success": true,
+      "responseTime": 14933,
+      "networkLatency": 89,
+      "joinTime": 82,
+      "questionTimes": [
+        4553,
+        4059,
+        6001
+      ],
+      "submitTime": 113,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 8,
+      "success": true,
+      "responseTime": 14953,
+      "networkLatency": 108,
+      "joinTime": 97,
+      "questionTimes": [
+        3799,
+        2996,
+        7711
+      ],
+      "submitTime": 207,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 31,
+      "success": true,
+      "responseTime": 15163,
+      "networkLatency": 139,
+      "joinTime": 135,
+      "questionTimes": [
+        3449,
+        4037,
+        7042
+      ],
+      "submitTime": 288,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 26,
+      "success": true,
+      "responseTime": 15413,
+      "networkLatency": 193,
+      "joinTime": 60,
+      "questionTimes": [
+        2559,
+        4499,
+        7861
+      ],
+      "submitTime": 199,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 32,
+      "success": true,
+      "responseTime": 15716,
+      "networkLatency": 106,
+      "joinTime": 84,
+      "questionTimes": [
+        6501,
+        2096,
+        6620
+      ],
+      "submitTime": 262,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 17,
+      "success": true,
+      "responseTime": 15718,
+      "networkLatency": 61,
+      "joinTime": 78,
+      "questionTimes": [
+        6490,
+        2957,
+        5908
+      ],
+      "submitTime": 195,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 24,
+      "success": true,
+      "responseTime": 15832,
+      "networkLatency": 105,
+      "joinTime": 135,
+      "questionTimes": [
+        7904,
+        2302,
+        4931
+      ],
+      "submitTime": 289,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 27,
+      "success": true,
+      "responseTime": 15913,
+      "networkLatency": 109,
+      "joinTime": 99,
+      "questionTimes": [
+        3379,
+        5976,
+        6052
+      ],
+      "submitTime": 272,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 16,
+      "success": true,
+      "responseTime": 16113,
+      "networkLatency": 123,
+      "joinTime": 112,
+      "questionTimes": [
+        4448,
+        7658,
+        3493
+      ],
+      "submitTime": 231,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 49,
+      "success": true,
+      "responseTime": 16198,
+      "networkLatency": 188,
+      "joinTime": 77,
+      "questionTimes": [
+        6928,
+        4882,
+        3860
+      ],
+      "submitTime": 226,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 12,
+      "success": true,
+      "responseTime": 16200,
+      "networkLatency": 57,
+      "joinTime": 124,
+      "questionTimes": [
+        3399,
+        6932,
+        5545
+      ],
+      "submitTime": 106,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 40,
+      "success": true,
+      "responseTime": 16614,
+      "networkLatency": 147,
+      "joinTime": 104,
+      "questionTimes": [
+        3227,
+        6950,
+        5927
+      ],
+      "submitTime": 199,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 34,
+      "success": true,
+      "responseTime": 16745,
+      "networkLatency": 113,
+      "joinTime": 134,
+      "questionTimes": [
+        7328,
+        4704,
+        4119
+      ],
+      "submitTime": 289,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 18,
+      "success": true,
+      "responseTime": 16762,
+      "networkLatency": 105,
+      "joinTime": 95,
+      "questionTimes": [
+        6436,
+        6848,
+        2968
+      ],
+      "submitTime": 265,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 1,
+      "success": true,
+      "responseTime": 16848,
+      "networkLatency": 195,
+      "joinTime": 146,
+      "questionTimes": [
+        4350,
+        5765,
+        6059
+      ],
+      "submitTime": 292,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 36,
+      "success": true,
+      "responseTime": 16945,
+      "networkLatency": 196,
+      "joinTime": 82,
+      "questionTimes": [
+        2632,
+        6149,
+        7588
+      ],
+      "submitTime": 269,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 29,
+      "success": true,
+      "responseTime": 17090,
+      "networkLatency": 176,
+      "joinTime": 94,
+      "questionTimes": [
+        4586,
+        6497,
+        5499
+      ],
+      "submitTime": 177,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 9,
+      "success": true,
+      "responseTime": 17184,
+      "networkLatency": 67,
+      "joinTime": 52,
+      "questionTimes": [
+        4803,
+        4294,
+        7635
+      ],
+      "submitTime": 285,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 43,
+      "success": true,
+      "responseTime": 17604,
+      "networkLatency": 174,
+      "joinTime": 127,
+      "questionTimes": [
+        5115,
+        6595,
+        5405
+      ],
+      "submitTime": 151,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 2,
+      "success": true,
+      "responseTime": 17732,
+      "networkLatency": 93,
+      "joinTime": 146,
+      "questionTimes": [
+        5209,
+        4903,
+        7203
+      ],
+      "submitTime": 159,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 4,
+      "success": true,
+      "responseTime": 17751,
+      "networkLatency": 71,
+      "joinTime": 97,
+      "questionTimes": [
+        7998,
+        6459,
+        2746
+      ],
+      "submitTime": 233,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 11,
+      "success": true,
+      "responseTime": 17795,
+      "networkLatency": 135,
+      "joinTime": 145,
+      "questionTimes": [
+        3119,
+        6498,
+        7744
+      ],
+      "submitTime": 105,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 15,
+      "success": true,
+      "responseTime": 17966,
+      "networkLatency": 133,
+      "joinTime": 129,
+      "questionTimes": [
+        4937,
+        5728,
+        6773
+      ],
+      "submitTime": 198,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 6,
+      "success": true,
+      "responseTime": 18460,
+      "networkLatency": 56,
+      "joinTime": 83,
+      "questionTimes": [
+        4205,
+        7756,
+        6152
+      ],
+      "submitTime": 151,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 28,
+      "success": true,
+      "responseTime": 18831,
+      "networkLatency": 154,
+      "joinTime": 143,
+      "questionTimes": [
+        7780,
+        4242,
+        6218
+      ],
+      "submitTime": 240,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 50,
+      "success": true,
+      "responseTime": 18861,
+      "networkLatency": 99,
+      "joinTime": 112,
+      "questionTimes": [
+        6502,
+        6970,
+        4947
+      ],
+      "submitTime": 175,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 7,
+      "success": true,
+      "responseTime": 19214,
+      "networkLatency": 90,
+      "joinTime": 89,
+      "questionTimes": [
+        5100,
+        5914,
+        7808
+      ],
+      "submitTime": 158,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 14,
+      "success": true,
+      "responseTime": 19572,
+      "networkLatency": 145,
+      "joinTime": 59,
+      "questionTimes": [
+        7529,
+        6307,
+        5260
+      ],
+      "submitTime": 233,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 23,
+      "success": true,
+      "responseTime": 19578,
+      "networkLatency": 113,
+      "joinTime": 68,
+      "questionTimes": [
+        6883,
+        7426,
+        4803
+      ],
+      "submitTime": 238,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 25,
+      "success": true,
+      "responseTime": 20226,
+      "networkLatency": 154,
+      "joinTime": 111,
+      "questionTimes": [
+        7672,
+        6688,
+        5281
+      ],
+      "submitTime": 272,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 21,
+      "success": true,
+      "responseTime": 20472,
+      "networkLatency": 137,
+      "joinTime": 87,
+      "questionTimes": [
+        7253,
+        7255,
+        5372
+      ],
+      "submitTime": 260,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 47,
+      "success": true,
+      "responseTime": 22435,
+      "networkLatency": 96,
+      "joinTime": 136,
+      "questionTimes": [
+        7819,
+        7033,
+        7127
+      ],
+      "submitTime": 178,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 18,
+      "success": true,
+      "responseTime": 9320,
+      "networkLatency": 141,
+      "joinTime": 73,
+      "questionTimes": [
+        2684,
+        2360,
+        3838
+      ],
+      "submitTime": 160,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 40,
+      "success": true,
+      "responseTime": 10107,
+      "networkLatency": 124,
+      "joinTime": 103,
+      "questionTimes": [
+        2447,
+        3980,
+        3162
+      ],
+      "submitTime": 253,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 10,
+      "success": true,
+      "responseTime": 11497,
+      "networkLatency": 82,
+      "joinTime": 110,
+      "questionTimes": [
+        2270,
+        6261,
+        2623
+      ],
+      "submitTime": 112,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 2,
+      "success": true,
+      "responseTime": 11566,
+      "networkLatency": 105,
+      "joinTime": 115,
+      "questionTimes": [
+        3529,
+        5517,
+        2034
+      ],
+      "submitTime": 214,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 9,
+      "success": true,
+      "responseTime": 11732,
+      "networkLatency": 110,
+      "joinTime": 109,
+      "questionTimes": [
+        3029,
+        2291,
+        5880
+      ],
+      "submitTime": 255,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 7,
+      "success": true,
+      "responseTime": 12371,
+      "networkLatency": 94,
+      "joinTime": 53,
+      "questionTimes": [
+        2272,
+        6334,
+        3462
+      ],
+      "submitTime": 118,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 48,
+      "success": true,
+      "responseTime": 12407,
+      "networkLatency": 79,
+      "joinTime": 138,
+      "questionTimes": [
+        4519,
+        4275,
+        3118
+      ],
+      "submitTime": 234,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 21,
+      "success": true,
+      "responseTime": 12565,
+      "networkLatency": 145,
+      "joinTime": 130,
+      "questionTimes": [
+        5115,
+        4320,
+        2568
+      ],
+      "submitTime": 245,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 3,
+      "success": true,
+      "responseTime": 12664,
+      "networkLatency": 114,
+      "joinTime": 132,
+      "questionTimes": [
+        2753,
+        7005,
+        2417
+      ],
+      "submitTime": 203,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 20,
+      "success": true,
+      "responseTime": 12780,
+      "networkLatency": 151,
+      "joinTime": 79,
+      "questionTimes": [
+        3213,
+        5995,
+        3003
+      ],
+      "submitTime": 296,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 15,
+      "success": true,
+      "responseTime": 12896,
+      "networkLatency": 87,
+      "joinTime": 63,
+      "questionTimes": [
+        2735,
+        7394,
+        2311
+      ],
+      "submitTime": 280,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 23,
+      "success": true,
+      "responseTime": 13147,
+      "networkLatency": 73,
+      "joinTime": 86,
+      "questionTimes": [
+        5772,
+        2221,
+        4636
+      ],
+      "submitTime": 288,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 11,
+      "success": true,
+      "responseTime": 13551,
+      "networkLatency": 186,
+      "joinTime": 129,
+      "questionTimes": [
+        7227,
+        2521,
+        3218
+      ],
+      "submitTime": 220,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 19,
+      "success": true,
+      "responseTime": 14053,
+      "networkLatency": 123,
+      "joinTime": 98,
+      "questionTimes": [
+        6047,
+        5092,
+        2489
+      ],
+      "submitTime": 165,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 29,
+      "success": true,
+      "responseTime": 14163,
+      "networkLatency": 156,
+      "joinTime": 92,
+      "questionTimes": [
+        2582,
+        5505,
+        5507
+      ],
+      "submitTime": 278,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 14,
+      "success": true,
+      "responseTime": 14330,
+      "networkLatency": 84,
+      "joinTime": 50,
+      "questionTimes": [
+        3964,
+        7493,
+        2581
+      ],
+      "submitTime": 119,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 31,
+      "success": true,
+      "responseTime": 14378,
+      "networkLatency": 186,
+      "joinTime": 89,
+      "questionTimes": [
+        5336,
+        6556,
+        2026
+      ],
+      "submitTime": 136,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 30,
+      "success": true,
+      "responseTime": 14420,
+      "networkLatency": 116,
+      "joinTime": 130,
+      "questionTimes": [
+        5362,
+        3271,
+        5265
+      ],
+      "submitTime": 243,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 28,
+      "success": true,
+      "responseTime": 14543,
+      "networkLatency": 159,
+      "joinTime": 87,
+      "questionTimes": [
+        4532,
+        3498,
+        6087
+      ],
+      "submitTime": 143,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 36,
+      "success": true,
+      "responseTime": 14770,
+      "networkLatency": 101,
+      "joinTime": 116,
+      "questionTimes": [
+        4664,
+        7569,
+        2097
+      ],
+      "submitTime": 169,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 8,
+      "success": true,
+      "responseTime": 14786,
+      "networkLatency": 77,
+      "joinTime": 122,
+      "questionTimes": [
+        3921,
+        2980,
+        7419
+      ],
+      "submitTime": 217,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 1,
+      "success": true,
+      "responseTime": 14796,
+      "networkLatency": 107,
+      "joinTime": 79,
+      "questionTimes": [
+        3834,
+        5245,
+        5257
+      ],
+      "submitTime": 248,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 16,
+      "success": true,
+      "responseTime": 14975,
+      "networkLatency": 179,
+      "joinTime": 62,
+      "questionTimes": [
+        4544,
+        3362,
+        6654
+      ],
+      "submitTime": 132,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 35,
+      "success": true,
+      "responseTime": 15187,
+      "networkLatency": 112,
+      "joinTime": 69,
+      "questionTimes": [
+        4422,
+        6390,
+        4042
+      ],
+      "submitTime": 103,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 33,
+      "success": true,
+      "responseTime": 15220,
+      "networkLatency": 113,
+      "joinTime": 90,
+      "questionTimes": [
+        7647,
+        3536,
+        3544
+      ],
+      "submitTime": 235,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 4,
+      "success": true,
+      "responseTime": 15309,
+      "networkLatency": 118,
+      "joinTime": 141,
+      "questionTimes": [
+        7347,
+        3065,
+        4443
+      ],
+      "submitTime": 141,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 32,
+      "success": true,
+      "responseTime": 15792,
+      "networkLatency": 63,
+      "joinTime": 124,
+      "questionTimes": [
+        5523,
+        4150,
+        5610
+      ],
+      "submitTime": 217,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 37,
+      "success": true,
+      "responseTime": 15934,
+      "networkLatency": 159,
+      "joinTime": 50,
+      "questionTimes": [
+        5166,
+        6810,
+        3390
+      ],
+      "submitTime": 213,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 12,
+      "success": true,
+      "responseTime": 15966,
+      "networkLatency": 114,
+      "joinTime": 113,
+      "questionTimes": [
+        4838,
+        5048,
+        5582
+      ],
+      "submitTime": 163,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 46,
+      "success": true,
+      "responseTime": 16111,
+      "networkLatency": 79,
+      "joinTime": 144,
+      "questionTimes": [
+        7699,
+        5143,
+        2681
+      ],
+      "submitTime": 228,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 45,
+      "success": true,
+      "responseTime": 16124,
+      "networkLatency": 144,
+      "joinTime": 114,
+      "questionTimes": [
+        7449,
+        2953,
+        5019
+      ],
+      "submitTime": 262,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 41,
+      "success": true,
+      "responseTime": 16144,
+      "networkLatency": 60,
+      "joinTime": 86,
+      "questionTimes": [
+        3305,
+        7573,
+        4873
+      ],
+      "submitTime": 179,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 39,
+      "success": true,
+      "responseTime": 16293,
+      "networkLatency": 59,
+      "joinTime": 117,
+      "questionTimes": [
+        6997,
+        6644,
+        2163
+      ],
+      "submitTime": 154,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 50,
+      "success": true,
+      "responseTime": 16358,
+      "networkLatency": 71,
+      "joinTime": 56,
+      "questionTimes": [
+        6696,
+        5656,
+        3436
+      ],
+      "submitTime": 247,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 22,
+      "success": true,
+      "responseTime": 16593,
+      "networkLatency": 91,
+      "joinTime": 143,
+      "questionTimes": [
+        4741,
+        6229,
+        5156
+      ],
+      "submitTime": 163,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 6,
+      "success": true,
+      "responseTime": 16668,
+      "networkLatency": 114,
+      "joinTime": 69,
+      "questionTimes": [
+        5581,
+        3969,
+        6665
+      ],
+      "submitTime": 247,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 43,
+      "success": true,
+      "responseTime": 16741,
+      "networkLatency": 195,
+      "joinTime": 143,
+      "questionTimes": [
+        3234,
+        7325,
+        5609
+      ],
+      "submitTime": 188,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 27,
+      "success": true,
+      "responseTime": 16791,
+      "networkLatency": 159,
+      "joinTime": 104,
+      "questionTimes": [
+        6313,
+        7274,
+        2725
+      ],
+      "submitTime": 161,
+      "totalQuestions": 3,
+      "score": 1
+    },
+    {
+      "userId": 17,
+      "success": true,
+      "responseTime": 16812,
+      "networkLatency": 189,
+      "joinTime": 115,
+      "questionTimes": [
+        5479,
+        5284,
+        5499
+      ],
+      "submitTime": 194,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 26,
+      "success": true,
+      "responseTime": 16892,
+      "networkLatency": 121,
+      "joinTime": 59,
+      "questionTimes": [
+        5641,
+        4601,
+        6180
+      ],
+      "submitTime": 238,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 24,
+      "success": true,
+      "responseTime": 16911,
+      "networkLatency": 115,
+      "joinTime": 124,
+      "questionTimes": [
+        6783,
+        6640,
+        3057
+      ],
+      "submitTime": 151,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 25,
+      "success": true,
+      "responseTime": 17106,
+      "networkLatency": 123,
+      "joinTime": 144,
+      "questionTimes": [
+        7123,
+        6576,
+        2863
+      ],
+      "submitTime": 225,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 44,
+      "success": true,
+      "responseTime": 17198,
+      "networkLatency": 158,
+      "joinTime": 104,
+      "questionTimes": [
+        5203,
+        3801,
+        7594
+      ],
+      "submitTime": 282,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 34,
+      "success": true,
+      "responseTime": 17831,
+      "networkLatency": 134,
+      "joinTime": 127,
+      "questionTimes": [
+        2005,
+        7804,
+        7563
+      ],
+      "submitTime": 131,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 13,
+      "success": true,
+      "responseTime": 18807,
+      "networkLatency": 168,
+      "joinTime": 66,
+      "questionTimes": [
+        6970,
+        4952,
+        6340
+      ],
+      "submitTime": 259,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 38,
+      "success": true,
+      "responseTime": 19181,
+      "networkLatency": 152,
+      "joinTime": 56,
+      "questionTimes": [
+        3822,
+        7432,
+        7390
+      ],
+      "submitTime": 289,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 49,
+      "success": true,
+      "responseTime": 19612,
+      "networkLatency": 153,
+      "joinTime": 126,
+      "questionTimes": [
+        6765,
+        7451,
+        4819
+      ],
+      "submitTime": 243,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 5,
+      "success": true,
+      "responseTime": 20263,
+      "networkLatency": 192,
+      "joinTime": 130,
+      "questionTimes": [
+        7901,
+        5937,
+        5918
+      ],
+      "submitTime": 154,
+      "totalQuestions": 3,
+      "score": 3
+    },
+    {
+      "userId": 47,
+      "success": true,
+      "responseTime": 20535,
+      "networkLatency": 132,
+      "joinTime": 127,
+      "questionTimes": [
+        7414,
+        7661,
+        4989
+      ],
+      "submitTime": 155,
+      "totalQuestions": 3,
+      "score": 2
+    },
+    {
+      "userId": 42,
+      "success": true,
+      "responseTime": 21620,
+      "networkLatency": 117,
+      "joinTime": 52,
+      "questionTimes": [
+        7618,
+        7303,
+        6231
+      ],
+      "submitTime": 235,
+      "totalQuestions": 3,
+      "score": 3
+    }
+  ]
+}

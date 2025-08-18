@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { CheckCircle, Flag, Clock, Target } from 'lucide-react';
 
 interface QuizProgressProps {
@@ -10,7 +10,7 @@ interface QuizProgressProps {
   flagged: number;
 }
 
-export function QuizProgress({ current, total, answered, flagged }: QuizProgressProps) {
+export const QuizProgress = memo(({ current, total, answered, flagged }: QuizProgressProps) => {
   const progressPercentage = (answered / total) * 100;
   // Calculate remaining the same way as unanswered in QuestionNavigation
   const remaining = total - answered; // This is the same as unanswered questions
@@ -33,7 +33,7 @@ export function QuizProgress({ current, total, answered, flagged }: QuizProgress
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3 relative overflow-hidden">
           <div
-            className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500 ease-out shadow-sm"
+            className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-200 ease-out shadow-sm"
             style={{ width: `${progressPercentage}%` }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-pulse" />
@@ -93,4 +93,6 @@ export function QuizProgress({ current, total, answered, flagged }: QuizProgress
       </div>
     </div>
   );
-}
+});
+
+QuizProgress.displayName = 'QuizProgress';

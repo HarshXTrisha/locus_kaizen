@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@types/mongoose": "^5.11.96",
+    "axios": "^1.11.0",
     "clsx": "^2.1.1",
     "firebase": "^10.7.1",
     "firebase-admin": "^13.4.0",

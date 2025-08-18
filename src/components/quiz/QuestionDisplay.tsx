@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Flag, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface Question {
@@ -23,7 +23,7 @@ interface QuestionDisplayProps {
   onShortAnswerChange?: (answer: string) => void;
 }
 
-export function QuestionDisplay({
+export const QuestionDisplay = memo(({
   question,
   questionNumber,
   totalQuestions,
@@ -32,7 +32,7 @@ export function QuestionDisplay({
   onAnswerSelect,
   onFlagQuestion,
   onShortAnswerChange
-}: QuestionDisplayProps) {
+}: QuestionDisplayProps) => {
   return (
     <div className="space-y-4">
       {/* Enhanced Question Header - Reduced spacing */}
@@ -51,7 +51,7 @@ export function QuestionDisplay({
         </div>
         <button
           onClick={onFlagQuestion}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-100 ${
             isFlagged
               ? 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200 shadow-sm'
               : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
@@ -100,22 +100,28 @@ export function QuestionDisplay({
               <button
                 key={index}
                 onClick={() => onAnswerSelect(option)}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
-                  isSelected
-                    ? 'border-[#20C997] bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                className={`
+                  w-full p-4 rounded-xl border-2 text-left transition-all duration-100
+                  ${isSelected
+                    ? 'border-[#20C997] bg-green-50 shadow-md'
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                  }
+                `}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center text-base font-bold transition-all duration-200 ${
-                    isSelected
-                      ? 'border-[#20C997] bg-[#20C997] text-white shadow-lg'
-                      : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                  }`}>
+                <div className="flex items-start gap-4">
+                  <div className={`
+                    flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-semibold
+                    ${isSelected
+                      ? 'border-[#20C997] bg-[#20C997] text-white'
+                      : 'border-gray-300 bg-gray-50 text-gray-600'
+                    }
+                  `}>
                     {optionLetter}
                   </div>
                   <div className="flex-1">
-                    <span className="text-base text-gray-900 leading-relaxed">{option}</span>
+                    <p className="text-gray-900 font-medium leading-relaxed">
+                      {option}
+                    </p>
                   </div>
                   {isSelected && (
                     <CheckCircle className="h-5 w-5 text-[#20C997] flex-shrink-0" />
@@ -127,16 +133,16 @@ export function QuestionDisplay({
         )}
       </div>
 
-      {/* Enhanced Navigation Hint - Reduced padding */}
-      <div className="bg-blue-50 p-3 rounded-xl border border-blue-200">
-        <div className="flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 text-blue-600" />
-          <p className="text-sm text-blue-800">
-            <strong>Tip:</strong> Select your answer and use the navigation buttons below to move between questions. 
-            You can flag questions for review and come back to them later.
-          </p>
-        </div>
+      {/* Question Type Indicator */}
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <AlertCircle className="h-4 w-4" />
+        <span className="capitalize">
+          {question.type === 'multiple-choice' ? 'Multiple Choice' : 
+           question.type === 'true-false' ? 'True/False' : 'Short Answer'}
+        </span>
       </div>
     </div>
   );
-}
+});
+
+QuestionDisplay.displayName = 'QuestionDisplay';

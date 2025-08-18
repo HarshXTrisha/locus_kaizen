@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { CheckCircle, Flag, Circle, Clock } from 'lucide-react';
 
 interface Question {
@@ -25,31 +25,32 @@ interface QuestionNavigationProps {
   onQuestionSelect: (index: number) => void;
 }
 
-export function QuestionNavigation({
+export const QuestionNavigation = React.memo(({
   questions,
   answers,
   currentQuestionIndex,
   onQuestionSelect
-}: QuestionNavigationProps) {
-  const getQuestionStatus = (index: number) => {
-    const answer = answers.find(a => a.questionId === questions[index].id);
-    if (!answer || answer.selectedOption === '') {
-      // Check if this question was visited (you'll need to track this in your quiz state)
-      // For now, we'll assume all unanswered questions are visited
-      return 'visited-unanswered';
-    }
-    if (answer.isFlagged) return 'flagged';
-    return 'answered';
-  };
+}: QuestionNavigationProps) => {
+  // Memoize question status calculations for better performance
+  const questionStatuses = useMemo(() => {
+    return questions.map((question, index) => {
+      const answer = answers.find(a => a.questionId === question.id);
+      if (!answer || answer.selectedOption === '') {
+        return 'visited-unanswered';
+      }
+      if (answer.isFlagged) return 'flagged';
+      return 'answered';
+    });
+  }, [questions, answers]);
 
-  const getStatusCounts = () => {
+  // Memoize status counts
+  const statusCounts = useMemo(() => {
     let answered = 0;
     let flagged = 0;
     let unanswered = 0;
     let visitedUnanswered = 0;
 
-    questions.forEach((_, index) => {
-      const status = getQuestionStatus(index);
+    questionStatuses.forEach(status => {
       if (status === 'answered') answered++;
       else if (status === 'flagged') flagged++;
       else if (status === 'visited-unanswered') visitedUnanswered++;
@@ -57,9 +58,23 @@ export function QuestionNavigation({
     });
 
     return { answered, flagged, unanswered, visitedUnanswered };
-  };
+  }, [questionStatuses]);
 
-  const statusCounts = getStatusCounts();
+  // Optimized question selection handler
+  const handleQuestionSelect = useCallback((index: number) => {
+    onQuestionSelect(index);
+  }, [onQuestionSelect]);
+
+  // Optimized quick navigation handlers
+  const handleNextUnanswered = useCallback(() => {
+    const firstUnanswered = questionStatuses.findIndex(status => status === 'visited-unanswered');
+    if (firstUnanswered !== -1) onQuestionSelect(firstUnanswered);
+  }, [questionStatuses, onQuestionSelect]);
+
+  const handleNextFlagged = useCallback(() => {
+    const firstFlagged = questionStatuses.findIndex(status => status === 'flagged');
+    if (firstFlagged !== -1) onQuestionSelect(firstFlagged);
+  }, [questionStatuses, onQuestionSelect]);
 
   return (
     <div className="space-y-5 w-full">
@@ -90,19 +105,19 @@ export function QuestionNavigation({
         </div>
       </div>
 
-      {/* Scrollable Question Grid - Increased size by 20% */}
+      {/* Scrollable Question Grid - Optimized for instant rendering */}
       <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         <div className="grid grid-cols-4 gap-3 p-2">
           {questions.map((question, index) => {
-            const status = getQuestionStatus(index);
+            const status = questionStatuses[index];
             const isCurrent = index === currentQuestionIndex;
             
             return (
               <button
                 key={question.id}
-                onClick={() => onQuestionSelect(index)}
+                onClick={() => handleQuestionSelect(index)}
                 className={`
-                  relative w-12 h-12 rounded-lg text-sm font-medium transition-all duration-200
+                  relative w-12 h-12 rounded-lg text-sm font-medium transition-all duration-150
                   ${isCurrent 
                     ? 'bg-[#20C997] text-white ring-2 ring-[#20C997] ring-offset-1 shadow-lg' 
                     : status === 'answered'
@@ -126,25 +141,19 @@ export function QuestionNavigation({
         </div>
       </div>
 
-      {/* Quick Navigation - Increased spacing */}
+      {/* Quick Navigation - Optimized handlers */}
       <div className="space-y-3">
         <div className="text-sm font-medium text-gray-600">Quick Navigation</div>
         <div className="flex flex-col gap-2">
           <button
-            onClick={() => {
-              const firstUnanswered = questions.findIndex((_, index) => getQuestionStatus(index) === 'visited-unanswered');
-              if (firstUnanswered !== -1) onQuestionSelect(firstUnanswered);
-            }}
+            onClick={handleNextUnanswered}
             disabled={statusCounts.visitedUnanswered === 0}
             className="w-full px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded border border-blue-200 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             Next Unanswered
           </button>
           <button
-            onClick={() => {
-              const firstFlagged = questions.findIndex((_, index) => getQuestionStatus(index) === 'flagged');
-              if (firstFlagged !== -1) onQuestionSelect(firstFlagged);
-            }}
+            onClick={handleNextFlagged}
             disabled={statusCounts.flagged === 0}
             className="w-full px-3 py-2 text-sm bg-yellow-50 text-yellow-700 rounded border border-yellow-200 hover:bg-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
@@ -154,4 +163,6 @@ export function QuestionNavigation({
       </div>
     </div>
   );
-}
+});
+
+QuestionNavigation.displayName = 'QuestionNavigation';

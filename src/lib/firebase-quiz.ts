@@ -150,7 +150,7 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
     const quizDoc: DatabaseQuiz = {
       title: quizData.title || 'Untitled Quiz',
       description: quizData.description || 'Quiz description not provided',
-      subject: (quizData.subject || 'Spreadsheets for Business Decisions') as AllowedSubject,
+      subject: quizData.subject || 'Spreadsheets for Business Decisions', // Allow any string
       questions: cleanedQuestions,
       timeLimit: quizData.timeLimit || 30,
       passingScore: quizData.passingScore || 0,
@@ -161,9 +161,8 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
       isTemporary: quizData.isTemporary || false
     };
 
-    // Validate subject is allowed (allow custom subjects and empty subjects)
+    // Log custom subjects for debugging (no validation blocking)
     if (quizDoc.subject && !ALLOWED_SUBJECTS.includes(quizDoc.subject as AllowedSubject)) {
-      // Allow custom subjects and empty subjects for BBA DBE portal
       console.log('Using custom subject:', quizDoc.subject);
     }
 

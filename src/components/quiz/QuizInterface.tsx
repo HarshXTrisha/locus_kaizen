@@ -105,6 +105,45 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
     return Math.round((correctAnswers / quiz.questions.length) * 100);
   }, [quiz, answers]);
 
+  // Optimized handlers - moved before early returns
+  const handleAnswerSelect = useCallback((questionId: string, selectedOption: string) => {
+    setAnswers(prev => 
+      prev.map(answer => 
+        answer.questionId === questionId 
+          ? { ...answer, selectedOption }
+          : answer
+      )
+    );
+  }, []);
+
+  const handleShortAnswerChange = useCallback((questionId: string, answer: string) => {
+    setAnswers(prev => 
+      prev.map(ans => 
+        ans.questionId === questionId 
+          ? { ...ans, selectedOption: answer }
+          : ans
+      )
+    );
+  }, []);
+
+  const handleFlagQuestion = useCallback((questionId: string) => {
+    setAnswers(prev => 
+      prev.map(answer => 
+        answer.questionId === questionId 
+          ? { ...answer, isFlagged: !answer.isFlagged }
+          : answer
+      )
+    );
+  }, []);
+
+  const handleQuestionNavigation = useCallback((index: number) => {
+    if (index >= 0 && index < (quiz?.questions?.length || 0)) {
+      // Immediate state update for instant navigation
+      setCurrentQuestionIndex(index);
+      setShowMobileNav(false); // Close mobile nav when navigating
+    }
+  }, [quiz?.questions?.length]);
+
   // Submit quiz function
   const submitQuiz = useCallback(async () => {
     if (!quiz || !user) return;
@@ -233,43 +272,6 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const totalQuestions = quiz.questions.length;
   const answeredQuestions = answers.filter(a => a.selectedOption !== '').length;
   const flaggedQuestions = answers.filter(a => a.isFlagged).length;
-
-  const handleAnswerSelect = (questionId: string, selectedOption: string) => {
-    setAnswers(prev => 
-      prev.map(answer => 
-        answer.questionId === questionId 
-          ? { ...answer, selectedOption }
-          : answer
-      )
-    );
-  };
-
-  const handleShortAnswerChange = (questionId: string, answer: string) => {
-    setAnswers(prev => 
-      prev.map(ans => 
-        ans.questionId === questionId 
-          ? { ...ans, selectedOption: answer }
-          : ans
-      )
-    );
-  };
-
-  const handleFlagQuestion = (questionId: string) => {
-    setAnswers(prev => 
-      prev.map(answer => 
-        answer.questionId === questionId 
-          ? { ...answer, isFlagged: !answer.isFlagged }
-          : answer
-      )
-    );
-  };
-
-  const handleQuestionNavigation = (index: number) => {
-    if (index >= 0 && index < totalQuestions) {
-      setCurrentQuestionIndex(index);
-      setShowMobileNav(false); // Close mobile nav when navigating
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
