@@ -117,7 +117,8 @@ export default function LiveQuizPage() {
               type="error"
               title="Quiz Not Found"
               description={error}
-              onRetry={() => window.location.reload()}
+              actionLabel="Retry"
+              onAction={() => window.location.reload()}
             />
           </div>
         </div>
