@@ -14,6 +14,7 @@ export function AppHeader() {
           <nav className="hidden md:flex items-center gap-8">
             <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Dashboard</a>
             <a href="/create" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Create Quiz</a>
+            <a href="/upload" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Upload</a>
             <a href="/archive" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Quiz Management</a>
             <a href="/results" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Results</a>
             <a href="/settings" className="text-sm font-medium text-green-600 border-b-2 border-green-600 pb-1">Profile</a>
