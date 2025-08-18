@@ -42,285 +42,6 @@ export default function DashboardPage() {
   });
   const [deletingQuiz, setDeletingQuiz] = useState<string | null>(null);
   const [deletingResult, setDeletingResult] = useState<string | null>(null);
-
-  // Fake data for testing
-  const fakeQuizzes: QuizWithControls[] = useMemo(() => [
-    {
-      id: 'fake-1',
-      title: 'Business Analytics Fundamentals',
-      description: 'Test your knowledge of business analytics concepts and tools',
-      subject: 'Spreadsheets for Business Decisions',
-      questions: [
-        {
-          id: 'q1',
-          text: 'What is the primary purpose of a pivot table?',
-          type: 'multiple-choice',
-          options: ['Data visualization', 'Data summarization', 'Data cleaning', 'Data validation'],
-          correctAnswer: 'Data summarization',
-          points: 1
-        }
-      ],
-      timeLimit: 30,
-      passingScore: 70,
-      createdBy: user?.id || '',
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-01-15'),
-      isPublished: true,
-      adminControls: {
-        canPublish: false,
-        canUnpublish: true,
-        canEdit: true,
-        canDelete: true,
-        canViewAnalytics: true,
-        isAdmin: false,
-        isCreator: true
-      }
-    },
-    {
-      id: 'fake-2',
-      title: 'Indian Theatre Traditions',
-      description: 'Explore the rich heritage of Indian theatre and its cultural significance',
-      subject: 'Understanding Indian Culture: Theatre and its Presence in Daily Life',
-      questions: [
-        {
-          id: 'q1',
-          text: 'Which form of theatre originated in Kerala?',
-          type: 'multiple-choice',
-          options: ['Kathakali', 'Bharatanatyam', 'Kuchipudi', 'Odissi'],
-          correctAnswer: 'Kathakali',
-          points: 1
-        }
-      ],
-      timeLimit: 45,
-      passingScore: 75,
-      createdBy: user?.id || '',
-      createdAt: new Date('2024-01-10'),
-      updatedAt: new Date('2024-01-10'),
-      isPublished: false,
-      adminControls: {
-        canPublish: true,
-        canUnpublish: false,
-        canEdit: true,
-        canDelete: true,
-        canViewAnalytics: true,
-        isAdmin: false,
-        isCreator: true
-      }
-    },
-    {
-      id: 'fake-3',
-      title: 'Sustainable Business Practices',
-      description: 'Learn about sustainable business models and environmental responsibility',
-      subject: 'Exploring Sustainability in the Indian Context',
-      questions: [
-        {
-          id: 'q1',
-          text: 'What is the triple bottom line approach?',
-          type: 'multiple-choice',
-          options: ['Profit, People, Planet', 'Cost, Quality, Time', 'Revenue, Growth, Market', 'Efficiency, Effectiveness, Economy'],
-          correctAnswer: 'Profit, People, Planet',
-          points: 1
-        }
-      ],
-      timeLimit: 60,
-      passingScore: 80,
-      createdBy: user?.id || '',
-      createdAt: new Date('2024-01-05'),
-      updatedAt: new Date('2024-01-05'),
-      isPublished: true,
-      adminControls: {
-        canPublish: false,
-        canUnpublish: true,
-        canEdit: true,
-        canDelete: true,
-        canViewAnalytics: true,
-        isAdmin: false,
-        isCreator: true
-      }
-    },
-    {
-      id: 'fake-4',
-      title: 'Digital Marketing Strategies',
-      description: 'Master the art of social media marketing and digital campaigns',
-      subject: 'Social Media for Marketing',
-      questions: [
-        {
-          id: 'q1',
-          text: 'Which platform is best for B2B marketing?',
-          type: 'multiple-choice',
-          options: ['Instagram', 'TikTok', 'LinkedIn', 'Snapchat'],
-          correctAnswer: 'LinkedIn',
-          points: 1
-        }
-      ],
-      timeLimit: 40,
-      passingScore: 75,
-      createdBy: user?.id || '',
-      createdAt: new Date('2024-01-20'),
-      updatedAt: new Date('2024-01-20'),
-      isPublished: true,
-      adminControls: {
-        canPublish: false,
-        canUnpublish: true,
-        canEdit: true,
-        canDelete: true,
-        canViewAnalytics: true,
-        isAdmin: false,
-        isCreator: true
-      }
-    },
-    {
-      id: 'fake-5',
-      title: 'Design Thinking Workshop',
-      description: 'Learn creative problem-solving through design thinking methodology',
-      subject: 'Design Your Thinking',
-      questions: [
-        {
-          id: 'q1',
-          text: 'What is the first stage of the Design Thinking process?',
-          type: 'multiple-choice',
-          options: ['Ideate', 'Prototype', 'Empathize', 'Test'],
-          correctAnswer: 'Empathize',
-          points: 1
-        }
-      ],
-      timeLimit: 50,
-      passingScore: 70,
-      createdBy: user?.id || '',
-      createdAt: new Date('2024-01-25'),
-      updatedAt: new Date('2024-01-25'),
-      isPublished: false,
-      adminControls: {
-        canPublish: true,
-        canUnpublish: false,
-        canEdit: true,
-        canDelete: true,
-        canViewAnalytics: true,
-        isAdmin: false,
-        isCreator: true
-      }
-    },
-    {
-      id: 'fake-6',
-      title: 'Startup Fundamentals',
-      description: 'Understand the entrepreneurial mindset and startup methodologies',
-      subject: 'Entrepreneurial Mindset and Methods',
-      questions: [
-        {
-          id: 'q1',
-          text: 'What is a Minimum Viable Product (MVP)?',
-          type: 'multiple-choice',
-          options: ['A fully developed product', 'A product with minimum features to test', 'A prototype', 'A business plan'],
-          correctAnswer: 'A product with minimum features to test',
-          points: 1
-        }
-      ],
-      timeLimit: 35,
-      passingScore: 75,
-      createdBy: user?.id || '',
-      createdAt: new Date('2024-01-30'),
-      updatedAt: new Date('2024-01-30'),
-      isPublished: true,
-      adminControls: {
-        canPublish: false,
-        canUnpublish: true,
-        canEdit: true,
-        canDelete: true,
-        canViewAnalytics: true,
-        isAdmin: false,
-        isCreator: true
-      }
-    },
-    {
-      id: 'fake-7',
-      title: 'Financial Analysis Basics',
-      description: 'Learn fundamental concepts of management accounting and financial analysis',
-      subject: 'Management Accounting',
-      questions: [
-        {
-          id: 'q1',
-          text: 'What does ROI stand for in financial terms?',
-          type: 'multiple-choice',
-          options: ['Return on Investment', 'Rate of Interest', 'Return on Income', 'Rate of Inflation'],
-          correctAnswer: 'Return on Investment',
-          points: 1
-        }
-      ],
-      timeLimit: 45,
-      passingScore: 80,
-      createdBy: user?.id || '',
-      createdAt: new Date('2024-02-01'),
-      updatedAt: new Date('2024-02-01'),
-      isPublished: true,
-      adminControls: {
-        canPublish: false,
-        canUnpublish: true,
-        canEdit: true,
-        canDelete: true,
-        canViewAnalytics: true,
-        isAdmin: false,
-        isCreator: true
-      }
-    }
-  ], [user?.id]);
-
-  const fakeResults = useMemo(() => [
-    {
-      id: 'result-1',
-      quizId: 'fake-1',
-      userId: user?.id || '',
-      score: 85,
-      totalQuestions: 10,
-      correctAnswers: 8,
-      timeTaken: 1800,
-      completedAt: new Date('2024-01-20'),
-      answers: []
-    },
-    {
-      id: 'result-2',
-      quizId: 'fake-3',
-      userId: user?.id || '',
-      score: 92,
-      totalQuestions: 15,
-      correctAnswers: 14,
-      timeTaken: 2400,
-      completedAt: new Date('2024-01-18'),
-      answers: []
-    },
-    {
-      id: 'result-3',
-      quizId: 'fake-4',
-      userId: user?.id || '',
-      score: 78,
-      totalQuestions: 12,
-      correctAnswers: 9,
-      timeTaken: 2100,
-      completedAt: new Date('2024-01-22'),
-      answers: []
-    },
-    {
-      id: 'result-4',
-      quizId: 'fake-6',
-      userId: user?.id || '',
-      score: 95,
-      totalQuestions: 8,
-      correctAnswers: 8,
-      timeTaken: 1200,
-      completedAt: new Date('2024-01-25'),
-      answers: []
-    },
-    {
-      id: 'result-5',
-      quizId: 'fake-7',
-      userId: user?.id || '',
-      score: 65,
-      totalQuestions: 20,
-      correctAnswers: 13,
-      timeTaken: 3600,
-      completedAt: new Date('2024-01-28'),
-      answers: []
-    }
-  ], [user?.id]);
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
     kind: 'quiz' | 'result' | null;
@@ -333,17 +54,27 @@ export default function DashboardPage() {
       setLoading(true);
       setError(null);
       
-      // Use fake data for testing
-      setQuizzes(fakeQuizzes);
-      setResults(fakeResults);
-      
-      // Calculate stats for fake data
-      const totalQuizzes = fakeQuizzes.length;
-      const totalResults = fakeResults.length;
+      if (!user?.id) {
+        setError('User not authenticated');
+        return;
+      }
+
+      // Load real data from Firebase
+      const [quizzesData, resultsData] = await Promise.all([
+        getUserQuizzesWithControls(user.id),
+        getUserQuizResults(user.id)
+      ]);
+
+      setQuizzes(quizzesData);
+      setResults(resultsData);
+
+      // Calculate stats from real data
+      const totalQuizzes = quizzesData.length;
+      const totalResults = resultsData.length;
       const averageScore = totalResults > 0 
-        ? Math.round(fakeResults.reduce((sum: number, result: any) => sum + result.score, 0) / totalResults)
+        ? Math.round(resultsData.reduce((sum: number, result: any) => sum + result.score, 0) / totalResults)
         : 0;
-      const totalTimeSpent = fakeResults.reduce((sum: number, result: any) => sum + result.timeTaken, 0);
+      const totalTimeSpent = resultsData.reduce((sum: number, result: any) => sum + (result.timeTaken || 0), 0);
       
       setStats({
         totalQuizzes,
@@ -358,7 +89,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [fakeQuizzes, fakeResults]);
+  }, [user?.id]);
 
   useEffect(() => {
     console.log('🏠 Dashboard: Auth state:', { isAuthenticated, user: !!user, isLoading });
@@ -397,13 +128,13 @@ export default function DashboardPage() {
 
   const handlePublishQuiz = async (quizId: string) => {
     try {
-      // Simulate publishing for fake data
-      setQuizzes(prev => prev.map(quiz => 
-        quiz.id === quizId 
-          ? { ...quiz, isPublished: true, adminControls: { ...quiz.adminControls, canPublish: false, canUnpublish: true } }
-          : quiz
-      ));
+      if (!user?.id) {
+        showError('Authentication Required', 'Please sign in to publish quizzes');
+        return;
+      }
+      await publishQuiz(quizId, user.id);
       showSuccess('Success', 'Quiz published successfully!');
+      loadDashboardData(); // Reload data to get updated state
     } catch (error) {
       showError('Publish Failed', 'Failed to publish quiz');
     }
@@ -411,13 +142,13 @@ export default function DashboardPage() {
 
   const handleUnpublishQuiz = async (quizId: string) => {
     try {
-      // Simulate unpublishing for fake data
-      setQuizzes(prev => prev.map(quiz => 
-        quiz.id === quizId 
-          ? { ...quiz, isPublished: false, adminControls: { ...quiz.adminControls, canPublish: true, canUnpublish: false } }
-          : quiz
-      ));
+      if (!user?.id) {
+        showError('Authentication Required', 'Please sign in to unpublish quizzes');
+        return;
+      }
+      await unpublishQuiz(quizId, user.id);
       showSuccess('Success', 'Quiz unpublished successfully!');
+      loadDashboardData(); // Reload data to get updated state
     } catch (error) {
       showError('Unpublish Failed', 'Failed to unpublish quiz');
     }
@@ -436,15 +167,14 @@ export default function DashboardPage() {
   };
 
   const confirmDeletion = async () => {
-    if (!confirmDelete.open || !confirmDelete.id || !confirmDelete.kind) return;
+    if (!confirmDelete.open || !confirmDelete.id || !confirmDelete.kind || !user?.id) return;
 
     if (confirmDelete.kind === 'quiz') {
       try {
         setDeletingQuiz(confirmDelete.id);
-        // Simulate deletion for fake data
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-        setQuizzes(prev => prev.filter(quiz => quiz.id !== confirmDelete.id));
+        await deleteQuiz(confirmDelete.id);
         showSuccess('Quiz deleted', `"${confirmDelete.title}" has been permanently removed.`);
+        loadDashboardData(); // Reload data to get updated state
       } catch (error) {
         console.error('Error deleting quiz:', error);
         showError('Failed to delete quiz', 'An error occurred while deleting the quiz.');
@@ -455,10 +185,9 @@ export default function DashboardPage() {
     } else if (confirmDelete.kind === 'result') {
       try {
         setDeletingResult(confirmDelete.id);
-        // Simulate deletion for fake data
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-        setResults(prev => prev.filter(result => result.id !== confirmDelete.id));
+        await deleteQuizResult(confirmDelete.id);
         showSuccess('Result deleted', `Result for "${confirmDelete.title}" has been permanently removed.`);
+        loadDashboardData(); // Reload data to get updated state
       } catch (error) {
         console.error('Error deleting result:', error);
         showError('Failed to delete result', 'An error occurred while deleting the result.');
