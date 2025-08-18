@@ -57,7 +57,7 @@ export default function PDFTestPage() {
             
             <div>
               <h3 className="font-medium text-gray-900">2. Download Sample PDF</h3>
-              <p className="text-gray-600">Click the "Sample PDF" download button to get a test file</p>
+              <p className="text-gray-600">Click the &quot;Sample PDF&quot; download button to get a test file</p>
             </div>
             
             <div>
