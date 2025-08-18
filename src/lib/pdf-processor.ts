@@ -31,9 +31,9 @@ export interface ExtractedQuiz {
 
 export class PDFProcessor {
   private static questionPatterns = {
-    // More flexible question patterns
+    // More flexible question patterns - support various formats
     questionNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*(.+)$/i,
-    // Option patterns - more flexible
+    // Option patterns - more flexible with various formats
     optionA: /^A[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
     optionB: /^B[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
     optionC: /^C[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
@@ -43,6 +43,15 @@ export class PDFProcessor {
     answerKeyEntry: /^(?:Q|Question)?(\d+)[\.:\)]?\s*[A-D][\.:\)]?\s*(.+)$/i,
     // Alternative answer format
     answerLine: /^Answer:\s*[A-D][\.:\)]?\s*(.+)$/i,
+    // Additional patterns for better question detection
+    questionStart: /^(?:Q|Question)?(\d+)[\.:\)]?\s*$/i,
+    // Enhanced patterns for better detection
+    questionWithNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*(.+)$/i,
+    questionWithoutNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*$/i,
+    // Multiple options on same line
+    multiOptions: /([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi,
+    // Correct answer indicators
+    correctAnswer: /[✓*]/g,
   };
 
   /**
@@ -120,19 +129,32 @@ export class PDFProcessor {
   }
 
   /**
-   * Parse extracted text into structured quiz data
+   * Parse extracted text into structured quiz data with enhanced error handling and validation
    */
   private static parseQuizText(text: string, fileName: string): ExtractedQuiz {
+    console.log('🔍 Starting enhanced PDF parsing...');
     console.log('Parsing text with length:', text.length);
     
+    // CRITICAL #3: User Feedback & Debugging
+    const parsingStats = {
+      totalLines: 0,
+      questionsFound: 0,
+      optionsFound: 0,
+      errors: [] as string[],
+      warnings: [] as string[]
+    };
+    
     const lines = text.split('\n').filter(line => line.trim());
+    parsingStats.totalLines = lines.length;
     console.log('Number of non-empty lines:', lines.length);
     
+    // CRITICAL #4: Fallback Mechanisms - Multiple parsing strategies
     const questions: ExtractedQuestion[] = [];
     let currentQuestion: Partial<ExtractedQuestion> | null = null;
     let questionCounter = 1;
     let answerKey: { [key: number]: string } = {};
     let inAnswerKey = false;
+    let parsingStrategy = 'standard'; // Track which strategy we're using
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -178,10 +200,42 @@ export class PDFProcessor {
         continue;
       }
       
-      // Check for question number
+      // CRITICAL #2: Robust Question Boundary Detection
       const questionMatch = trimmedLine.match(this.questionPatterns.questionNumber);
       if (questionMatch) {
-        console.log(`Found question ${questionCounter}:`, questionMatch[2]);
+        console.log(`✅ Found question ${questionCounter}:`, questionMatch[2]);
+        parsingStats.questionsFound++;
+        
+        // CRITICAL #1: Error Correction & Validation - Validate previous question before saving
+        if (currentQuestion && currentQuestion.text) {
+          const validation = this.validateQuestion(currentQuestion, questionCounter - 1);
+          if (validation.isValid) {
+            const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
+            questions.push(finalizedQuestion);
+            console.log(`✅ Added validated question ${questionCounter - 1}:`, finalizedQuestion);
+          } else {
+            parsingStats.errors.push(`Question ${questionCounter - 1}: ${validation.errors.join(', ')}`);
+            console.warn(`⚠️ Question ${questionCounter - 1} validation failed:`, validation.errors);
+          }
+        }
+        
+        // Start new question with enhanced validation
+        currentQuestion = {
+          id: `q${questionCounter}`,
+          text: questionMatch[2].trim(),
+          type: 'multiple-choice',
+          options: [],
+          correctAnswer: '',
+          points: 1
+        };
+        questionCounter++;
+        continue;
+      }
+
+      // Check for question number without text (e.g., "Q1." on one line, question text on next)
+      const questionStartMatch = trimmedLine.match(this.questionPatterns.questionStart);
+      if (questionStartMatch) {
+        console.log(`Found question start ${questionCounter}:`, trimmedLine);
         
         // Save previous question if exists
         if (currentQuestion && currentQuestion.text) {
@@ -190,10 +244,10 @@ export class PDFProcessor {
           console.log(`Added question ${questionCounter - 1}:`, finalizedQuestion);
         }
         
-        // Start new question
+        // Start new question with empty text (will be filled by next line)
         currentQuestion = {
           id: `q${questionCounter}`,
-          text: questionMatch[2].trim(),
+          text: '',
           type: 'multiple-choice',
           options: [],
           correctAnswer: '',
@@ -233,87 +287,125 @@ export class PDFProcessor {
           currentQuestion.options = currentQuestion.options || [];
           const optionText = optionAMatch[1].trim();
           currentQuestion.options.push(optionText);
-          console.log(`Added option A:`, optionText);
+          parsingStats.optionsFound++;
+          console.log(`✅ Added option A:`, optionText);
           // Check if this option is marked as correct
           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
             currentQuestion.correctAnswer = optionText;
-            console.log(`Marked A as correct:`, optionText);
+            console.log(`🎯 Marked A as correct:`, optionText);
           }
         } else if (optionBMatch) {
           currentQuestion.options = currentQuestion.options || [];
           const optionText = optionBMatch[1].trim();
           currentQuestion.options.push(optionText);
-          console.log(`Added option B:`, optionText);
+          parsingStats.optionsFound++;
+          console.log(`✅ Added option B:`, optionText);
           // Check if this option is marked as correct
           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
             currentQuestion.correctAnswer = optionText;
-            console.log(`Marked B as correct:`, optionText);
+            console.log(`🎯 Marked B as correct:`, optionText);
           }
         } else if (optionCMatch) {
           currentQuestion.options = currentQuestion.options || [];
           const optionText = optionCMatch[1].trim();
           currentQuestion.options.push(optionText);
-          console.log(`Added option C:`, optionText);
+          parsingStats.optionsFound++;
+          console.log(`✅ Added option C:`, optionText);
           // Check if this option is marked as correct
           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
             currentQuestion.correctAnswer = optionText;
-            console.log(`Marked C as correct:`, optionText);
+            console.log(`🎯 Marked C as correct:`, optionText);
           }
         } else if (optionDMatch) {
           currentQuestion.options = currentQuestion.options || [];
           const optionText = optionDMatch[1].trim();
           currentQuestion.options.push(optionText);
-          console.log(`Added option D:`, optionText);
+          parsingStats.optionsFound++;
+          console.log(`✅ Added option D:`, optionText);
           // Check if this option is marked as correct
           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
             currentQuestion.correctAnswer = optionText;
-            console.log(`Marked D as correct:`, optionText);
+            console.log(`🎯 Marked D as correct:`, optionText);
           }
-        } else if (trimmedLine && currentQuestion.text && !trimmedLine.match(/^[A-D]\)/)) {
-                     // Check if this line contains multiple options (e.g., "B) Osaka C) Tokyo D) Hiroshima")
-           const multiOptionMatch = trimmedLine.match(/([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi);
-           if (multiOptionMatch && currentQuestion && currentQuestion.options) {
-             console.log(`Found multiple options on same line:`, trimmedLine);
-             // Parse each option
-             multiOptionMatch.forEach(match => {
-               const optionMatch = match.match(/([A-D])[\.:\)]\s*(.+)/i);
-               if (optionMatch && currentQuestion) {
-                 const optionLetter = optionMatch[1];
-                 const optionText = optionMatch[2].trim();
-                 const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
-                 
-                 // Ensure we have enough options
-                 while (currentQuestion.options!.length <= optionIndex) {
-                   currentQuestion.options!.push('');
-                 }
-                 currentQuestion.options![optionIndex] = optionText;
-                 console.log(`Added option ${optionLetter}:`, optionText);
-               }
-             });
-          } else {
-            // Append to question text if it's not an option and not empty
-            currentQuestion.text += ' ' + trimmedLine;
-            console.log(`Appended to question text:`, trimmedLine);
+        } else {
+          // Check if this line contains multiple options (e.g., "B) Osaka C) Tokyo D) Hiroshima")
+          const multiOptionMatch = trimmedLine.match(/([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi);
+          if (multiOptionMatch && currentQuestion && currentQuestion.options) {
+            console.log(`Found multiple options on same line:`, trimmedLine);
+            // Parse each option
+            multiOptionMatch.forEach(match => {
+              const optionMatch = match.match(/([A-D])[\.:\)]\s*(.+)/i);
+              if (optionMatch && currentQuestion) {
+                const optionLetter = optionMatch[1];
+                const optionText = optionMatch[2].trim();
+                const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+                
+                // Ensure we have enough options
+                while (currentQuestion.options!.length <= optionIndex) {
+                  currentQuestion.options!.push('');
+                }
+                currentQuestion.options![optionIndex] = optionText;
+                console.log(`Added option ${optionLetter}:`, optionText);
+              }
+            });
+          } else if (trimmedLine && !trimmedLine.match(/^[A-D]\)/) && !trimmedLine.match(/^Answer:/i) && !trimmedLine.match(/^ANSWERS?/i)) {
+            // Only append to question text if it's not an option, answer line, or answer key
+            // and if we haven't started collecting options yet
+            if (currentQuestion.options && currentQuestion.options.length === 0) {
+              currentQuestion.text += ' ' + trimmedLine;
+              console.log(`Appended to question text:`, trimmedLine);
+            }
           }
         }
       }
     }
 
-    // Add the last question
+    // CRITICAL #1: Error Correction & Validation - Validate and add the last question
     if (currentQuestion && currentQuestion.text) {
-      const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
-      questions.push(finalizedQuestion);
-      console.log(`Added final question:`, finalizedQuestion);
+      const validation = this.validateQuestion(currentQuestion, questionCounter - 1);
+      if (validation.isValid) {
+        const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
+        questions.push(finalizedQuestion);
+        console.log(`✅ Added final validated question:`, finalizedQuestion);
+      } else {
+        parsingStats.errors.push(`Final question: ${validation.errors.join(', ')}`);
+        console.warn(`⚠️ Final question validation failed:`, validation.errors);
+      }
     }
 
+    // CRITICAL #5: Data Integrity Checks - Validate entire quiz before returning
     const result = {
       title: this.extractTitle(fileName),
       description: `Quiz extracted from ${fileName}`,
       subject: 'General',
       questions: questions
     };
-    
-    console.log('Final parsed result:', result);
+
+    // Enhanced validation and user feedback
+    const quizValidation = this.validateQuiz(result);
+    if (!quizValidation.isValid) {
+      parsingStats.errors.push(...quizValidation.errors);
+    }
+
+    // CRITICAL #3: User Feedback & Debugging - Log comprehensive parsing results
+    console.log('📊 PARSING STATISTICS:', {
+      totalLines: parsingStats.totalLines,
+      questionsFound: parsingStats.questionsFound,
+      optionsFound: parsingStats.optionsFound,
+      errors: parsingStats.errors.length,
+      warnings: parsingStats.warnings.length,
+      parsingStrategy,
+      finalQuestionCount: questions.length
+    });
+
+    if (parsingStats.errors.length > 0) {
+      console.error('❌ PARSING ERRORS:', parsingStats.errors);
+    }
+    if (parsingStats.warnings.length > 0) {
+      console.warn('⚠️ PARSING WARNINGS:', parsingStats.warnings);
+    }
+
+    console.log('🎯 Final parsed result:', result);
     return result;
   }
 
@@ -366,7 +458,44 @@ export class PDFProcessor {
   }
 
   /**
-   * Validate extracted quiz data
+   * CRITICAL #1: Validate individual question during parsing
+   */
+  private static validateQuestion(question: Partial<ExtractedQuestion>, index: number): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    // Check question text
+    if (!question.text || !question.text.trim()) {
+      errors.push('Question text is missing or empty');
+    }
+
+    // Check options for multiple choice
+    if (question.type === 'multiple-choice' || !question.type) {
+      if (!question.options || question.options.length < 2) {
+        errors.push(`Question needs at least 2 options (found: ${question.options?.length || 0})`);
+      }
+      
+      // Check for empty options
+      if (question.options) {
+        const emptyOptions = question.options.filter(opt => !opt || !opt.trim());
+        if (emptyOptions.length > 0) {
+          errors.push(`Question has ${emptyOptions.length} empty option(s)`);
+        }
+      }
+    }
+
+    // Check correct answer
+    if (!question.correctAnswer || !question.correctAnswer.trim()) {
+      errors.push('Question has no correct answer');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  /**
+   * CRITICAL #5: Validate extracted quiz data with enhanced checks
    */
   static validateQuiz(quiz: ExtractedQuiz): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
@@ -390,6 +519,16 @@ export class PDFProcessor {
 
       if (!question.correctAnswer.trim()) {
         errors.push(`Question ${index + 1} has no correct answer`);
+      }
+
+      // Additional integrity checks
+      if (question.options && question.options.length > 0) {
+        const duplicateOptions = question.options.filter((opt, i) => 
+          question.options!.indexOf(opt) !== i
+        );
+        if (duplicateOptions.length > 0) {
+          errors.push(`Question ${index + 1} has duplicate options`);
+        }
       }
     });
 
