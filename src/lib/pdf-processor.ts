@@ -33,11 +33,11 @@ export class PDFProcessor {
   private static questionPatterns = {
     // More flexible question patterns - support various formats
     questionNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*(.+)$/i,
-    // Option patterns - more flexible with various formats
-    optionA: /^A[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
-    optionB: /^B[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
-    optionC: /^C[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
-    optionD: /^D[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
+    // Option patterns - more flexible with various formats (handle extra parentheses)
+    optionA: /^A[\.:\)]\s*(.+?)(?:\s*[✓*]|\s*\)|$)/i,
+    optionB: /^B[\.:\)]\s*(.+?)(?:\s*[✓*]|\s*\)|$)/i,
+    optionC: /^C[\.:\)]\s*(.+?)(?:\s*[✓*]|\s*\)|$)/i,
+    optionD: /^D[\.:\)]\s*(.+?)(?:\s*[✓*]|\s*\)|$)/i,
     // Answer patterns
     answerKey: /^(?:ANSWERS?|ANSWER KEY|Answer):\s*$/i,
     answerKeyEntry: /^(?:Q|Question)?(\d+)[\.:\)]?\s*[A-D][\.:\)]?\s*(.+)$/i,
@@ -48,8 +48,8 @@ export class PDFProcessor {
     // Enhanced patterns for better detection
     questionWithNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*(.+)$/i,
     questionWithoutNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*$/i,
-    // Multiple options on same line
-    multiOptions: /([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi,
+    // Multiple options on same line (handle extra parentheses)
+    multiOptions: /([A-D])[\.:\)]\s*([^A-D]+?)(?=\s*[✓*]|\s*\)|\s+[A-D][\.:\)]|$)/gi,
     // Correct answer indicators
     correctAnswer: /[✓*]/g,
   };
@@ -344,71 +344,81 @@ export class PDFProcessor {
         const optionCMatch = trimmedLine.match(this.questionPatterns.optionC);
         const optionDMatch = trimmedLine.match(this.questionPatterns.optionD);
 
-        if (optionAMatch) {
-          currentQuestion.options = currentQuestion.options || [];
-          const optionText = optionAMatch[1].trim();
-          currentQuestion.options.push(optionText);
-          parsingStats.optionsFound++;
-          console.log(`✅ Added option A:`, optionText);
-          // Check if this option is marked as correct
-          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
-            currentQuestion.correctAnswer = optionText;
-            console.log(`🎯 Marked A as correct:`, optionText);
-          }
-        } else if (optionBMatch) {
-          currentQuestion.options = currentQuestion.options || [];
-          const optionText = optionBMatch[1].trim();
-          currentQuestion.options.push(optionText);
-          parsingStats.optionsFound++;
-          console.log(`✅ Added option B:`, optionText);
-          // Check if this option is marked as correct
-          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
-            currentQuestion.correctAnswer = optionText;
-            console.log(`🎯 Marked B as correct:`, optionText);
-          }
-        } else if (optionCMatch) {
-          currentQuestion.options = currentQuestion.options || [];
-          const optionText = optionCMatch[1].trim();
-          currentQuestion.options.push(optionText);
-          parsingStats.optionsFound++;
-          console.log(`✅ Added option C:`, optionText);
-          // Check if this option is marked as correct
-          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
-            currentQuestion.correctAnswer = optionText;
-            console.log(`🎯 Marked C as correct:`, optionText);
-          }
-        } else if (optionDMatch) {
-          currentQuestion.options = currentQuestion.options || [];
-          const optionText = optionDMatch[1].trim();
-          currentQuestion.options.push(optionText);
-          parsingStats.optionsFound++;
-          console.log(`✅ Added option D:`, optionText);
-          // Check if this option is marked as correct
-          if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
-            currentQuestion.correctAnswer = optionText;
-            console.log(`🎯 Marked D as correct:`, optionText);
-          }
+                 if (optionAMatch) {
+           currentQuestion.options = currentQuestion.options || [];
+           let optionText = optionAMatch[1].trim();
+           // Remove trailing parentheses and checkmarks
+           optionText = optionText.replace(/\s*[✓*]\s*\)?\s*$/, '');
+           currentQuestion.options.push(optionText);
+           parsingStats.optionsFound++;
+           console.log(`✅ Added option A:`, optionText);
+           // Check if this option is marked as correct
+           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+             currentQuestion.correctAnswer = optionText;
+             console.log(`🎯 Marked A as correct:`, optionText);
+           }
+         } else if (optionBMatch) {
+           currentQuestion.options = currentQuestion.options || [];
+           let optionText = optionBMatch[1].trim();
+           // Remove trailing parentheses and checkmarks
+           optionText = optionText.replace(/\s*[✓*]\s*\)?\s*$/, '');
+           currentQuestion.options.push(optionText);
+           parsingStats.optionsFound++;
+           console.log(`✅ Added option B:`, optionText);
+           // Check if this option is marked as correct
+           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+             currentQuestion.correctAnswer = optionText;
+             console.log(`🎯 Marked B as correct:`, optionText);
+           }
+         } else if (optionCMatch) {
+           currentQuestion.options = currentQuestion.options || [];
+           let optionText = optionCMatch[1].trim();
+           // Remove trailing parentheses and checkmarks
+           optionText = optionText.replace(/\s*[✓*]\s*\)?\s*$/, '');
+           currentQuestion.options.push(optionText);
+           parsingStats.optionsFound++;
+           console.log(`✅ Added option C:`, optionText);
+           // Check if this option is marked as correct
+           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+             currentQuestion.correctAnswer = optionText;
+             console.log(`🎯 Marked C as correct:`, optionText);
+           }
+         } else if (optionDMatch) {
+           currentQuestion.options = currentQuestion.options || [];
+           let optionText = optionDMatch[1].trim();
+           // Remove trailing parentheses and checkmarks
+           optionText = optionText.replace(/\s*[✓*]\s*\)?\s*$/, '');
+           currentQuestion.options.push(optionText);
+           parsingStats.optionsFound++;
+           console.log(`✅ Added option D:`, optionText);
+           // Check if this option is marked as correct
+           if (trimmedLine.includes('✓') || trimmedLine.includes('*')) {
+             currentQuestion.correctAnswer = optionText;
+             console.log(`🎯 Marked D as correct:`, optionText);
+           }
         } else {
-          // Check if this line contains multiple options (e.g., "B) Osaka C) Tokyo D) Hiroshima")
-          const multiOptionMatch = trimmedLine.match(/([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi);
-          if (multiOptionMatch && currentQuestion && currentQuestion.options) {
-            console.log(`Found multiple options on same line:`, trimmedLine);
-            // Parse each option
-            multiOptionMatch.forEach(match => {
-              const optionMatch = match.match(/([A-D])[\.:\)]\s*(.+)/i);
-              if (optionMatch && currentQuestion) {
-                const optionLetter = optionMatch[1];
-                const optionText = optionMatch[2].trim();
-                const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
-                
-                // Ensure we have enough options
-                while (currentQuestion.options!.length <= optionIndex) {
-                  currentQuestion.options!.push('');
-                }
-                currentQuestion.options![optionIndex] = optionText;
-                console.log(`Added option ${optionLetter}:`, optionText);
-              }
-            });
+                     // Check if this line contains multiple options (e.g., "B) Osaka C) Tokyo D) Hiroshima")
+           const multiOptionMatch = trimmedLine.match(/([A-D])[\.:\)]\s*([^A-D]+?)(?=\s*[✓*]|\s*\)|\s+[A-D][\.:\)]|$)/gi);
+           if (multiOptionMatch && currentQuestion && currentQuestion.options) {
+             console.log(`Found multiple options on same line:`, trimmedLine);
+             // Parse each option
+             multiOptionMatch.forEach(match => {
+               const optionMatch = match.match(/([A-D])[\.:\)]\s*(.+)/i);
+               if (optionMatch && currentQuestion) {
+                 const optionLetter = optionMatch[1];
+                 let optionText = optionMatch[2].trim();
+                 // Remove trailing parentheses and checkmarks
+                 optionText = optionText.replace(/\s*[✓*]\s*\)?\s*$/, '');
+                 const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+                 
+                 // Ensure we have enough options
+                 while (currentQuestion.options!.length <= optionIndex) {
+                   currentQuestion.options!.push('');
+                 }
+                 currentQuestion.options![optionIndex] = optionText;
+                 console.log(`Added option ${optionLetter}:`, optionText);
+               }
+             });
           } else if (trimmedLine && !trimmedLine.match(/^[A-D]\)/) && !trimmedLine.match(/^Answer:/i) && !trimmedLine.match(/^ANSWERS?/i)) {
             // Only append to question text if it's not an option, answer line, or answer key
             // and if we haven't started collecting options yet
