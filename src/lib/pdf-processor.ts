@@ -110,8 +110,12 @@ export class PDFProcessor {
         console.log(`Page ${pageNum} text length:`, pageText.length);
       }
 
-      console.log('Total extracted text length:', allText.length);
-      console.log('First 500 characters:', allText.substring(0, 500));
+             console.log('Total extracted text length:', allText.length);
+       console.log('First 500 characters:', allText.substring(0, 500));
+       console.log('🔍 FULL EXTRACTED TEXT:');
+       console.log('---START OF TEXT---');
+       console.log(allText);
+       console.log('---END OF TEXT---');
 
       const result = this.parseQuizText(allText, file.name);
       console.log('Parsed quiz:', result);
@@ -213,9 +217,10 @@ export class PDFProcessor {
         continue;
       }
       
-      // CRITICAL #2: Robust Question Boundary Detection
-      const questionMatch = trimmedLine.match(this.questionPatterns.questionNumber);
-      if (questionMatch) {
+             // CRITICAL #2: Robust Question Boundary Detection
+       console.log(`🔍 Testing line "${trimmedLine}" against question pattern:`, this.questionPatterns.questionNumber);
+       const questionMatch = trimmedLine.match(this.questionPatterns.questionNumber);
+       if (questionMatch) {
         console.log(`✅ Found question ${questionCounter}:`, questionMatch[2]);
         parsingStats.questionsFound++;
         
@@ -337,12 +342,13 @@ export class PDFProcessor {
         questionCounter++;
       }
 
-      // Check for options
-      if (currentQuestion) {
-        const optionAMatch = trimmedLine.match(this.questionPatterns.optionA);
-        const optionBMatch = trimmedLine.match(this.questionPatterns.optionB);
-        const optionCMatch = trimmedLine.match(this.questionPatterns.optionC);
-        const optionDMatch = trimmedLine.match(this.questionPatterns.optionD);
+             // Check for options
+       if (currentQuestion) {
+         console.log(`🔍 Testing line "${trimmedLine}" for options...`);
+         const optionAMatch = trimmedLine.match(this.questionPatterns.optionA);
+         const optionBMatch = trimmedLine.match(this.questionPatterns.optionB);
+         const optionCMatch = trimmedLine.match(this.questionPatterns.optionC);
+         const optionDMatch = trimmedLine.match(this.questionPatterns.optionD);
 
                  if (optionAMatch) {
            currentQuestion.options = currentQuestion.options || [];
