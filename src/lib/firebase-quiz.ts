@@ -573,3 +573,17 @@ export async function setUserRole(userId: string, role: 'user' | 'admin' | 'crea
 
 // Get user role from Firestore
 export async function getUserRole(userId: string): Promise<{ role: string } | null> {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
+      return userDoc.data() as { role: string };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error getting user role:', error);
+    return null;
+  }
+}
