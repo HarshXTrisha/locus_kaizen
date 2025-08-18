@@ -1,369 +1,359 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { ExtractedQuiz, ExtractedQuestion } from '@/lib/pdf-processor';
-import { SmartFormatDetector } from '@/lib/smart-format-detector';
-import { 
-  Edit3, 
-  Save, 
-  X, 
-  GripVertical, 
-  Plus, 
-  Trash2, 
-  Eye, 
-  EyeOff,
-  AlertCircle,
-  CheckCircle,
-  Star
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { Edit3, Save, X, Move, Trash2, Plus, Eye, EyeOff } from 'lucide-react';
+import { ExtractedQuestion } from '@/lib/pdf-processor';
 
 interface QuizPreviewEditorProps {
-  quiz: ExtractedQuiz;
-  onQuizUpdated: (quiz: ExtractedQuiz) => void;
-  onSave: () => void;
+  quiz: {
+    title: string;
+    description?: string;
+    subject: string;
+    questions: ExtractedQuestion[];
+  };
+  onSave: (updatedQuiz: any) => void;
+  onCancel: () => void;
 }
 
-export function QuizPreviewEditor({ 
-  quiz, 
-  onQuizUpdated, 
-  onSave 
-}: QuizPreviewEditorProps) {
-  const [editingQuiz, setEditingQuiz] = useState<ExtractedQuiz>(quiz);
-  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
-  const [showQualityScores, setShowQualityScores] = useState(false);
-  const [previewMode, setPreviewMode] = useState<'preview' | 'edit'>('preview');
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
+export function QuizPreviewEditor({ quiz, onSave, onCancel }: QuizPreviewEditorProps) {
+  const [editedQuiz, setEditedQuiz] = useState(quiz);
+  const [editingQuestion, setEditingQuestion] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Analyze question quality
-  const questionAnalysis = SmartFormatDetector.validateQuestions(editingQuiz.questions);
+  const handleTitleChange = (newTitle: string) => {
+    setEditedQuiz(prev => ({ ...prev, title: newTitle }));
+  };
 
-  const handleQuestionUpdate = useCallback((questionId: string, updates: Partial<ExtractedQuestion>) => {
-    setEditingQuiz(prev => ({
+  const handleDescriptionChange = (newDescription: string) => {
+    setEditedQuiz(prev => ({ ...prev, description: newDescription }));
+  };
+
+  const handleSubjectChange = (newSubject: string) => {
+    setEditedQuiz(prev => ({ ...prev, subject: newSubject }));
+  };
+
+  const handleQuestionTextChange = (questionId: string, newText: string) => {
+    setEditedQuiz(prev => ({
       ...prev,
-      questions: prev.questions.map(q => 
-        q.id === questionId ? { ...q, ...updates } : q
+      questions: prev.questions.map(q =>
+        q.id === questionId ? { ...q, text: newText } : q
       )
     }));
-  }, []);
+  };
 
-  const handleQuestionDelete = useCallback((questionId: string) => {
-    setEditingQuiz(prev => ({
+  const handleOptionChange = (questionId: string, optionIndex: number, newOption: string) => {
+    setEditedQuiz(prev => ({
+      ...prev,
+      questions: prev.questions.map(q =>
+        q.id === questionId
+          ? {
+              ...q,
+              options: q.options?.map((opt, idx) =>
+                idx === optionIndex ? newOption : opt
+              )
+            }
+          : q
+      )
+    }));
+  };
+
+  const handleCorrectAnswerChange = (questionId: string, newAnswer: string) => {
+    setEditedQuiz(prev => ({
+      ...prev,
+      questions: prev.questions.map(q =>
+        q.id === questionId ? { ...q, correctAnswer: newAnswer } : q
+      )
+    }));
+  };
+
+  const handleAddOption = (questionId: string) => {
+    setEditedQuiz(prev => ({
+      ...prev,
+      questions: prev.questions.map(q =>
+        q.id === questionId
+          ? {
+              ...q,
+              options: [...(q.options || []), 'New Option']
+            }
+          : q
+      )
+    }));
+  };
+
+  const handleRemoveOption = (questionId: string, optionIndex: number) => {
+    setEditedQuiz(prev => ({
+      ...prev,
+      questions: prev.questions.map(q =>
+        q.id === questionId
+          ? {
+              ...q,
+              options: q.options?.filter((_, idx) => idx !== optionIndex)
+            }
+          : q
+      )
+    }));
+  };
+
+  const handleDeleteQuestion = (questionId: string) => {
+    setEditedQuiz(prev => ({
       ...prev,
       questions: prev.questions.filter(q => q.id !== questionId)
     }));
-  }, []);
-
-  const handleQuestionReorder = useCallback((fromIndex: number, toIndex: number) => {
-    setEditingQuiz(prev => {
-      const newQuestions = [...prev.questions];
-      const [movedQuestion] = newQuestions.splice(fromIndex, 1);
-      newQuestions.splice(toIndex, 0, movedQuestion);
-      return { ...prev, questions: newQuestions };
-    });
-  }, []);
-
-  const handleDragStart = useCallback((index: number) => {
-    setDragIndex(index);
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (dragIndex !== null && dragIndex !== index) {
-      handleQuestionReorder(dragIndex, index);
-      setDragIndex(index);
-    }
-  }, [dragIndex, handleQuestionReorder]);
-
-  const handleDragEnd = useCallback(() => {
-    setDragIndex(null);
-  }, []);
-
-  const handleSave = useCallback(() => {
-    onQuizUpdated(editingQuiz);
-    onSave();
-  }, [editingQuiz, onQuizUpdated, onSave]);
-
-  const getQualityColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
   };
 
-  const getQualityIcon = (score: number) => {
-    if (score >= 80) return <CheckCircle className="h-4 w-4 text-green-600" />;
-    if (score >= 60) return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-    return <AlertCircle className="h-4 w-4 text-red-600" />;
+  const handleMoveQuestion = (questionId: string, direction: 'up' | 'down') => {
+    setEditedQuiz(prev => {
+      const questions = [...prev.questions];
+      const index = questions.findIndex(q => q.id === questionId);
+      
+      if (direction === 'up' && index > 0) {
+        [questions[index], questions[index - 1]] = [questions[index - 1], questions[index]];
+      } else if (direction === 'down' && index < questions.length - 1) {
+        [questions[index], questions[index + 1]] = [questions[index + 1], questions[index]];
+      }
+      
+      return { ...prev, questions };
+    });
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await onSave(editedQuiz);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header Controls */}
-      <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4">
-        <div className="flex items-center gap-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Quiz Preview & Editor
-          </h3>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPreviewMode('preview')}
-              className={`px-3 py-1 rounded text-sm font-medium ${
-                previewMode === 'preview'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Eye className="h-4 w-4 mr-1" />
-              Preview
-            </button>
-            <button
-              onClick={() => setPreviewMode('edit')}
-              className={`px-3 py-1 rounded text-sm font-medium ${
-                previewMode === 'edit'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Edit3 className="h-4 w-4 mr-1" />
-              Edit
-            </button>
-          </div>
-        </div>
-
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
+          <Edit3 className="h-6 w-6 text-blue-600" />
+          <h2 className="text-2xl font-bold text-gray-900">Quiz Preview & Editor</h2>
+        </div>
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowQualityScores(!showQualityScores)}
-            className="flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded text-sm font-medium hover:bg-purple-200"
+            onClick={() => setShowPreview(!showPreview)}
+            className="flex items-center gap-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
           >
-            <Star className="h-4 w-4" />
-            Quality
+            {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPreview ? 'Hide Preview' : 'Show Preview'}
+          </button>
+          <button
+            onClick={onCancel}
+            className="flex items-center gap-1 px-3 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+          >
+            <X className="h-4 w-4" />
+            Cancel
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            disabled={isSaving}
+            className="flex items-center gap-1 px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300"
           >
             <Save className="h-4 w-4" />
-            Save Changes
+            {isSaving ? 'Saving...' : 'Save Quiz'}
           </button>
         </div>
       </div>
 
-      {/* Quiz Info */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Quiz Title
-            </label>
-            <input
-              type="text"
-              value={editingQuiz.title}
-              onChange={(e) => setEditingQuiz(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={previewMode === 'preview'}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Subject
-            </label>
-            <input
-              type="text"
-              value={editingQuiz.subject}
-              onChange={(e) => setEditingQuiz(prev => ({ ...prev, subject: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={previewMode === 'preview'}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Questions
-            </label>
-            <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900">
-              {editingQuiz.questions.length}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Editor Panel */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-900">Edit Quiz Details</h3>
+          
+          {/* Quiz Metadata */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Quiz Title
+              </label>
+              <input
+                type="text"
+                value={editedQuiz.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                value={editedQuiz.description || ''}
+                onChange={(e) => handleDescriptionChange(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Subject
+              </label>
+              <input
+                type="text"
+                value={editedQuiz.subject}
+                onChange={(e) => handleSubjectChange(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
           </div>
-        </div>
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            value={editingQuiz.description || ''}
-            onChange={(e) => setEditingQuiz(prev => ({ ...prev, description: e.target.value }))}
-            rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={previewMode === 'preview'}
-          />
-        </div>
-      </div>
 
-      {/* Questions List */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-gray-900">
-            Questions ({editingQuiz.questions.length})
-          </h4>
-          {showQualityScores && (
-            <div className="text-sm text-gray-600">
-              Average Quality: {Math.round(questionAnalysis.reduce((sum, q) => sum + q.score, 0) / questionAnalysis.length)}%
-            </div>
-          )}
-        </div>
-
-        {editingQuiz.questions.map((question, index) => {
-          const analysis = questionAnalysis.find(a => a.questionId === question.id);
-          const isEditing = editingQuestionId === question.id;
-          const isDragging = dragIndex === index;
-
-          return (
-            <div
-              key={question.id}
-              className={`bg-white border border-gray-200 rounded-lg p-4 transition-all ${
-                isDragging ? 'opacity-50 shadow-lg' : ''
-              }`}
-              draggable={previewMode === 'edit'}
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="flex items-start gap-3">
-                {previewMode === 'edit' && (
-                  <div className="flex flex-col items-center gap-1">
-                    <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
-                    {showQualityScores && analysis && (
-                      <div className="flex items-center gap-1">
-                        {getQualityIcon(analysis.score)}
-                        <span className={`text-xs font-medium ${getQualityColor(analysis.score)}`}>
-                          {analysis.score}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex-1 space-y-3">
-                  {/* Question Text */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium text-gray-700">
-                        Question {index + 1}
-                      </label>
-                      {previewMode === 'edit' && (
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setEditingQuestionId(isEditing ? null : question.id)}
-                            className="p-1 text-gray-400 hover:text-gray-600"
-                          >
-                            {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
-                          </button>
-                          <button
-                            onClick={() => handleQuestionDelete(question.id)}
-                            className="p-1 text-red-400 hover:text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
+          {/* Questions Editor */}
+          <div>
+            <h4 className="text-md font-semibold text-gray-900 mb-3">Edit Questions</h4>
+            <div className="space-y-4">
+              {editedQuiz.questions.map((question, index) => (
+                <div key={question.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-gray-600">
+                      Question {index + 1}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleMoveQuestion(question.id, 'up')}
+                        disabled={index === 0}
+                        className="p-1 text-gray-400 hover:text-gray-600 disabled:text-gray-200"
+                      >
+                        <Move className="h-4 w-4 rotate-90" />
+                      </button>
+                      <button
+                        onClick={() => handleMoveQuestion(question.id, 'down')}
+                        disabled={index === editedQuiz.questions.length - 1}
+                        className="p-1 text-gray-400 hover:text-gray-600 disabled:text-gray-200"
+                      >
+                        <Move className="h-4 w-4 -rotate-90" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteQuestion(question.id)}
+                        className="p-1 text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
-                    
-                    {isEditing ? (
-                      <textarea
-                        value={question.text}
-                        onChange={(e) => handleQuestionUpdate(question.id, { text: e.target.value })}
-                        rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      <p className="text-gray-900">{question.text}</p>
-                    )}
+                  </div>
+
+                  {/* Question Text */}
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Question Text
+                    </label>
+                    <textarea
+                      value={question.text}
+                      onChange={(e) => handleQuestionTextChange(question.id, e.target.value)}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
                   </div>
 
                   {/* Options */}
-                  {question.options && question.options.length > 0 && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">
                         Options
                       </label>
-                      <div className="space-y-2">
+                      <button
+                        onClick={() => handleAddOption(question.id)}
+                        className="flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Add Option
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      {question.options?.map((option, optionIndex) => (
+                        <div key={optionIndex} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={option}
+                            onChange={(e) => handleOptionChange(question.id, optionIndex, e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
+                          />
+                          <button
+                            onClick={() => handleRemoveOption(question.id, optionIndex)}
+                            className="p-1 text-red-400 hover:text-red-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Correct Answer */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Correct Answer
+                    </label>
+                    <input
+                      type="text"
+                      value={question.correctAnswer}
+                      onChange={(e) => handleCorrectAnswerChange(question.id, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Preview Panel */}
+        {showPreview && (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
+            
+            <div className="bg-gray-50 rounded-lg p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                {editedQuiz.title}
+              </h2>
+              {editedQuiz.description && (
+                <p className="text-gray-600 mb-4">{editedQuiz.description}</p>
+              )}
+              <p className="text-sm text-gray-500 mb-6">Subject: {editedQuiz.subject}</p>
+
+              <div className="space-y-6">
+                {editedQuiz.questions.map((question, index) => (
+                  <div key={question.id} className="bg-white rounded-lg p-4 shadow-sm">
+                    <h4 className="font-semibold text-gray-900 mb-3">
+                      Question {index + 1}: {question.text}
+                    </h4>
+                    
+                    {question.options && question.options.length > 0 && (
+                      <div className="space-y-2 mb-3">
                         {question.options.map((option, optionIndex) => (
-                          <div key={optionIndex} className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-500 w-6">
+                          <div
+                            key={optionIndex}
+                            className={`p-2 rounded border ${
+                              option === question.correctAnswer
+                                ? 'bg-green-50 border-green-200 text-green-800'
+                                : 'bg-gray-50 border-gray-200 text-gray-700'
+                            }`}
+                          >
+                            <span className="font-medium">
                               {String.fromCharCode(65 + optionIndex)})
-                            </span>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={option}
-                                onChange={(e) => {
-                                  const newOptions = [...question.options!];
-                                  newOptions[optionIndex] = e.target.value;
-                                  handleQuestionUpdate(question.id, { options: newOptions });
-                                }}
-                                className="flex-1 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <span className={`text-sm ${option === question.correctAnswer ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
-                                {option}
-                                {option === question.correctAnswer && ' ✓'}
-                              </span>
+                            </span>{' '}
+                            {option}
+                            {option === question.correctAnswer && (
+                              <span className="ml-2 text-green-600">✓ Correct</span>
                             )}
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
-
-                  {/* Correct Answer */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Correct Answer
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={question.correctAnswer}
-                        onChange={(e) => handleQuestionUpdate(question.id, { correctAnswer: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      <p className="text-green-600 font-medium">{question.correctAnswer}</p>
                     )}
                   </div>
-
-                  {/* Quality Analysis */}
-                  {showQualityScores && analysis && (
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Quality Analysis</span>
-                        <div className="flex items-center gap-1">
-                          {getQualityIcon(analysis.score)}
-                          <span className={`text-sm font-medium ${getQualityColor(analysis.score)}`}>
-                            Score: {analysis.score}/100
-                          </span>
-                        </div>
-                      </div>
-                      {analysis.suggestions.length > 0 && (
-                        <div className="space-y-1">
-                          {analysis.suggestions.map((suggestion, idx) => (
-                            <p key={idx} className="text-xs text-gray-600">💡 {suggestion}</p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                ))}
               </div>
             </div>
-          );
-        })}
+          </div>
+        )}
       </div>
-
-      {/* Empty State */}
-      {editingQuiz.questions.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-500">No questions available</p>
-        </div>
-      )}
     </div>
   );
 }

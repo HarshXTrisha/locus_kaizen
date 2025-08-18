@@ -6,7 +6,7 @@ if (typeof window !== 'undefined') {
   import('pdfjs-dist').then((module) => {
     pdfjsLib = module;
     // Set worker source to local file to avoid CDN issues
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
     console.log('PDF.js initialized with worker:', pdfjsLib.GlobalWorkerOptions.workerSrc);
   }).catch((error) => {
     console.error('Failed to load PDF.js:', error);
@@ -50,7 +50,7 @@ export class PDFProcessor {
     questionWithoutNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*$/i,
     // Multiple options on same line (handle extra parentheses)
     multiOptions: /([A-D])[\.:\)]\s*([^A-D]+?)(?=\s*[✓*]|\s*\)|\s+[A-D][\.:\)]|$)/gi,
-    // Correct answer indicators
+// Correct answer indicators
     correctAnswer: /[✓*]/g,
   };
 
@@ -86,26 +86,26 @@ export class PDFProcessor {
       // If that fails, disable worker
       console.log('Worker setup failed, disabling worker');
       pdfjsLib.GlobalWorkerOptions.workerSrc = false;
-    }
-
-    try {
+  }
+  
+  try {
       console.log('Processing PDF file:', file.name, 'Size:', file.size);
-      
-      const arrayBuffer = await file.arrayBuffer();
+    
+    const arrayBuffer = await file.arrayBuffer();
       console.log('File converted to ArrayBuffer, size:', arrayBuffer.byteLength);
-      
+    
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       console.log('PDF loaded, pages:', pdf.numPages);
-      
+    
       let allText = '';
-      
-      // Extract text from all pages
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(' ');
+    
+    // Extract text from all pages
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
         allText += pageText + '\n';
         console.log(`Page ${pageNum} text length:`, pageText.length);
       }
@@ -121,7 +121,7 @@ export class PDFProcessor {
       console.log('Parsed quiz:', result);
       
       return result;
-    } catch (error) {
+  } catch (error) {
       console.error('Error processing PDF:', error);
       console.error('Error details:', {
         name: error instanceof Error ? error.name : 'Unknown',
@@ -129,10 +129,10 @@ export class PDFProcessor {
         stack: error instanceof Error ? error.stack : undefined
       });
       throw new Error(`Failed to process PDF file: ${error instanceof Error ? error.message : String(error)}`);
-    }
   }
+}
 
-  /**
+/**
    * Parse extracted text into structured quiz data with enhanced error handling and validation
    */
   private static parseQuizText(text: string, fileName: string): ExtractedQuiz {
@@ -289,8 +289,8 @@ export class PDFProcessor {
                  type: 'multiple-choice',
                  options: [],
                  correctAnswer: '',
-                 points: 1
-               };
+        points: 1
+      };
                questionCounter = qNum + 1;
                parsingStats.questionsFound++;
                
@@ -603,8 +603,8 @@ export class PDFProcessor {
    * CRITICAL #5: Validate extracted quiz data with enhanced checks
    */
   static validateQuiz(quiz: ExtractedQuiz): { isValid: boolean; errors: string[] } {
-    const errors: string[] = [];
-
+  const errors: string[] = [];
+  
     if (!quiz.title.trim()) {
       errors.push('Quiz title is required');
     }
@@ -616,9 +616,9 @@ export class PDFProcessor {
     quiz.questions.forEach((question, index) => {
       if (!question.text.trim()) {
         errors.push(`Question ${index + 1} has no text`);
-      }
-
-      if (question.type === 'multiple-choice' && (!question.options || question.options.length < 2)) {
+    }
+    
+    if (question.type === 'multiple-choice' && (!question.options || question.options.length < 2)) {
         errors.push(`Question ${index + 1} needs at least 2 options`);
       }
 
@@ -634,12 +634,12 @@ export class PDFProcessor {
         if (duplicateOptions.length > 0) {
           errors.push(`Question ${index + 1} has duplicate options`);
         }
-      }
-    });
-
-    return {
+    }
+  });
+  
+  return {
       isValid: errors.length === 0,
-      errors
-    };
+    errors
+  };
   }
 }
