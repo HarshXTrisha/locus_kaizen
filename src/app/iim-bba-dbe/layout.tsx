@@ -32,7 +32,7 @@ export default function IIMBBADBELayout({ children }: IIMBBADBELayoutProps) {
     <div className="min-h-screen bg-gray-50">
       <IIMSidebar />
       <div className={`transition-all duration-300 ${
-        sidebarOpen ? 'lg:pl-72' : 'lg:pl-20'
+        sidebarOpen ? 'lg:pl-80' : 'lg:pl-20'
       }`}>
         <main className="min-h-screen">
           <PageTransition>

@@ -34,7 +34,7 @@ export interface Quiz {
   id: string;
   title: string;
   description: string;
-  subject: AllowedSubject;
+  subject: string; // Allow any string for custom subjects
   questions: Question[];
   timeLimit: number; // in minutes
   passingScore: number;
@@ -49,7 +49,7 @@ export interface Quiz {
 interface DatabaseQuiz {
   title: string;
   description: string;
-  subject: AllowedSubject;
+  subject: string; // Allow any string for custom subjects
   questions: Question[];
   timeLimit: number;
   passingScore: number;
@@ -161,9 +161,10 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
       isTemporary: quizData.isTemporary || false
     };
 
-    // Validate subject is allowed
-    if (!ALLOWED_SUBJECTS.includes(quizDoc.subject as AllowedSubject)) {
-      throw new Error(`Subject must be one of: ${ALLOWED_SUBJECTS.join(', ')}`);
+    // Validate subject is allowed (allow custom subjects and empty subjects)
+    if (quizDoc.subject && !ALLOWED_SUBJECTS.includes(quizDoc.subject as AllowedSubject)) {
+      // Allow custom subjects and empty subjects for BBA DBE portal
+      console.log('Using custom subject:', quizDoc.subject);
     }
 
     // Additional validation before saving

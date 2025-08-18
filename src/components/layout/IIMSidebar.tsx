@@ -37,13 +37,12 @@ export function IIMSidebar() {
 
   const navigation = [
     { name: 'Dashboard', href: '/iim-bba-dbe', icon: Home, description: 'Overview & Analytics' },
-    { name: 'Create Quiz', href: '/create', icon: Plus, description: 'Build New Quizzes' },
-    { name: 'Upload Files', href: '/upload', icon: Upload, description: 'Import Quiz Content' },
+    { name: 'Upload Files', href: '/iim-bba-dbe?tab=upload', icon: Upload, description: 'Create Quizzes' },
+    { name: 'Manage Quizzes', href: '/iim-bba-dbe?tab=manage', icon: Settings, description: 'Quiz Management' },
+    { name: 'Results', href: '/iim-bba-dbe?tab=results', icon: BarChart3, description: 'Performance Analytics' },
+    { name: 'Leaderboard', href: '/iim-bba-dbe?tab=leaderboard', icon: Trophy, description: 'Top Performers' },
     { name: 'Live Quiz', href: '/live-quiz', icon: Target, description: 'Real-time Sessions' },
-    { name: 'Schedule Quiz', href: '/schedule', icon: Calendar, description: 'Plan Future Quizzes' },
     { name: 'Take Quiz', href: '/quiz', icon: Play, description: 'Participate in Quizzes' },
-    { name: 'Results', href: '/results', icon: BarChart3, description: 'Performance Analytics' },
-    { name: 'Leaderboard', href: '/leaderboard', icon: Trophy, description: 'Top Performers' },
     { name: 'Archive', href: '/archive', icon: Archive, description: 'Past Quizzes' },
     { name: 'Teams', href: '/teams', icon: Users, description: 'Group Management' },
     { name: 'Settings', href: '/settings', icon: Settings, description: 'Account & Preferences' },
@@ -88,7 +87,7 @@ export function IIMSidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
         {navigation.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || (pathname === '/iim-bba-dbe' && item.href.includes('tab='));
           return (
             <Link
               key={item.name}

@@ -16,7 +16,7 @@ import { FileUploadArea } from '@/components/upload/FileUploadArea';
 import { PDFUploadArea } from '@/components/upload/PDFUploadArea';
 
 export default function IIMBBADBEPage() {
-  const { user, sidebarOpen } = useAppStore();
+  const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [lastCreatedQuiz, setLastCreatedQuiz] = useState<{ id: string; link: string } | null>(null);
   const [copyStatus, setCopyStatus] = useState<string>('');

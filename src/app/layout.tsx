@@ -29,9 +29,7 @@ export default function RootLayout({
           <NotificationProvider>
             <ClientInit />
             <PageTransition>
-              <AuthenticatedLayout>
-                {children}
-              </AuthenticatedLayout>
+              {children}
             </PageTransition>
           </NotificationProvider>
         </AuthProvider>
