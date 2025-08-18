@@ -37,7 +37,7 @@ export default function IIMBBADBEPage() {
   const [quizData, setQuizData] = useState({
     title: '',
     description: '',
-    subject: 'Spreadsheets for Business Decisions',
+    subject: '',
     timeLimit: 30,
     passingScore: 0
   });
@@ -52,6 +52,10 @@ export default function IIMBBADBEPage() {
     'Entrepreneurial Mindset and Methods',
     'Management Accounting'
   ];
+
+  // Custom subject state
+  const [customSubject, setCustomSubject] = useState('');
+  const [showCustomSubjectInput, setShowCustomSubjectInput] = useState(false);
 
   // Load initial data and initialize schedule checking
   useEffect(() => {
@@ -197,11 +201,13 @@ export default function IIMBBADBEPage() {
       setQuizData({
         title: '',
         description: '',
-        subject: 'Spreadsheets for Business Decisions',
+        subject: '',
         timeLimit: 30,
         passingScore: 0
       });
       setExtractedQuestions([]);
+      setCustomSubject('');
+      setShowCustomSubjectInput(false);
       
     } catch (error) {
       console.error('Error creating quiz:', error);
@@ -484,9 +490,24 @@ export default function IIMBBADBEPage() {
                     </label>
                     <select
                       value={quizData.subject}
-                      onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'custom') {
+                          setShowCustomSubjectInput(true);
+                          setQuizData(prev => ({ ...prev, subject: '' }));
+                        } else if (value === 'none') {
+                          setShowCustomSubjectInput(false);
+                          setQuizData(prev => ({ ...prev, subject: '' }));
+                        } else {
+                          setShowCustomSubjectInput(false);
+                          setQuizData(prev => ({ ...prev, subject: value }));
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
+                      <option value="">Select a subject</option>
+                      <option value="none">No Subject</option>
+                      <option value="custom">+ Add Custom Subject</option>
                       {iimSubjects.map((subject) => (
                         <option key={subject} value={subject}>
                           {subject}
@@ -494,6 +515,25 @@ export default function IIMBBADBEPage() {
                       ))}
                     </select>
                   </div>
+                  
+                  {/* Custom Subject Input */}
+                  {showCustomSubjectInput && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Custom Subject
+                      </label>
+                      <input
+                        type="text"
+                        value={customSubject}
+                        onChange={(e) => {
+                          setCustomSubject(e.target.value);
+                          setQuizData(prev => ({ ...prev, subject: e.target.value }));
+                        }}
+                        placeholder="Enter your custom subject"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  )}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Time Limit (minutes)
