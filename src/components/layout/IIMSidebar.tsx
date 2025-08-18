@@ -14,10 +14,18 @@ import {
   Users,
   BookOpen,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Play,
+  FileText,
+  Globe,
+  Target,
+  Calendar,
+  Award,
+  Clock,
+  Trophy
 } from 'lucide-react';
 
-export function Sidebar() {
+export function IIMSidebar() {
   const pathname = usePathname();
   const { user, sidebarOpen, toggleSidebar } = useAppStore();
 
@@ -26,10 +34,14 @@ export function Sidebar() {
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Dashboard', href: '/iim-bba-dbe', icon: Home },
     { name: 'Create Quiz', href: '/create', icon: Plus },
-    { name: 'Upload', href: '/upload', icon: Upload },
+    { name: 'Upload Files', href: '/upload', icon: Upload },
+    { name: 'Live Quiz', href: '/live-quiz', icon: Target },
+    { name: 'Schedule Quiz', href: '/schedule', icon: Calendar },
+    { name: 'Take Quiz', href: '/quiz', icon: Play },
     { name: 'Results', href: '/results', icon: BarChart3 },
+    { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
     { name: 'Archive', href: '/archive', icon: Archive },
     { name: 'Teams', href: '/teams', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings },
@@ -42,15 +54,15 @@ export function Sidebar() {
       {/* Logo Section */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
         <Link
-          href="/dashboard"
+          href="/iim-bba-dbe"
           className={`flex items-center gap-3 text-2xl font-bold text-[#20C997] hover:text-[#1BA085] transition-colors ${
             !sidebarOpen && 'justify-center w-full'
           }`}
         >
           <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center shadow-md">
-            <BookOpen className="h-5 w-5 text-white" />
+            <Globe className="h-5 w-5 text-white" />
           </div>
-          {sidebarOpen && <span>Locus</span>}
+          {sidebarOpen && <span>IIM BBA DBE</span>}
         </Link>
         
         {/* Toggle Button */}

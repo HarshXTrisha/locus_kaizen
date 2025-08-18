@@ -11,6 +11,7 @@ import { liveQuizService } from '@/lib/live-quiz-service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ResponsiveLayout } from '@/components/layout/ResponsiveLayout';
+import { IIMSidebar } from '@/components/layout/IIMSidebar';
 import { ExtractedQuestion, ExtractedQuiz } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { createQuiz, ALLOWED_SUBJECTS } from '@/lib/firebase-quiz';
@@ -245,7 +246,7 @@ export default function IIMBBADBEPage() {
   };
 
   return (
-    <ResponsiveLayout>
+    <ResponsiveLayout sidebar={<IIMSidebar />}>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         {/* Header */}
         <div className="bg-white shadow-sm border-b">

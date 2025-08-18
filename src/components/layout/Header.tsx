@@ -161,70 +161,7 @@ export function Header() {
               }}
               className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
             >
-              Upload Files
-            </button>
-            <button
-              onClick={() => {
-                router.push('/quiz');
-                setShowMobileMenu(false);
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-            >
-              Take Quiz
-            </button>
-            <button
-              onClick={() => {
-                router.push('/live-quiz');
-                setShowMobileMenu(false);
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-            >
-              Live Quiz
-            </button>
-            <button
-              onClick={() => {
-                router.push('/schedule');
-                setShowMobileMenu(false);
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-            >
-              Schedule Quiz
-            </button>
-            <button
-              onClick={() => {
-                router.push('/results');
-                setShowMobileMenu(false);
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-            >
-              Results
-            </button>
-            <button
-              onClick={() => {
-                router.push('/archive');
-                setShowMobileMenu(false);
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-            >
-              Archive
-            </button>
-            <button
-              onClick={() => {
-                router.push('/iim-bba-dbe');
-                setShowMobileMenu(false);
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-            >
-              IIM BBA DBE
-            </button>
-            <button
-              onClick={() => {
-                router.push('/teams');
-                setShowMobileMenu(false);
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-            >
-              Teams
+              Upload
             </button>
             <button
               onClick={() => {
