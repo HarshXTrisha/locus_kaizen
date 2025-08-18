@@ -22,7 +22,7 @@ export default function IIMBBADBEPage() {
   });
   const [upcomingQuizzes, setUpcomingQuizzes] = useState<any[]>([]);
 
-  // Load initial data
+             // Load initial data and initialize schedule checking
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -47,6 +47,14 @@ export default function IIMBBADBEPage() {
     };
 
     loadInitialData();
+    
+    // Initialize auto start/stop schedule checking
+    liveQuizService.initializeScheduleChecking();
+    
+    // Cleanup on unmount
+    return () => {
+      liveQuizService.stopScheduleChecking();
+    };
   }, []);
 
   // Set up real-time listeners

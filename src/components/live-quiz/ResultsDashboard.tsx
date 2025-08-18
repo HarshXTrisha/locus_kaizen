@@ -12,6 +12,7 @@ interface ResultsDashboardProps {
 export default function ResultsDashboard({ userId }: ResultsDashboardProps) {
   const [results, setResults] = useState<LiveQuizResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAllResults, setShowAllResults] = useState(false);
   const [stats, setStats] = useState({
     totalTests: 0,
     averageScore: 0,
@@ -23,11 +24,29 @@ export default function ResultsDashboard({ userId }: ResultsDashboardProps) {
     const loadResults = async () => {
       try {
         setIsLoading(true);
-        if (userId) {
+        if (showAllResults) {
+          // Show all completed quizzes for all users
+          const allResults = await liveQuizService.getAllCompletedQuizzes();
+          setResults(allResults);
+          
+          // Calculate overall stats
+          const totalTests = allResults.length;
+          const totalPoints = allResults.reduce((sum, result) => sum + result.score, 0);
+          const averageScore = totalTests > 0 ? Math.round(totalPoints / totalTests) : 0;
+          const bestRank = allResults.length > 0 ? Math.min(...allResults.map(r => r.rank)) : 0;
+          
+          setStats({
+            totalTests,
+            averageScore,
+            bestRank,
+            totalPoints
+          });
+        } else if (userId) {
+          // Show only user's results
           const userResults = await liveQuizService.getUserResults(userId);
           setResults(userResults);
           
-          // Calculate stats
+          // Calculate user stats
           const totalTests = userResults.length;
           const totalPoints = userResults.reduce((sum, result) => sum + result.score, 0);
           const averageScore = totalTests > 0 ? Math.round(totalPoints / totalTests) : 0;
@@ -48,7 +67,7 @@ export default function ResultsDashboard({ userId }: ResultsDashboardProps) {
     };
 
     loadResults();
-  }, [userId]);
+  }, [userId, showAllResults]);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -95,6 +114,19 @@ export default function ResultsDashboard({ userId }: ResultsDashboardProps) {
 
   return (
     <div className="space-y-6">
+      {/* Toggle Button */}
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium text-gray-900">
+          {showAllResults ? 'All Completed Tests' : 'My Results'}
+        </h3>
+        <button
+          onClick={() => setShowAllResults(!showAllResults)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
+        >
+          {showAllResults ? 'Show My Results' : 'Show All Tests'}
+        </button>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
@@ -149,7 +181,9 @@ export default function ResultsDashboard({ userId }: ResultsDashboardProps) {
       {/* Results List */}
       <div className="bg-white rounded-lg shadow">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Your Quiz Results</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            {showAllResults ? 'All Quiz Results' : 'Your Quiz Results'}
+          </h3>
         </div>
         <div className="divide-y divide-gray-200">
           {results.map((result) => (

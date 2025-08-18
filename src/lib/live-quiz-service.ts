@@ -36,12 +36,81 @@ import {
 
 export class LiveQuizService {
   private static instance: LiveQuizService;
+  private scheduleCheckInterval: NodeJS.Timeout | null = null;
   
   public static getInstance(): LiveQuizService {
     if (!LiveQuizService.instance) {
       LiveQuizService.instance = new LiveQuizService();
     }
     return LiveQuizService.instance;
+  }
+
+  // Initialize schedule checking
+  initializeScheduleChecking(): void {
+    if (this.scheduleCheckInterval) {
+      clearInterval(this.scheduleCheckInterval);
+    }
+    
+    // Check every 30 seconds for scheduled quizzes
+    this.scheduleCheckInterval = setInterval(async () => {
+      await this.checkScheduledQuizzes();
+    }, 30000);
+  }
+
+  // Stop schedule checking
+  stopScheduleChecking(): void {
+    if (this.scheduleCheckInterval) {
+      clearInterval(this.scheduleCheckInterval);
+      this.scheduleCheckInterval = null;
+    }
+  }
+
+  // Check for quizzes that need to start or stop
+  private async checkScheduledQuizzes(): Promise<void> {
+    try {
+      const now = new Date();
+      
+      // Get all published quizzes
+      const publishedQuizzes = await this.getPublishedQuizzes();
+      
+      for (const quiz of publishedQuizzes) {
+        const scheduledTime = new Date(quiz.scheduledAt);
+        const endTime = new Date(scheduledTime.getTime() + (quiz.duration * 60 * 1000));
+        
+        // Check if quiz should start
+        if (quiz.status === 'published' && now >= scheduledTime && now < endTime) {
+          await this.startQuiz(quiz.id);
+          console.log(`🟢 Auto-started quiz: ${quiz.title}`);
+        }
+        
+        // Check if quiz should end
+        if (quiz.status === 'live' && now >= endTime) {
+          await this.completeQuiz(quiz.id);
+          console.log(`🔴 Auto-completed quiz: ${quiz.title}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking scheduled quizzes:', error);
+    }
+  }
+
+  // Get all published quizzes
+  private async getPublishedQuizzes(): Promise<LiveQuiz[]> {
+    try {
+      const q = query(
+        collection(db, 'liveQuizzes'),
+        where('status', 'in', ['published', 'live'])
+      );
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as LiveQuiz[];
+    } catch (error) {
+      console.error('Error getting published quizzes:', error);
+      return [];
+    }
   }
 
   // Create a new live quiz
@@ -421,6 +490,38 @@ export class LiveQuizService {
       });
     } catch (error) {
       console.error('Error getting user results:', error);
+      throw error;
+    }
+  }
+
+  // Get all completed quizzes (for all users)
+  async getAllCompletedQuizzes(): Promise<LiveQuizResult[]> {
+    try {
+      const q = query(
+        collection(db, 'liveQuizResults'),
+        orderBy('date', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          quizId: data.quizId || '',
+          quizTitle: data.quizTitle || '',
+          category: data.category || '',
+          date: data.date?.toDate() || new Date(),
+          participantName: data.participantName || '',
+          score: data.score || 0,
+          rank: data.rank || 0,
+          totalParticipants: data.totalParticipants || 0,
+          duration: data.duration || 0,
+          accuracy: data.accuracy || 0,
+          averageTimePerQuestion: data.averageTimePerQuestion || 0
+        } as LiveQuizResult;
+      });
+    } catch (error) {
+      console.error('Error getting all completed quizzes:', error);
       throw error;
     }
   }
