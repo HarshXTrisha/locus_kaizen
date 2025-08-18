@@ -358,7 +358,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fakeQuizzes, fakeResults]);
 
   useEffect(() => {
     console.log('🏠 Dashboard: Auth state:', { isAuthenticated, user: !!user, isLoading });

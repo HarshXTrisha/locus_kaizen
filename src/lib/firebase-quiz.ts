@@ -11,7 +11,8 @@ import {
   where, 
   orderBy,
   serverTimestamp,
-  FieldValue
+  FieldValue,
+  setDoc
 } from 'firebase/firestore';
 import { ExtractedQuestion } from './pdf-processor';
 
@@ -557,3 +558,18 @@ export const getUserQuizzesWithControls = async (userId: string): Promise<QuizWi
     throw error;
   }
 };
+
+// Set user role in Firestore
+export async function setUserRole(userId: string, role: 'user' | 'admin' | 'creator') {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await setDoc(userRef, { role }, { merge: true });
+    console.log(`User role set to ${role} for user ${userId}`);
+  } catch (error) {
+    console.error('Error setting user role:', error);
+    throw error;
+  }
+}
+
+// Get user role from Firestore
+export async function getUserRole(userId: string): Promise<{ role: string } | null> {
