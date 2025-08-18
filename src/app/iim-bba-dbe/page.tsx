@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Users, Trophy, Play, Settings, BarChart3, Clock, Target, Link as LinkIcon, Copy, Plus, CheckCircle, Upload, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { ResponsiveLayout } from '@/components/layout/ResponsiveLayout';
 import { IIMSidebar } from '@/components/layout/IIMSidebar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -39,10 +38,21 @@ export default function IIMBBADBEPage() {
   const [quizData, setQuizData] = useState({
     title: '',
     description: '',
-    subject: '',
+    subject: 'Spreadsheets for Business Decisions',
     timeLimit: 30,
     passingScore: 0
   });
+
+  // IIM BBA DBE specific subjects
+  const iimSubjects = [
+    'Spreadsheets for Business Decisions',
+    'Understanding Indian Culture: Theatre and its Presence in Daily Life',
+    'Exploring Sustainability in the Indian Context',
+    'Social Media for Marketing',
+    'Design Your Thinking',
+    'Entrepreneurial Mindset and Methods',
+    'Management Accounting'
+  ];
 
   // Load initial data and initialize schedule checking
   useEffect(() => {
@@ -184,14 +194,14 @@ export default function IIMBBADBEPage() {
       const quizId = await createQuiz(quizToSave);
       showSuccess('Quiz Created', 'Quiz created successfully from uploaded file!');
       
-      // Reset form
-      setQuizData({
-        title: '',
-        description: '',
-        subject: '',
-        timeLimit: 30,
-        passingScore: 0
-      });
+             // Reset form
+       setQuizData({
+         title: '',
+         description: '',
+         subject: 'Spreadsheets for Business Decisions',
+         timeLimit: 30,
+         passingScore: 0
+       });
       setExtractedQuestions([]);
       
     } catch (error) {
@@ -240,8 +250,14 @@ export default function IIMBBADBEPage() {
   ];
 
   return (
-    <ResponsiveLayout sidebar={<IIMSidebar />}>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* IIM BBA DBE Sidebar */}
+      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+        <IIMSidebar />
+      </div>
+      
+      {/* Main Content with Sidebar Offset */}
+      <div className="ml-64">
         {/* Header */}
         <div className="bg-white shadow-sm border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -470,18 +486,22 @@ export default function IIMBBADBEPage() {
                         placeholder="Enter quiz title"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Subject
-                      </label>
-                      <input
-                        type="text"
-                        value={quizData.subject}
-                        onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter subject"
-                      />
-                    </div>
+                                         <div>
+                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                         Subject
+                       </label>
+                       <select
+                         value={quizData.subject}
+                         onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       >
+                         {iimSubjects.map((subject) => (
+                           <option key={subject} value={subject}>
+                             {subject}
+                           </option>
+                         ))}
+                       </select>
+                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Time Limit (minutes)
@@ -636,8 +656,8 @@ export default function IIMBBADBEPage() {
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </ResponsiveLayout>
-  );
-}
+                 )}
+       </div>
+     </div>
+   );
+ }
