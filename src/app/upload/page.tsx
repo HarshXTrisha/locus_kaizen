@@ -227,18 +227,18 @@ export default function UploadPage() {
                   <a
                     href="/pdf-format-guide.md"
                     download
-                    className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors font-medium"
                   >
-                    <Download className="h-3 w-3" />
-                    Format Guide
+                    <Download className="h-4 w-4" />
+                    📖 Format Guide
                   </a>
                   <a
                     href="/sample-quiz.pdf"
                     download
-                    className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors font-medium"
                   >
-                    <Download className="h-3 w-3" />
-                    Sample PDF
+                    <Download className="h-4 w-4" />
+                    📄 Sample PDF
                   </a>
                 </div>
               )}

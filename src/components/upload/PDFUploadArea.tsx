@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2, Download } from 'lucide-react';
 import { PDFProcessor, ExtractedQuiz } from '@/lib/pdf-processor';
 
 interface PDFUploadAreaProps {
@@ -115,6 +115,34 @@ export function PDFUploadArea({
 
   return (
     <div className="space-y-4">
+      {/* PDF Format Guides */}
+      <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-blue-900 mb-1">📋 Need Help with PDF Format?</h3>
+            <p className="text-sm text-blue-700">Download our format guide and sample PDF to get started</p>
+          </div>
+          <div className="flex gap-2">
+            <a
+              href="/pdf-format-guide.md"
+              download
+              className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors font-medium"
+            >
+              <Download className="h-4 w-4" />
+              Format Guide
+            </a>
+            <a
+              href="/sample-quiz.pdf"
+              download
+              className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors font-medium"
+            >
+              <Download className="h-4 w-4" />
+              Sample PDF
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Upload Area */}
       <div
         className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
