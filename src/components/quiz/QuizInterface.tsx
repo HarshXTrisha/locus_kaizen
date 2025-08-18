@@ -8,6 +8,7 @@ import { QuestionDisplay } from './QuestionDisplay';
 import { QuestionNavigation } from './QuestionNavigation';
 import { QuizTimer } from './QuizTimer';
 import { QuizProgress } from './QuizProgress';
+import { TimeExpirationModal } from './TimeExpirationModal';
 import { ButtonLoader } from '@/components/common/LoadingSpinner';
 import { CheckCircle, AlertTriangle, Clock, Flag, Loader2, Menu, X } from 'lucide-react';
 
@@ -33,6 +34,9 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
+  const [showTimeExpirationModal, setShowTimeExpirationModal] = useState(false);
+  const [timeExpired, setTimeExpired] = useState(false);
+  const [hasShownWarning, setHasShownWarning] = useState(false);
 
   const showSuccess = useCallback((title: string, message: string) => {
     addNotification({
@@ -146,18 +150,36 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
     if (!quiz) return;
     
     const answeredQuestions = answers.filter(a => a.selectedOption !== '').length;
-    if (answeredQuestions < quiz.questions.length) {
+    if (answeredQuestions < quiz.questions.length && !timeExpired) {
       setShowConfirmSubmit(true);
       return;
     }
     
     await submitQuiz();
-  }, [quiz, answers, submitQuiz]);
+  }, [quiz, answers, submitQuiz, timeExpired]);
 
+  // Handle time expiration
+  const handleTimeExpiration = useCallback(async () => {
+    setTimeExpired(true);
+    setShowTimeExpirationModal(true);
+    
+    // Auto-submit after a short delay to show the modal
+    setTimeout(async () => {
+      await submitQuiz();
+    }, 2000);
+  }, [submitQuiz]);
+
+  // Timer effect with automatic submission
   useEffect(() => {
-    if (timeRemaining <= 0 && quiz) {
-      handleSubmitQuiz();
+    if (timeRemaining <= 0 && quiz && !timeExpired) {
+      handleTimeExpiration();
       return;
+    }
+
+    // Show warning when less than 5 minutes remaining
+    if (timeRemaining <= 300 && timeRemaining > 0 && !hasShownWarning && quiz) {
+      setHasShownWarning(true);
+      setShowTimeExpirationModal(true);
     }
 
     const timer = setInterval(() => {
@@ -165,7 +187,23 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeRemaining, quiz, handleSubmitQuiz]);
+  }, [timeRemaining, quiz, timeExpired, hasShownWarning, handleTimeExpiration]);
+
+  // Handle time expiration modal actions
+  const handleTimeModalClose = () => {
+    if (!timeExpired) {
+      setShowTimeExpirationModal(false);
+    }
+  };
+
+  const handleTimeModalContinue = async () => {
+    if (timeExpired) {
+      setShowTimeExpirationModal(false);
+    } else {
+      setShowTimeExpirationModal(false);
+      await handleSubmitQuiz();
+    }
+  };
 
   if (loading) {
     return (
@@ -359,11 +397,16 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
         <div className="fixed bottom-6 right-6 z-30">
           <button
             onClick={handleSubmitQuiz}
-            disabled={isSubmitting}
+            disabled={isSubmitting || timeExpired}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-full shadow-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium disabled:opacity-50 hover:shadow-xl"
           >
             {isSubmitting ? (
               <ButtonLoader text="Submitting..." />
+            ) : timeExpired ? (
+              <>
+                <Clock className="h-5 w-5" />
+                Time Expired
+              </>
             ) : (
               <>
                 <CheckCircle className="h-5 w-5" />
@@ -373,6 +416,14 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
           </button>
         </div>
       </div>
+
+      {/* Time Expiration Modal */}
+      <TimeExpirationModal
+        isOpen={showTimeExpirationModal}
+        onClose={handleTimeModalClose}
+        onContinue={handleTimeModalContinue}
+        timeExpired={timeExpired}
+      />
 
       {/* Confirmation Modal */}
       {showConfirmSubmit && (

@@ -107,26 +107,51 @@ export interface CreateQuizData {
  */
 export async function createQuiz(quizData: CreateQuizData): Promise<string> {
   try {
+    // Validate and clean the quiz data before saving
+    const cleanedQuestions = quizData.questions.map(q => ({
+      id: q.id || `q${Math.random().toString(36).substr(2, 9)}`,
+      text: q.text || 'Question text not provided',
+      type: q.type || 'multiple-choice',
+      options: q.options && q.options.length > 0 ? q.options.filter(opt => opt && opt.trim()) : undefined,
+      correctAnswer: q.correctAnswer || (q.options && q.options.length > 0 ? q.options[0] : 'No correct answer provided'),
+      points: q.points || 1
+    }));
+
     const quizDoc: DatabaseQuiz = {
-      title: quizData.title,
-      description: quizData.description,
-      subject: quizData.subject,
-      questions: quizData.questions.map(q => ({
-        id: q.id,
-        text: q.text,
-        type: q.type,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        points: q.points
-      })),
-      timeLimit: quizData.timeLimit,
-      passingScore: quizData.passingScore,
+      title: quizData.title || 'Untitled Quiz',
+      description: quizData.description || 'Quiz description not provided',
+      subject: quizData.subject || 'General',
+      questions: cleanedQuestions,
+      timeLimit: quizData.timeLimit || 30,
+      passingScore: quizData.passingScore || 70,
       createdBy: quizData.createdBy,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       isPublished: false,
       isTemporary: quizData.isTemporary || false
     };
+
+    // Additional validation before saving
+    if (!quizDoc.createdBy) {
+      throw new Error('User ID is required to create a quiz');
+    }
+
+    if (quizDoc.questions.length === 0) {
+      throw new Error('Quiz must have at least one question');
+    }
+
+    // Validate each question
+    quizDoc.questions.forEach((question, index) => {
+      if (!question.text || question.text.trim() === '') {
+        throw new Error(`Question ${index + 1} has no text`);
+      }
+      if (question.type === 'multiple-choice' && (!question.options || question.options.length < 2)) {
+        throw new Error(`Question ${index + 1} needs at least 2 options for multiple choice`);
+      }
+      if (!question.correctAnswer || question.correctAnswer.trim() === '') {
+        throw new Error(`Question ${index + 1} has no correct answer`);
+      }
+    });
 
     const docRef = await addDoc(collection(db, 'quizzes'), quizDoc);
     console.log('✅ Quiz created with ID:', docRef.id);
