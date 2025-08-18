@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { 
@@ -44,7 +44,7 @@ export default function DashboardPage() {
   const [deletingResult, setDeletingResult] = useState<string | null>(null);
 
   // Fake data for testing
-  const fakeQuizzes: QuizWithControls[] = [
+  const fakeQuizzes: QuizWithControls[] = useMemo(() => [
     {
       id: 'fake-1',
       title: 'Business Analytics Fundamentals',
@@ -262,9 +262,9 @@ export default function DashboardPage() {
         isCreator: true
       }
     }
-  ];
+  ], [user?.id]);
 
-  const fakeResults = [
+  const fakeResults = useMemo(() => [
     {
       id: 'result-1',
       quizId: 'fake-1',
@@ -320,7 +320,7 @@ export default function DashboardPage() {
       completedAt: new Date('2024-01-28'),
       answers: []
     }
-  ];
+  ], [user?.id]);
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
     kind: 'quiz' | 'result' | null;

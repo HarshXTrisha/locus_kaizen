@@ -94,7 +94,7 @@ export async function PUT(request: NextRequest) {
       });
       
       // Set user role in the users collection
-      await setUserRole(user.uid, 'user', email);
+      await setUserRole(user.uid, 'user');
       
       console.log('New user document created successfully');
     }
