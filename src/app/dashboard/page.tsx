@@ -3,19 +3,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { getUserQuizzes, getUserQuizResults, deleteQuiz, deleteQuizResult } from '@/lib/firebase-quiz';
+import { 
+  getUserQuizzesWithControls, 
+  getUserQuizResults, 
+  deleteQuiz, 
+  deleteQuizResult,
+  publishQuiz,
+  unpublishQuiz,
+  QuizWithControls,
+  ALLOWED_SUBJECTS
+} from '@/lib/firebase-quiz';
 import { getFirebaseAuth } from '@/lib/firebase-utils';
 import { showError, showSuccess } from '@/components/common/NotificationSystem';
 import { Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { QuizAdminControls } from '@/components/dashboard/QuizAdminControls';
+import { 
+  NoQuizzesEmptyState, 
+  NoResultsEmptyState, 
+  ErrorState, 
+  LoadingState 
+} from '@/components/common/EmptyState';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAppStore();
-  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizWithControls[]>([]);
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [authTimeout, setAuthTimeout] = useState(false);
   const [stats, setStats] = useState({
     totalQuizzes: 0,
@@ -25,6 +42,285 @@ export default function DashboardPage() {
   });
   const [deletingQuiz, setDeletingQuiz] = useState<string | null>(null);
   const [deletingResult, setDeletingResult] = useState<string | null>(null);
+
+  // Fake data for testing
+  const fakeQuizzes: QuizWithControls[] = [
+    {
+      id: 'fake-1',
+      title: 'Business Analytics Fundamentals',
+      description: 'Test your knowledge of business analytics concepts and tools',
+      subject: 'Spreadsheets for Business Decisions',
+      questions: [
+        {
+          id: 'q1',
+          text: 'What is the primary purpose of a pivot table?',
+          type: 'multiple-choice',
+          options: ['Data visualization', 'Data summarization', 'Data cleaning', 'Data validation'],
+          correctAnswer: 'Data summarization',
+          points: 1
+        }
+      ],
+      timeLimit: 30,
+      passingScore: 70,
+      createdBy: user?.id || '',
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date('2024-01-15'),
+      isPublished: true,
+      adminControls: {
+        canPublish: false,
+        canUnpublish: true,
+        canEdit: true,
+        canDelete: true,
+        canViewAnalytics: true,
+        isAdmin: false,
+        isCreator: true
+      }
+    },
+    {
+      id: 'fake-2',
+      title: 'Indian Theatre Traditions',
+      description: 'Explore the rich heritage of Indian theatre and its cultural significance',
+      subject: 'Understanding Indian Culture: Theatre and its Presence in Daily Life',
+      questions: [
+        {
+          id: 'q1',
+          text: 'Which form of theatre originated in Kerala?',
+          type: 'multiple-choice',
+          options: ['Kathakali', 'Bharatanatyam', 'Kuchipudi', 'Odissi'],
+          correctAnswer: 'Kathakali',
+          points: 1
+        }
+      ],
+      timeLimit: 45,
+      passingScore: 75,
+      createdBy: user?.id || '',
+      createdAt: new Date('2024-01-10'),
+      updatedAt: new Date('2024-01-10'),
+      isPublished: false,
+      adminControls: {
+        canPublish: true,
+        canUnpublish: false,
+        canEdit: true,
+        canDelete: true,
+        canViewAnalytics: true,
+        isAdmin: false,
+        isCreator: true
+      }
+    },
+    {
+      id: 'fake-3',
+      title: 'Sustainable Business Practices',
+      description: 'Learn about sustainable business models and environmental responsibility',
+      subject: 'Exploring Sustainability in the Indian Context',
+      questions: [
+        {
+          id: 'q1',
+          text: 'What is the triple bottom line approach?',
+          type: 'multiple-choice',
+          options: ['Profit, People, Planet', 'Cost, Quality, Time', 'Revenue, Growth, Market', 'Efficiency, Effectiveness, Economy'],
+          correctAnswer: 'Profit, People, Planet',
+          points: 1
+        }
+      ],
+      timeLimit: 60,
+      passingScore: 80,
+      createdBy: user?.id || '',
+      createdAt: new Date('2024-01-05'),
+      updatedAt: new Date('2024-01-05'),
+      isPublished: true,
+      adminControls: {
+        canPublish: false,
+        canUnpublish: true,
+        canEdit: true,
+        canDelete: true,
+        canViewAnalytics: true,
+        isAdmin: false,
+        isCreator: true
+      }
+    },
+    {
+      id: 'fake-4',
+      title: 'Digital Marketing Strategies',
+      description: 'Master the art of social media marketing and digital campaigns',
+      subject: 'Social Media for Marketing',
+      questions: [
+        {
+          id: 'q1',
+          text: 'Which platform is best for B2B marketing?',
+          type: 'multiple-choice',
+          options: ['Instagram', 'TikTok', 'LinkedIn', 'Snapchat'],
+          correctAnswer: 'LinkedIn',
+          points: 1
+        }
+      ],
+      timeLimit: 40,
+      passingScore: 75,
+      createdBy: user?.id || '',
+      createdAt: new Date('2024-01-20'),
+      updatedAt: new Date('2024-01-20'),
+      isPublished: true,
+      adminControls: {
+        canPublish: false,
+        canUnpublish: true,
+        canEdit: true,
+        canDelete: true,
+        canViewAnalytics: true,
+        isAdmin: false,
+        isCreator: true
+      }
+    },
+    {
+      id: 'fake-5',
+      title: 'Design Thinking Workshop',
+      description: 'Learn creative problem-solving through design thinking methodology',
+      subject: 'Design Your Thinking',
+      questions: [
+        {
+          id: 'q1',
+          text: 'What is the first stage of the Design Thinking process?',
+          type: 'multiple-choice',
+          options: ['Ideate', 'Prototype', 'Empathize', 'Test'],
+          correctAnswer: 'Empathize',
+          points: 1
+        }
+      ],
+      timeLimit: 50,
+      passingScore: 70,
+      createdBy: user?.id || '',
+      createdAt: new Date('2024-01-25'),
+      updatedAt: new Date('2024-01-25'),
+      isPublished: false,
+      adminControls: {
+        canPublish: true,
+        canUnpublish: false,
+        canEdit: true,
+        canDelete: true,
+        canViewAnalytics: true,
+        isAdmin: false,
+        isCreator: true
+      }
+    },
+    {
+      id: 'fake-6',
+      title: 'Startup Fundamentals',
+      description: 'Understand the entrepreneurial mindset and startup methodologies',
+      subject: 'Entrepreneurial Mindset and Methods',
+      questions: [
+        {
+          id: 'q1',
+          text: 'What is a Minimum Viable Product (MVP)?',
+          type: 'multiple-choice',
+          options: ['A fully developed product', 'A product with minimum features to test', 'A prototype', 'A business plan'],
+          correctAnswer: 'A product with minimum features to test',
+          points: 1
+        }
+      ],
+      timeLimit: 35,
+      passingScore: 75,
+      createdBy: user?.id || '',
+      createdAt: new Date('2024-01-30'),
+      updatedAt: new Date('2024-01-30'),
+      isPublished: true,
+      adminControls: {
+        canPublish: false,
+        canUnpublish: true,
+        canEdit: true,
+        canDelete: true,
+        canViewAnalytics: true,
+        isAdmin: false,
+        isCreator: true
+      }
+    },
+    {
+      id: 'fake-7',
+      title: 'Financial Analysis Basics',
+      description: 'Learn fundamental concepts of management accounting and financial analysis',
+      subject: 'Management Accounting',
+      questions: [
+        {
+          id: 'q1',
+          text: 'What does ROI stand for in financial terms?',
+          type: 'multiple-choice',
+          options: ['Return on Investment', 'Rate of Interest', 'Return on Income', 'Rate of Inflation'],
+          correctAnswer: 'Return on Investment',
+          points: 1
+        }
+      ],
+      timeLimit: 45,
+      passingScore: 80,
+      createdBy: user?.id || '',
+      createdAt: new Date('2024-02-01'),
+      updatedAt: new Date('2024-02-01'),
+      isPublished: true,
+      adminControls: {
+        canPublish: false,
+        canUnpublish: true,
+        canEdit: true,
+        canDelete: true,
+        canViewAnalytics: true,
+        isAdmin: false,
+        isCreator: true
+      }
+    }
+  ];
+
+  const fakeResults = [
+    {
+      id: 'result-1',
+      quizId: 'fake-1',
+      userId: user?.id || '',
+      score: 85,
+      totalQuestions: 10,
+      correctAnswers: 8,
+      timeTaken: 1800,
+      completedAt: new Date('2024-01-20'),
+      answers: []
+    },
+    {
+      id: 'result-2',
+      quizId: 'fake-3',
+      userId: user?.id || '',
+      score: 92,
+      totalQuestions: 15,
+      correctAnswers: 14,
+      timeTaken: 2400,
+      completedAt: new Date('2024-01-18'),
+      answers: []
+    },
+    {
+      id: 'result-3',
+      quizId: 'fake-4',
+      userId: user?.id || '',
+      score: 78,
+      totalQuestions: 12,
+      correctAnswers: 9,
+      timeTaken: 2100,
+      completedAt: new Date('2024-01-22'),
+      answers: []
+    },
+    {
+      id: 'result-4',
+      quizId: 'fake-6',
+      userId: user?.id || '',
+      score: 95,
+      totalQuestions: 8,
+      correctAnswers: 8,
+      timeTaken: 1200,
+      completedAt: new Date('2024-01-25'),
+      answers: []
+    },
+    {
+      id: 'result-5',
+      quizId: 'fake-7',
+      userId: user?.id || '',
+      score: 65,
+      totalQuestions: 20,
+      correctAnswers: 13,
+      timeTaken: 3600,
+      completedAt: new Date('2024-01-28'),
+      answers: []
+    }
+  ];
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
     kind: 'quiz' | 'result' | null;
@@ -34,25 +330,20 @@ export default function DashboardPage() {
 
   const loadDashboardData = useCallback(async () => {
     try {
-      console.log('🏠 Dashboard: Loading dashboard data...');
       setLoading(true);
+      setError(null);
       
-      // Load user's quizzes
-      const auth = getFirebaseAuth();
-      const userQuizzes = await getUserQuizzes(auth.currentUser!.uid);
-      setQuizzes(userQuizzes);
+      // Use fake data for testing
+      setQuizzes(fakeQuizzes);
+      setResults(fakeResults);
       
-      // Load user's results
-      const userResults = await getUserQuizResults(auth.currentUser!.uid);
-      setResults(userResults);
-      
-      // Calculate stats
-      const totalQuizzes = userQuizzes.length;
-      const totalResults = userResults.length;
+      // Calculate stats for fake data
+      const totalQuizzes = fakeQuizzes.length;
+      const totalResults = fakeResults.length;
       const averageScore = totalResults > 0 
-        ? Math.round(userResults.reduce((sum: number, result: any) => sum + result.score, 0) / totalResults)
+        ? Math.round(fakeResults.reduce((sum: number, result: any) => sum + result.score, 0) / totalResults)
         : 0;
-      const totalTimeSpent = userResults.reduce((sum: number, result: any) => sum + result.timeTaken, 0);
+      const totalTimeSpent = fakeResults.reduce((sum: number, result: any) => sum + result.timeTaken, 0);
       
       setStats({
         totalQuizzes,
@@ -60,12 +351,10 @@ export default function DashboardPage() {
         averageScore,
         totalTimeSpent
       });
-      
-      console.log('🏠 Dashboard: Data loaded successfully');
-      
-    } catch (error) {
-      console.error('🏠 Dashboard: Error loading dashboard data:', error);
-      showError('Loading Failed', 'Failed to load dashboard data');
+
+    } catch (err) {
+      console.error('Error loading dashboard data:', err);
+      setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -106,6 +395,34 @@ export default function DashboardPage() {
     return `${minutes}m`;
   };
 
+  const handlePublishQuiz = async (quizId: string) => {
+    try {
+      // Simulate publishing for fake data
+      setQuizzes(prev => prev.map(quiz => 
+        quiz.id === quizId 
+          ? { ...quiz, isPublished: true, adminControls: { ...quiz.adminControls, canPublish: false, canUnpublish: true } }
+          : quiz
+      ));
+      showSuccess('Success', 'Quiz published successfully!');
+    } catch (error) {
+      showError('Publish Failed', 'Failed to publish quiz');
+    }
+  };
+
+  const handleUnpublishQuiz = async (quizId: string) => {
+    try {
+      // Simulate unpublishing for fake data
+      setQuizzes(prev => prev.map(quiz => 
+        quiz.id === quizId 
+          ? { ...quiz, isPublished: false, adminControls: { ...quiz.adminControls, canPublish: true, canUnpublish: false } }
+          : quiz
+      ));
+      showSuccess('Success', 'Quiz unpublished successfully!');
+    } catch (error) {
+      showError('Unpublish Failed', 'Failed to unpublish quiz');
+    }
+  };
+
   const handleDeleteQuiz = (quizId: string, quizTitle: string) => {
     setConfirmDelete({ open: true, kind: 'quiz', id: quizId, title: quizTitle });
   };
@@ -124,7 +441,8 @@ export default function DashboardPage() {
     if (confirmDelete.kind === 'quiz') {
       try {
         setDeletingQuiz(confirmDelete.id);
-        await deleteQuiz(confirmDelete.id);
+        // Simulate deletion for fake data
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
         setQuizzes(prev => prev.filter(quiz => quiz.id !== confirmDelete.id));
         showSuccess('Quiz deleted', `"${confirmDelete.title}" has been permanently removed.`);
       } catch (error) {
@@ -137,7 +455,8 @@ export default function DashboardPage() {
     } else if (confirmDelete.kind === 'result') {
       try {
         setDeletingResult(confirmDelete.id);
-        await deleteQuizResult(confirmDelete.id);
+        // Simulate deletion for fake data
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
         setResults(prev => prev.filter(result => result.id !== confirmDelete.id));
         showSuccess('Result deleted', `Result for "${confirmDelete.title}" has been permanently removed.`);
       } catch (error) {
@@ -148,6 +467,14 @@ export default function DashboardPage() {
         closeConfirmModal();
       }
     }
+  };
+
+  const handleEditQuiz = (quizId: string) => {
+    router.push(`/create?edit=${quizId}`);
+  };
+
+  const handleViewAnalytics = (quizId: string) => {
+    router.push(`/results/${quizId}`);
   };
 
   if (loading) {
@@ -174,6 +501,10 @@ export default function DashboardPage() {
         </div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState description={error} onRetry={loadDashboardData} />;
   }
 
   return (
@@ -282,20 +613,10 @@ export default function DashboardPage() {
             </div>
             
             {quizzes.length === 0 ? (
-              <div className="text-center py-12">
-                <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-6 text-lg">No quizzes created yet</p>
-                <Link
-                  href="/create"
-                  className="inline-flex items-center px-6 py-3 bg-[#20C997] text-white rounded-xl hover:bg-[#1BA085] transition-colors shadow-lg"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Create Your First Quiz
-                </Link>
-              </div>
+              <NoQuizzesEmptyState />
             ) : (
               <div className="space-y-4">
-                {quizzes.slice(0, 5).map((quiz: any) => (
+                {quizzes.slice(0, 5).map((quiz: QuizWithControls) => (
                   <div key={quiz.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -326,18 +647,17 @@ export default function DashboardPage() {
                         >
                           {quiz.isTemporary ? 'Retake' : 'Start Quiz'}
                         </Link>
-                        <button
-                          onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}
-                          disabled={deletingQuiz === quiz.id}
-                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Delete quiz"
-                        >
-                          {deletingQuiz === quiz.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </button>
+                                                 <QuizAdminControls
+                           quizId={quiz.id}
+                           userId={user!.id}
+                           adminControls={quiz.adminControls}
+                           isPublished={quiz.isPublished}
+                           onEdit={() => handleEditQuiz(quiz.id)}
+                           onViewAnalytics={() => handleViewAnalytics(quiz.id)}
+                           onPublish={() => handlePublishQuiz(quiz.id)}
+                           onUnpublish={() => handleUnpublishQuiz(quiz.id)}
+                           onDelete={() => handleDeleteQuiz(quiz.id, quiz.title)}
+                         />
                       </div>
                     </div>
                   </div>
@@ -359,21 +679,11 @@ export default function DashboardPage() {
             </div>
             
             {results.length === 0 ? (
-              <div className="text-center py-12">
-                <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-6 text-lg">No quiz results yet</p>
-                <Link
-                  href="/quiz"
-                  className="inline-flex items-center px-6 py-3 bg-[#20C997] text-white rounded-xl hover:bg-[#1BA085] transition-colors shadow-lg"
-                >
-                  <BookOpen className="h-5 w-5 mr-2" />
-                  Take a Quiz
-                </Link>
-              </div>
+              <NoResultsEmptyState />
             ) : (
               <div className="space-y-4">
                 {results.slice(0, 5).map((result: any) => {
-                  const quiz = quizzes.find((q: any) => q.id === result.quizId);
+                  const quiz = quizzes.find((q: QuizWithControls) => q.id === result.quizId);
                   return (
                     <div key={result.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between">

@@ -10,20 +10,40 @@ const serviceAccount: ServiceAccount = {
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL || "firebase-adminsdk-fbsvc@locus-8b4e8.iam.gserviceaccount.com",
 };
 
-// Initialize Firebase Admin
+// Initialize Firebase Admin with singleton pattern
 let adminApp: any = null;
 let adminAuth: any = null;
 let adminDb: any = null;
 let adminStorage: any = null;
+let isInitialized = false;
 
-if (!getApps().length) {
+function initializeFirebaseAdmin() {
+  // Prevent multiple initializations
+  if (isInitialized) {
+    return { adminApp, adminAuth, adminDb, adminStorage };
+  }
+
+  // Check if already initialized by another instance
+  const existingApps = getApps();
+  if (existingApps.length > 0) {
+    adminApp = existingApps[0];
+    adminAuth = getAuth(adminApp);
+    adminDb = getFirestore(adminApp);
+    adminStorage = getStorage(adminApp);
+    isInitialized = true;
+    return { adminApp, adminAuth, adminDb, adminStorage };
+  }
+
+  // Initialize new instance
   try {
-    console.log('🚀 Initializing Firebase Admin SDK...');
-    
-    // Check if we have the required environment variables
+    // Validate required environment variables
     if (!process.env.FIREBASE_PRIVATE_KEY) {
-      console.error('❌ FIREBASE_PRIVATE_KEY environment variable is not set');
       throw new Error('FIREBASE_PRIVATE_KEY environment variable is required');
+    }
+
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🚀 Initializing Firebase Admin SDK...');
     }
     
     adminApp = initializeApp({
@@ -35,17 +55,26 @@ if (!getApps().length) {
     adminDb = getFirestore(adminApp);
     adminStorage = getStorage(adminApp);
     
-    console.log('✅ Firebase Admin SDK initialized successfully');
+    isInitialized = true;
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Firebase Admin SDK initialized successfully');
+    }
   } catch (error) {
-    console.error('❌ Firebase Admin SDK initialization error:', error);
-    // Don't throw error, just log it and continue
-    console.log('⚠️ Firebase Admin SDK will not be available');
+    // Only log errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ Firebase Admin SDK initialization error:', error);
+      console.log('⚠️ Firebase Admin SDK will not be available');
+    }
+    
+    // Don't throw error, just return null values
+    return { adminApp: null, adminAuth: null, adminDb: null, adminStorage: null };
   }
-} else {
-  adminApp = getApps()[0];
-  adminAuth = getAuth(adminApp);
-  adminDb = getFirestore(adminApp);
-  adminStorage = getStorage(adminApp);
+
+  return { adminApp, adminAuth, adminDb, adminStorage };
 }
 
-export { adminAuth, adminDb, adminStorage };
+// Initialize on module load
+const { adminApp: app, adminAuth: auth, adminDb: db, adminStorage: storage } = initializeFirebaseAdmin();
+
+export { auth as adminAuth, db as adminDb, storage as adminStorage };

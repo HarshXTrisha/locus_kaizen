@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { EmptyState } from '@/components/common/EmptyState';
+import { ResponsiveLayout } from '@/components/layout/ResponsiveLayout';
 import { ExtractedQuestion, ExtractedQuiz } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
-import { createQuiz } from '@/lib/firebase-quiz';
+import { createQuiz, ALLOWED_SUBJECTS } from '@/lib/firebase-quiz';
 import { getFirebaseAuth } from '@/lib/firebase-utils';
 import { Plus, ArrowRight, FileJson, CheckCircle, Play, FileText, Download } from 'lucide-react';
 
@@ -36,7 +38,7 @@ export default function UploadPage() {
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
   const [extractedQuiz, setExtractedQuiz] = useState<ExtractedQuiz | null>(null);
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
-  const [activeTab, setActiveTab] = useState<'json' | 'pdf'>('json');
+  const [activeTab, setActiveTab] = useState<'json' | 'pdf' | 'txt'>('json');
   const [quizData, setQuizData] = useState({
     title: '',
     description: '',
@@ -72,6 +74,17 @@ export default function UploadPage() {
     }));
   };
 
+  const handleTXTQuizExtracted = (quiz: ExtractedQuiz) => {
+    setExtractedQuiz(quiz);
+    setExtractedQuestions(quiz.questions);
+    setQuizData(prev => ({
+      ...prev,
+      title: quiz.title || `Quiz with ${quiz.questions.length} Questions`,
+      description: quiz.description || `Quiz extracted from TXT with ${quiz.questions.length} questions`,
+      subject: quiz.subject
+    }));
+  };
+
   const handleCreateQuiz = async () => {
     try {
       const auth = getFirebaseAuth();
@@ -100,351 +113,227 @@ export default function UploadPage() {
         createdBy: auth?.currentUser?.uid
       });
 
-      showSuccess('Quiz Created!', 'Your quiz has been created successfully');
-      
-      // Navigate to the quiz
+      showSuccess('Success', 'Quiz created successfully!');
       router.push(`/quiz/${quizId}`);
-      
     } catch (error) {
       console.error('Error creating quiz:', error);
-      showError('Quiz Creation Failed', 'Failed to create quiz. Please try again.');
+      showError('Creation Failed', 'Failed to create quiz. Please try again.');
     } finally {
       setIsCreatingQuiz(false);
     }
-  };
-
-  const handleStartTest = async () => {
-    try {
-      const auth = getFirebaseAuth();
-      if (!auth?.currentUser) {
-        showError('Authentication Required', 'Please sign in to start tests');
-        return;
-      }
-
-      const questionsToUse = extractedQuiz ? extractedQuiz.questions : extractedQuestions;
-      
-      if (questionsToUse.length === 0) {
-        showError('No Questions', 'No questions available to start test');
-        return;
-      }
-
-      setIsCreatingQuiz(true);
-      
-      // Create a temporary quiz for immediate testing
-      const tempQuizId = await createQuiz({
-        title: quizData.title || `Quick Test - ${questionsToUse.length} Questions`,
-        description: quizData.description || 'Quick test from uploaded file(s)',
-        subject: quizData.subject || 'General',
-        timeLimit: quizData.timeLimit,
-        passingScore: quizData.passingScore,
-        questions: questionsToUse,
-        createdBy: auth?.currentUser?.uid,
-        isTemporary: true // Mark as temporary
-      });
-
-      showSuccess('Test Started!', 'Your test is ready to begin');
-      
-      // Navigate directly to the quiz
-      router.push(`/quiz/${tempQuizId}`);
-      
-    } catch (error) {
-      console.error('Error starting test:', error);
-      showError('Test Start Failed', 'Failed to start test. Please try again.');
-    } finally {
-      setIsCreatingQuiz(false);
-    }
-  };
-
-  const handleReset = () => {
-    setExtractedQuestions([]);
-    setExtractedQuiz(null);
-    setQuizData({
-      title: '',
-      description: '',
-      subject: '',
-      timeLimit: 30,
-      passingScore: 70
-    });
   };
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="xl" text="Checking authentication..." />
-      </div>
+      <ResponsiveLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <LoadingSpinner size="xl" text="Checking authentication..." />
+        </div>
+      </ResponsiveLayout>
     );
   }
 
-  const hasQuestions = extractedQuestions.length > 0 || extractedQuiz;
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <ResponsiveLayout>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Upload & Create Quiz</h1>
-          <p className="text-gray-600 mt-2">
-            Upload JSON files or PDF documents to create quizzes automatically.
-          </p>
-          
-          {/* Tab Navigation */}
-          <div className="mt-6 border-b border-gray-200">
-            <nav className="-mb-px flex gap-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Quiz</h1>
+          <p className="text-gray-600">Upload JSON files, PDF documents, or TXT files to create quizzes</p>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => setActiveTab('json')}
-                className={`shrink-0 border-b-2 px-1 pb-4 text-sm font-medium ${
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'json'
-                    ? 'border-[#20C997] text-[#20C997]'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <FileJson className="h-4 w-4" />
-                  JSON Upload
-                </div>
+                <FileJson className="inline-block w-4 h-4 mr-2" />
+                JSON Upload
               </button>
               <button
                 onClick={() => setActiveTab('pdf')}
-                className={`shrink-0 border-b-2 px-1 pb-4 text-sm font-medium ${
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'pdf'
-                    ? 'border-[#20C997] text-[#20C997]'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  PDF/TXT Upload
-                </div>
+                <FileText className="inline-block w-4 h-4 mr-2" />
+                PDF Upload
+              </button>
+              <button
+                onClick={() => setActiveTab('txt')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'txt'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <FileText className="inline-block w-4 h-4 mr-2" />
+                TXT Upload
               </button>
             </nav>
           </div>
+        </div>
 
-          {/* Upload Guidelines */}
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-blue-900">📋 Upload Guidelines:</h3>
-              {activeTab === 'pdf' && (
-                <div className="flex gap-2">
-                  <a
-                    href="/pdf-format-guide.md"
-                    download
-                    className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors font-medium"
-                  >
-                    <Download className="h-4 w-4" />
-                    📖 Format Guide
-                  </a>
-                  <a
-                    href="/sample-quiz.pdf"
-                    download
-                    className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors font-medium"
-                  >
-                    <Download className="h-4 w-4" />
-                    📄 Sample PDF
-                  </a>
-                </div>
-              )}
-            </div>
+        {/* Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Upload Area */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-semibold mb-4">
+              {activeTab === 'json' ? 'Upload JSON Files' : activeTab === 'pdf' ? 'Upload PDF Document' : 'Upload TXT Document'}
+            </h2>
+            
             {activeTab === 'json' ? (
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• <strong>JSON files only:</strong> Maximum 10MB per file, up to 500 questions per file</li>
-                <li>• <strong>Bulk upload:</strong> Upload multiple JSON files at once (max 1000 total questions)</li>
-                <li>• <strong>Required format:</strong> Download the template for exact JSON structure</li>
-                <li>• <strong>Start Test:</strong> Begin immediately with uploaded questions</li>
-                <li>• <strong>Create Quiz:</strong> Save as permanent quiz for future use</li>
-              </ul>
+              <FileUploadArea onQuestionsExtracted={handleQuestionsExtracted} />
+            ) : activeTab === 'pdf' ? (
+              <PDFUploadArea onQuizExtracted={handlePDFQuizExtracted} />
             ) : (
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• <strong>PDF files only:</strong> Maximum 10MB per file</li>
-                <li>• <strong>Supported format:</strong> Questions with Q1, A), B), C), D) pattern</li>
-                <li>• <strong>Automatic extraction:</strong> Questions and options are automatically detected</li>
-                <li>• <strong>Client-side processing:</strong> PDF never leaves your device</li>
-                <li>• <strong>Preview available:</strong> Review extracted questions before creating quiz</li>
-                <li>• <strong>Download guides:</strong> Get format guide and sample PDF above</li>
-              </ul>
+              <FileUploadArea onQuestionsExtracted={handleQuestionsExtracted} />
             )}
           </div>
-        </div>
 
-        {/* Upload Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Step 1: Upload {activeTab === 'json' ? 'JSON Files' : 'PDF Document'}
-          </h2>
-          
-          {activeTab === 'json' ? (
-            <FileUploadArea 
-              onQuestionsExtracted={handleQuestionsExtracted}
-              onUploadStart={() => setExtractedQuestions([])}
-            />
-          ) : (
-            <PDFUploadArea
-              onQuizExtracted={handlePDFQuizExtracted}
-              onUploadStart={() => {
-                setExtractedQuestions([]);
-                setExtractedQuiz(null);
-              }}
-            />
-          )}
-        </div>
-
-        {/* Quiz Creation Section */}
-        {hasQuestions && (
+          {/* Quiz Preview */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Step 2: Create Quiz</h2>
-              <div className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="h-5 w-5" />
-                <span className="text-sm font-medium">
-                  {extractedQuiz ? extractedQuiz.questions.length : extractedQuestions.length} questions ready
-                </span>
-              </div>
-            </div>
+            <h2 className="text-xl font-semibold mb-4">Quiz Details</h2>
+            
+            {extractedQuestions.length === 0 ? (
+              <EmptyState
+                type="upload"
+                title="No Questions Yet"
+                description="Upload files to see extracted questions here"
+                showIcon={true}
+              />
+            ) : (
+              <div className="space-y-4">
+                {/* Quiz Form */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Quiz Title
+                    </label>
+                    <input
+                      type="text"
+                      value={quizData.title}
+                      onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter quiz title"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={quizData.description}
+                      onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Enter quiz description"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Subject
+                    </label>
+                    <select
+                      value={quizData.subject}
+                      onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select a subject</option>
+                      {ALLOWED_SUBJECTS.map(subject => (
+                        <option key={subject} value={subject}>
+                          {subject}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Time Limit (minutes)
+                      </label>
+                      <input
+                        type="number"
+                        value={quizData.timeLimit}
+                        onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 30 }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        min="1"
+                        max="180"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Passing Score (%)
+                      </label>
+                      <input
+                        type="number"
+                        value={quizData.passingScore}
+                        onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 70 }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        min="0"
+                        max="100"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-            {/* Quiz Details Form */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quiz Title *
-                </label>
-                <input
-                  type="text"
-                  value={quizData.title}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
-                  placeholder="Enter quiz title"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  value={quizData.subject}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
-                  placeholder="e.g., Mathematics, Science"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={quizData.description}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
-                  rows={3}
-                  placeholder="Enter quiz description"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Time Limit (minutes)
-                </label>
-                <input
-                  type="number"
-                  value={quizData.timeLimit}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 30 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
-                  min="1"
-                  max="480"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Passing Score (%)
-                </label>
-                <input
-                  type="number"
-                  value={quizData.passingScore}
-                  onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 70 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
-                  min="0"
-                  max="100"
-                />
-              </div>
-            </div>
-
-            {/* Questions Preview */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Questions Preview</h3>
-              <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto">
-                {(extractedQuiz ? extractedQuiz.questions : extractedQuestions).slice(0, 5).map((question, index) => (
-                  <div key={question.id} className="mb-3 last:mb-0">
-                    <p className="text-sm font-medium text-gray-900">
-                      Q{index + 1}: {question.text}
-                    </p>
-                    {question.options && (
-                      <p className="text-xs text-gray-600 mt-1">
-                        Options: {question.options.join(', ')}
+                {/* Questions Summary */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-medium mb-3">Questions ({extractedQuestions.length})</h3>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {extractedQuestions.slice(0, 5).map((question, index) => (
+                      <div key={index} className="p-3 bg-gray-50 rounded-md">
+                        <p className="text-sm font-medium text-gray-900">
+                          {index + 1}. {question.text.substring(0, 100)}...
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Type: {question.type} | Points: {question.points || 1}
+                        </p>
+                      </div>
+                    ))}
+                    {extractedQuestions.length > 5 && (
+                      <p className="text-sm text-gray-500 text-center">
+                        ... and {extractedQuestions.length - 5} more questions
                       </p>
                     )}
                   </div>
-                ))}
-                {(extractedQuiz ? extractedQuiz.questions : extractedQuestions).length > 5 && (
-                  <p className="text-sm text-gray-500 italic">
-                    ... and {(extractedQuiz ? extractedQuiz.questions : extractedQuestions).length - 5} more questions
-                  </p>
-                )}
-              </div>
-            </div>
+                </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={handleReset}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Reset
-              </button>
-              
-              {/* Start Test Button - For immediate testing */}
-              <button
-                onClick={handleStartTest}
-                disabled={isCreatingQuiz || !hasQuestions}
-                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isCreatingQuiz ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Starting...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4" />
-                    Start Test
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </button>
-              
-              {/* Create Quiz Button - For permanent quiz */}
-              <button
-                onClick={handleCreateQuiz}
-                disabled={isCreatingQuiz || !quizData.title.trim()}
-                className="flex items-center gap-2 px-6 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isCreatingQuiz ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-4 w-4" />
-                    Create Quiz
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </button>
-            </div>
+                {/* Create Button */}
+                <button
+                  onClick={handleCreateQuiz}
+                  disabled={isCreatingQuiz || extractedQuestions.length === 0}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {isCreatingQuiz ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      Creating Quiz...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Quiz
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </ResponsiveLayout>
   );
 }

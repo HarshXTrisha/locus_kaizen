@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { liveQuizService } from '@/lib/live-quiz-service';
 import { LiveQuiz, LiveQuizParticipant } from '@/lib/live-quiz-types';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { EmptyState } from '@/components/common/EmptyState';
+import { ResponsiveLayout } from '@/components/layout/ResponsiveLayout';
 import ShareableLinkRegistration from '@/components/live-quiz/ShareableLinkRegistration';
 import LiveQuizInterface from '@/components/live-quiz/LiveQuizInterface';
 
@@ -95,68 +98,68 @@ export default function LiveQuizPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900">Loading Quiz...</h2>
-          <p className="text-gray-600 mt-2">Please wait while we prepare your quiz</p>
+      <ResponsiveLayout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-md mx-4">
+            <LoadingSpinner size="xl" text="Loading live quiz..." />
+          </div>
         </div>
-      </div>
+      </ResponsiveLayout>
     );
   }
 
-  if (error || !quiz) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Quiz Not Found</h2>
-          <p className="text-gray-600 mb-4">{error || 'The quiz you&apos;re looking for doesn&apos;t exist or has been removed.'}</p>
-          <a 
-            href="/iim-bba-dbe" 
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Back to Dashboard
-          </a>
+      <ResponsiveLayout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-md mx-4">
+            <EmptyState
+              type="error"
+              title="Quiz Not Found"
+              description={error}
+              onRetry={() => window.location.reload()}
+            />
+          </div>
         </div>
-      </div>
+      </ResponsiveLayout>
     );
   }
 
-  if (!isRegistered) {
+  if (!quiz) {
     return (
-      <ShareableLinkRegistration
-        quizId={quizId}
-        onRegistrationComplete={handleRegistrationComplete}
-        onError={setError}
-      />
-    );
-  }
-
-  if (!participant) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="text-red-500 text-6xl mb-4">❌</div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Registration Error</h2>
-          <p className="text-gray-600 mb-4">Failed to register for the quiz. Please try again.</p>
-          <button 
-            onClick={() => setIsRegistered(false)}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Try Again
-          </button>
+      <ResponsiveLayout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-md mx-4">
+            <EmptyState
+              type="quiz"
+              title="Quiz Not Available"
+              description="The requested quiz could not be found or is no longer available"
+            />
+          </div>
         </div>
-      </div>
+      </ResponsiveLayout>
     );
   }
 
   return (
-    <LiveQuizInterface
-      quiz={quiz}
-      participant={participant}
-      onAnswerSubmit={handleAnswerSubmit}
-      onQuizComplete={handleQuizComplete}
-    />
+    <ResponsiveLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        {!isRegistered ? (
+          <div className="container mx-auto px-4 py-8">
+            <ShareableLinkRegistration
+              quiz={quiz}
+              onRegistrationComplete={handleRegistrationComplete}
+            />
+          </div>
+        ) : (
+          <LiveQuizInterface
+            quiz={quiz}
+            participant={participant!}
+            onAnswerSubmit={handleAnswerSubmit}
+            onQuizComplete={handleQuizComplete}
+          />
+        )}
+      </div>
+    </ResponsiveLayout>
   );
 }

@@ -15,12 +15,25 @@ import {
 } from 'firebase/firestore';
 import { ExtractedQuestion } from './pdf-processor';
 
+// Allowed subjects for quizzes
+export const ALLOWED_SUBJECTS = [
+  'Spreadsheets for Business Decisions',
+  'Understanding Indian Culture: Theatre and its Presence in Daily Life',
+  'Exploring Sustainability in the Indian Context',
+  'Social Media for Marketing',
+  'Design Your Thinking',
+  'Entrepreneurial Mindset and Methods',
+  'Management Accounting'
+] as const;
+
+export type AllowedSubject = typeof ALLOWED_SUBJECTS[number];
+
 // Quiz interface (for user-facing operations)
 export interface Quiz {
   id: string;
   title: string;
   description: string;
-  subject: string;
+  subject: AllowedSubject;
   questions: Question[];
   timeLimit: number; // in minutes
   passingScore: number;
@@ -35,7 +48,7 @@ export interface Quiz {
 interface DatabaseQuiz {
   title: string;
   description: string;
-  subject: string;
+  subject: AllowedSubject;
   questions: Question[];
   timeLimit: number;
   passingScore: number;
@@ -102,6 +115,22 @@ export interface CreateQuizData {
   isTemporary?: boolean;
 }
 
+// Admin controls interface
+export interface QuizAdminControls {
+  canPublish: boolean;
+  canUnpublish: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canViewAnalytics: boolean;
+  isAdmin: boolean;
+  isCreator: boolean;
+}
+
+// Enhanced Quiz interface with admin controls
+export interface QuizWithControls extends Quiz {
+  adminControls: QuizAdminControls;
+}
+
 /**
  * Create a new quiz
  */
@@ -120,7 +149,7 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
     const quizDoc: DatabaseQuiz = {
       title: quizData.title || 'Untitled Quiz',
       description: quizData.description || 'Quiz description not provided',
-      subject: quizData.subject || 'General',
+      subject: quizData.subject || 'Spreadsheets for Business Decisions',
       questions: cleanedQuestions,
       timeLimit: quizData.timeLimit || 30,
       passingScore: quizData.passingScore || 70,
@@ -130,6 +159,11 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
       isPublished: false,
       isTemporary: quizData.isTemporary || false
     };
+
+    // Validate subject is allowed
+    if (!ALLOWED_SUBJECTS.includes(quizDoc.subject as AllowedSubject)) {
+      throw new Error(`Subject must be one of: ${ALLOWED_SUBJECTS.join(', ')}`);
+    }
 
     // Additional validation before saving
     if (!quizDoc.createdBy) {
@@ -401,3 +435,125 @@ export async function deleteQuizResult(resultId: string): Promise<void> {
     throw new Error('Failed to delete quiz result');
   }
 }
+
+// Publish/Unpublish quiz functions
+export const publishQuiz = async (quizId: string, userId: string): Promise<void> => {
+  try {
+    const quizRef = doc(db, 'quizzes', quizId);
+    const quizDoc = await getDoc(quizRef);
+    
+    if (!quizDoc.exists()) {
+      throw new Error('Quiz not found');
+    }
+    
+    const quizData = quizDoc.data();
+    if (quizData.createdBy !== userId) {
+      throw new Error('Only the quiz creator can publish/unpublish');
+    }
+    
+    await updateDoc(quizRef, {
+      isPublished: true,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Error publishing quiz:', error);
+    throw error;
+  }
+};
+
+export const unpublishQuiz = async (quizId: string, userId: string): Promise<void> => {
+  try {
+    const quizRef = doc(db, 'quizzes', quizId);
+    const quizDoc = await getDoc(quizRef);
+    
+    if (!quizDoc.exists()) {
+      throw new Error('Quiz not found');
+    }
+    
+    const quizData = quizDoc.data();
+    if (quizData.createdBy !== userId) {
+      throw new Error('Only the quiz creator can publish/unpublish');
+    }
+    
+    await updateDoc(quizRef, {
+      isPublished: false,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Error unpublishing quiz:', error);
+    throw error;
+  }
+};
+
+// Get admin controls for a quiz
+export const getQuizAdminControls = async (quizId: string, userId: string): Promise<QuizAdminControls> => {
+  try {
+    const quizRef = doc(db, 'quizzes', quizId);
+    const quizDoc = await getDoc(quizRef);
+    
+    if (!quizDoc.exists()) {
+      throw new Error('Quiz not found');
+    }
+    
+    const quizData = quizDoc.data();
+    const isCreator = quizData.createdBy === userId;
+    
+    // Get user role from Firestore users collection
+    const userRole = await getUserRole(userId);
+    const isAdmin = userRole?.role === 'admin';
+    const isCreatorRole = userRole?.role === 'creator';
+    
+    return {
+      canPublish: (isCreator || isAdmin) && !quizData.isPublished,
+      canUnpublish: (isCreator || isAdmin) && quizData.isPublished,
+      canEdit: isCreator || isAdmin || isCreatorRole,
+      canDelete: isCreator || isAdmin,
+      canViewAnalytics: isCreator || isAdmin,
+      isAdmin,
+      isCreator: isCreator || isCreatorRole
+    };
+  } catch (error) {
+    console.error('Error getting admin controls:', error);
+    throw error;
+  }
+};
+
+// Get quizzes with admin controls
+export const getUserQuizzesWithControls = async (userId: string): Promise<QuizWithControls[]> => {
+  try {
+    const quizzesQuery = query(
+      collection(db, 'quizzes'),
+      where('createdBy', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(quizzesQuery);
+    const quizzes: QuizWithControls[] = [];
+    
+    for (const doc of querySnapshot.docs) {
+      const quizData = doc.data();
+      const adminControls = await getQuizAdminControls(doc.id, userId);
+      
+      quizzes.push({
+        id: doc.id,
+        title: quizData.title,
+        description: quizData.description,
+        subject: quizData.subject,
+        questions: quizData.questions,
+        timeLimit: quizData.timeLimit,
+        passingScore: quizData.passingScore,
+        createdBy: quizData.createdBy,
+        createdAt: quizData.createdAt?.toDate() || new Date(),
+        updatedAt: quizData.updatedAt?.toDate() || new Date(),
+        isPublished: quizData.isPublished || false,
+        isTemporary: quizData.isTemporary || false,
+        adminControls
+      });
+    }
+    
+    return quizzes;
+  } catch (error) {
+    console.error('Error getting user quizzes with controls:', error);
+    throw error;
+  }
+};

@@ -4,6 +4,13 @@ import mongoose from 'mongoose';
 
 export async function GET(request: NextRequest) {
   try {
+    // Short-circuit: skip MongoDB test if not explicitly enabled
+    if (process.env.ENABLE_MONGODB_TEST !== 'true') {
+      return NextResponse.json({
+        success: true,
+        message: 'MongoDB test disabled',
+      });
+    }
     console.log('🔗 Testing MongoDB connection...');
     
     // Test the connection

@@ -324,6 +324,19 @@ export class LiveQuizService {
     }
   }
 
+  // Unpublish a quiz (back to draft)
+  async unpublishQuiz(quizId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'liveQuizzes', quizId);
+      await updateDoc(docRef, {
+        status: 'draft'
+      });
+    } catch (error) {
+      console.error('Error unpublishing quiz:', error);
+      throw error;
+    }
+  }
+
   // Register participant for a quiz
   async registerParticipant(quizId: string, userId: string, name: string): Promise<void> {
     try {
@@ -446,6 +459,17 @@ export class LiveQuizService {
       await batch.commit();
     } catch (error) {
       console.error('Error completing quiz:', error);
+      throw error;
+    }
+  }
+
+  // Delete a quiz
+  async deleteQuiz(quizId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'liveQuizzes', quizId);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
       throw error;
     }
   }
