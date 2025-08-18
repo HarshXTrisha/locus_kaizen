@@ -18,7 +18,7 @@ import { FileUploadArea } from '@/components/upload/FileUploadArea';
 import { PDFUploadArea } from '@/components/upload/PDFUploadArea';
 
 export default function IIMBBADBEPage() {
-  const { user } = useAppStore();
+  const { user, sidebarOpen } = useAppStore();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showQuizCreator, setShowQuizCreator] = useState(false);
   const [lastCreatedQuiz, setLastCreatedQuiz] = useState<{ id: string; link: string } | null>(null);
@@ -251,13 +251,8 @@ export default function IIMBBADBEPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* IIM BBA DBE Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
-        <IIMSidebar />
-      </div>
-      
-      {/* Main Content with Sidebar Offset */}
-      <div className="ml-64">
+      <IIMSidebar />
+      <div className={`ml-0 transition-[margin] duration-300 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-20'}`}>
         {/* Header */}
         <div className="bg-white shadow-sm border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

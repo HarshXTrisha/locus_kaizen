@@ -44,7 +44,7 @@ export default function UploadPage() {
     description: '',
     subject: '',
     timeLimit: 30,
-            passingScore: 0
+    passingScore: 0
   });
 
   useEffect(() => {
@@ -135,60 +135,133 @@ export default function UploadPage() {
 
   return (
     <ResponsiveLayout>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Quiz</h1>
           <p className="text-gray-600">Upload JSON files, PDF documents, or TXT files to create quizzes</p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab('json')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'json'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <FileJson className="inline-block w-4 h-4 mr-2" />
-                JSON Upload
-              </button>
-              <button
-                onClick={() => setActiveTab('pdf')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'pdf'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <FileText className="inline-block w-4 h-4 mr-2" />
-                PDF Upload
-              </button>
-              <button
-                onClick={() => setActiveTab('txt')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'txt'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <FileText className="inline-block w-4 h-4 mr-2" />
-                TXT Upload
-              </button>
-            </nav>
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Quiz Details */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quiz Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quiz Title *
+                </label>
+                <input
+                  type="text"
+                  value={quizData.title}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter quiz title"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Subject
+                </label>
+                <select
+                  value={quizData.subject}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select a subject</option>
+                  {ALLOWED_SUBJECTS.map(subject => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Time Limit (minutes)
+                </label>
+                <input
+                  type="number"
+                  value={quizData.timeLimit}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 30 }))}
+                  placeholder="30"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  min="1"
+                  max="180"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Passing Score (%)
+                </label>
+                <input
+                  type="number"
+                  value={quizData.passingScore}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 0 }))}
+                  placeholder="0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  min="0"
+                  max="100"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={quizData.description}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Enter quiz description"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upload Area */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold mb-4">
-              {activeTab === 'json' ? 'Upload JSON Files' : activeTab === 'pdf' ? 'Upload PDF Document' : 'Upload TXT Document'}
-            </h2>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload Files</h2>
+            
+            {/* Tab Navigation */}
+            <div className="mb-6">
+              <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8">
+                  <button
+                    onClick={() => setActiveTab('json')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'json'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <FileJson className="inline-block w-4 h-4 mr-2" />
+                    JSON Upload
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('pdf')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'pdf'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <FileText className="inline-block w-4 h-4 mr-2" />
+                    PDF Upload
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('txt')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'txt'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <FileText className="inline-block w-4 h-4 mr-2" />
+                    TXT Upload
+                  </button>
+                </nav>
+              </div>
+            </div>
             
             {activeTab === 'json' ? (
               <FileUploadArea onQuestionsExtracted={handleQuestionsExtracted} />
@@ -199,9 +272,9 @@ export default function UploadPage() {
             )}
           </div>
 
-          {/* Quiz Preview */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold mb-4">Quiz Details</h2>
+          {/* Upload Quiz Section */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload Quiz</h2>
             
             {extractedQuestions.length === 0 ? (
               <EmptyState
@@ -212,83 +285,6 @@ export default function UploadPage() {
               />
             ) : (
               <div className="space-y-4">
-                {/* Quiz Form */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Quiz Title
-                    </label>
-                    <input
-                      type="text"
-                      value={quizData.title}
-                      onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter quiz title"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description
-                    </label>
-                    <textarea
-                      value={quizData.description}
-                      onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder="Enter quiz description"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Subject
-                    </label>
-                    <select
-                      value={quizData.subject}
-                      onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Select a subject</option>
-                      {ALLOWED_SUBJECTS.map(subject => (
-                        <option key={subject} value={subject}>
-                          {subject}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Time Limit (minutes)
-                      </label>
-                      <input
-                        type="number"
-                        value={quizData.timeLimit}
-                        onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 30 }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        min="1"
-                        max="180"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Passing Score (%)
-                      </label>
-                      <input
-                        type="number"
-                        value={quizData.passingScore}
-                        onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        min="0"
-                        max="100"
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 {/* Questions Summary */}
                 <div className="border-t pt-4">
                   <h3 className="text-lg font-medium mb-3">Questions ({extractedQuestions.length})</h3>
