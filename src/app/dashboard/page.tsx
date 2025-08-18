@@ -25,6 +25,12 @@ export default function DashboardPage() {
   });
   const [deletingQuiz, setDeletingQuiz] = useState<string | null>(null);
   const [deletingResult, setDeletingResult] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{
+    open: boolean;
+    kind: 'quiz' | 'result' | null;
+    id: string | null;
+    title: string;
+  }>({ open: false, kind: null, id: null, title: '' });
 
   const loadDashboardData = useCallback(async () => {
     try {
@@ -100,45 +106,47 @@ export default function DashboardPage() {
     return `${minutes}m`;
   };
 
-  const handleDeleteQuiz = async (quizId: string, quizTitle: string) => {
-    if (!confirm(`Are you sure you want to delete "${quizTitle}"? This action cannot be undone.`)) {
-      return;
-    }
-
-    try {
-      setDeletingQuiz(quizId);
-      await deleteQuiz(quizId);
-      
-      // Remove from local state
-      setQuizzes(prev => prev.filter(quiz => quiz.id !== quizId));
-      
-      showSuccess('Quiz Deleted', `"${quizTitle}" has been successfully deleted.`);
-    } catch (error) {
-      console.error('Error deleting quiz:', error);
-      showError('Failed to delete quiz', 'An error occurred while deleting the quiz.');
-    } finally {
-      setDeletingQuiz(null);
-    }
+  const handleDeleteQuiz = (quizId: string, quizTitle: string) => {
+    setConfirmDelete({ open: true, kind: 'quiz', id: quizId, title: quizTitle });
   };
 
-  const handleDeleteResult = async (resultId: string, quizTitle: string) => {
-    if (!confirm(`Are you sure you want to delete the result for "${quizTitle}"? This action cannot be undone.`)) {
-      return;
-    }
+  const handleDeleteResult = (resultId: string, quizTitle: string) => {
+    setConfirmDelete({ open: true, kind: 'result', id: resultId, title: quizTitle });
+  };
 
-    try {
-      setDeletingResult(resultId);
-      await deleteQuizResult(resultId);
-      
-      // Remove from local state
-      setResults(prev => prev.filter(result => result.id !== resultId));
-      
-      showSuccess('Result Deleted', `Result for "${quizTitle}" has been successfully deleted.`);
-    } catch (error) {
-      console.error('Error deleting result:', error);
-      showError('Failed to delete result', 'An error occurred while deleting the result.');
-    } finally {
-      setDeletingResult(null);
+  const closeConfirmModal = () => {
+    setConfirmDelete({ open: false, kind: null, id: null, title: '' });
+  };
+
+  const confirmDeletion = async () => {
+    if (!confirmDelete.open || !confirmDelete.id || !confirmDelete.kind) return;
+
+    if (confirmDelete.kind === 'quiz') {
+      try {
+        setDeletingQuiz(confirmDelete.id);
+        await deleteQuiz(confirmDelete.id);
+        setQuizzes(prev => prev.filter(quiz => quiz.id !== confirmDelete.id));
+        showSuccess('Quiz deleted', `"${confirmDelete.title}" has been permanently removed.`);
+      } catch (error) {
+        console.error('Error deleting quiz:', error);
+        showError('Failed to delete quiz', 'An error occurred while deleting the quiz.');
+      } finally {
+        setDeletingQuiz(null);
+        closeConfirmModal();
+      }
+    } else if (confirmDelete.kind === 'result') {
+      try {
+        setDeletingResult(confirmDelete.id);
+        await deleteQuizResult(confirmDelete.id);
+        setResults(prev => prev.filter(result => result.id !== confirmDelete.id));
+        showSuccess('Result deleted', `Result for "${confirmDelete.title}" has been permanently removed.`);
+      } catch (error) {
+        console.error('Error deleting result:', error);
+        showError('Failed to delete result', 'An error occurred while deleting the result.');
+      } finally {
+        setDeletingResult(null);
+        closeConfirmModal();
+      }
     }
   };
 
@@ -424,6 +432,53 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      {confirmDelete.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={closeConfirmModal} />
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="relative bg-white rounded-xl border border-gray-200 shadow-2xl w-full max-w-md mx-4 p-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-2 rounded-full bg-red-100 text-red-600">
+                <AlertCircle className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                  {confirmDelete.kind === 'quiz' ? 'Delete quiz?' : 'Delete result?'}
+                </h3>
+                <p className="text-sm text-gray-700 mb-2">{confirmDelete.title}</p>
+                <p className="text-sm text-gray-600">
+                  This action is permanent. Once deleted, you will no longer be able to access this {confirmDelete.kind === 'quiz' ? 'quiz' : 'result'}. This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                onClick={closeConfirmModal}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeletion}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+                disabled={
+                  (confirmDelete.kind === 'quiz' && deletingQuiz === confirmDelete.id) ||
+                  (confirmDelete.kind === 'result' && deletingResult === confirmDelete.id)
+                }
+              >
+                {((confirmDelete.kind === 'quiz' && deletingQuiz === confirmDelete.id) ||
+                  (confirmDelete.kind === 'result' && deletingResult === confirmDelete.id)) && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
