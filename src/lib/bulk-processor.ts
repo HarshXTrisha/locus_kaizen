@@ -60,12 +60,7 @@ export class BulkProcessor {
         }
 
         // Add questions to collection
-        const questionsWithSource = quiz.questions.map(q => ({
-          ...q,
-          sourceFile: file.name
-        }));
-
-        allQuestions.push(...questionsWithSource);
+        allQuestions.push(...quiz.questions);
         totalQuestions += quiz.questions.length;
         successfulFiles++;
 
@@ -133,9 +128,9 @@ export class BulkProcessor {
         // This is a duplicate
         const existing = duplicateMap.get(normalizedText);
         if (existing) {
-          existing.push({ question, file: question.sourceFile || 'unknown' });
+          existing.push({ question, file: 'unknown' });
         } else {
-          duplicateMap.set(normalizedText, [{ question, file: question.sourceFile || 'unknown' }]);
+          duplicateMap.set(normalizedText, [{ question, file: 'unknown' }]);
         }
       } else {
         // This is unique
@@ -185,11 +180,7 @@ export class BulkProcessor {
     let totalQuestions = 0;
 
     quizzes.forEach(quiz => {
-      const questionsWithSource = quiz.questions.map(q => ({
-        ...q,
-        sourceFile: quiz.title
-      }));
-      allQuestions.push(...questionsWithSource);
+      allQuestions.push(...quiz.questions);
       totalQuestions += quiz.questions.length;
     });
 

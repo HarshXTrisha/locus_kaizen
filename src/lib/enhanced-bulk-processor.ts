@@ -96,12 +96,8 @@ export class EnhancedBulkProcessor {
           throw new Error('Unsupported file type');
         }
 
-        // Add source file information
-        const questionsWithSource = quiz.questions.map(q => ({
-          ...q,
-          sourceFile: file.name,
-          processedAt: new Date().toISOString()
-        }));
+        // Use questions directly
+        const questionsWithSource = quiz.questions;
 
         // Apply merge strategy
         const mergeResult = await this.applyMergeStrategy(
@@ -277,14 +273,14 @@ export class EnhancedBulkProcessor {
       const similarQuestion = this.findSimilarQuestion(newQ, existing);
       
       if (similarQuestion) {
-        conflicts.push({
-          questionId: newQ.id,
-          originalText: similarQuestion.text,
-          newText: newQ.text,
-          sourceFile: newQ.sourceFile || 'unknown',
-          conflictType: 'similar',
-          resolution: 'skip'
-        });
+                 conflicts.push({
+           questionId: newQ.id,
+           originalText: similarQuestion.text,
+           newText: newQ.text,
+           sourceFile: 'unknown',
+           conflictType: 'similar',
+           resolution: 'skip'
+         });
       } else {
         merged.push(newQ);
       }
@@ -308,23 +304,23 @@ export class EnhancedBulkProcessor {
       const similar = this.findSimilarQuestion(newQ, existing);
       
       if (duplicate) {
-        conflicts.push({
-          questionId: newQ.id,
-          originalText: duplicate.text,
-          newText: newQ.text,
-          sourceFile: newQ.sourceFile || 'unknown',
-          conflictType: 'duplicate',
-          resolution: 'skip'
-        });
+               conflicts.push({
+         questionId: newQ.id,
+         originalText: duplicate.text,
+         newText: newQ.text,
+         sourceFile: 'unknown',
+         conflictType: 'duplicate',
+         resolution: 'skip'
+       });
       } else if (similar) {
-        conflicts.push({
-          questionId: newQ.id,
-          originalText: similar.text,
-          newText: newQ.text,
-          sourceFile: newQ.sourceFile || 'unknown',
-          conflictType: 'similar',
-          resolution: 'merge'
-        });
+                 conflicts.push({
+           questionId: newQ.id,
+           originalText: similar.text,
+           newText: newQ.text,
+           sourceFile: 'unknown',
+           conflictType: 'similar',
+           resolution: 'merge'
+         });
         // Merge similar questions
         const mergedQuestion = this.mergeQuestions(similar, newQ);
         const index = merged.findIndex(q => q.id === similar.id);
@@ -359,14 +355,14 @@ export class EnhancedBulkProcessor {
         );
         
         if (existingQuestion) {
-          conflicts.push({
-            questionId: question.id,
-            originalText: existingQuestion.text,
-            newText: question.text,
-            sourceFile: question.sourceFile || 'unknown',
-            conflictType: 'duplicate',
-            resolution: 'skip'
-          });
+                   conflicts.push({
+           questionId: question.id,
+           originalText: existingQuestion.text,
+           newText: question.text,
+           sourceFile: 'unknown',
+           conflictType: 'duplicate',
+           resolution: 'skip'
+         });
         }
       } else {
         processedTexts.add(normalizedText);
@@ -425,15 +421,14 @@ export class EnhancedBulkProcessor {
    * Merge two similar questions
    */
   private static mergeQuestions(q1: ExtractedQuestion, q2: ExtractedQuestion): ExtractedQuestion {
-    return {
-      ...q1,
-      text: q1.text.length > q2.text.length ? q1.text : q2.text,
-      options: q1.options && q2.options ? 
-        [...new Set([...q1.options, ...q2.options])] : 
-        q1.options || q2.options,
-      correctAnswer: q1.correctAnswer || q2.correctAnswer,
-      sourceFile: `${q1.sourceFile}, ${q2.sourceFile}`
-    };
+         return {
+       ...q1,
+       text: q1.text.length > q2.text.length ? q1.text : q2.text,
+       options: q1.options && q2.options ? 
+         [...new Set([...q1.options, ...q2.options])] : 
+         q1.options || q2.options,
+       correctAnswer: q1.correctAnswer || q2.correctAnswer
+     };
   }
 
   /**
@@ -471,16 +466,8 @@ export class EnhancedBulkProcessor {
    * Detect subject from merged questions
    */
   private static detectMergedSubject(questions: ExtractedQuestion[]): string {
-    const subjects = questions.map(q => q.subject || 'General');
-    const subjectCounts = subjects.reduce((acc, subject) => {
-      acc[subject] = (acc[subject] || 0) + 1;
-      return acc;
-    }, {} as { [key: string]: number });
-
-    const mostCommon = Object.entries(subjectCounts)
-      .sort(([,a], [,b]) => b - a)[0];
-
-    return mostCommon ? mostCommon[0] : 'General';
+    // Since ExtractedQuestion doesn't have subject, default to 'General'
+    return 'General';
   }
 
   /**
