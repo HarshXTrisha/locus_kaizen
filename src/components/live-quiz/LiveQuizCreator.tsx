@@ -114,7 +114,9 @@ export default function LiveQuizCreator({ onQuizCreated, onCancel }: LiveQuizCre
         }
       };
 
-      const quizId = await liveQuizService.createLiveQuiz(quizPayload, 'current-user-id'); // TODO: Get actual user ID
+      // Get current user ID from localStorage or generate a temporary one
+      const currentUserId = localStorage.getItem('liveQuizUserId') || `temp_${Date.now()}`;
+      const quizId = await liveQuizService.createLiveQuiz(quizPayload, currentUserId);
       
       setSuccess('Live quiz created successfully!');
       setTimeout(() => {

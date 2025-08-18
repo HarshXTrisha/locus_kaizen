@@ -68,9 +68,11 @@ export default function IIMBBADBEPage() {
       // Update stats when quizzes change
       const totalQuizzes = quizzes.length;
       const activeParticipants = quizzes.reduce((sum, quiz) => sum + (quiz.currentParticipants || 0), 0);
-      const totalParticipants = quizzes.reduce((sum, quiz) => sum + (quiz.totalParticipants || 0), 0);
-      const averageScore = quizzes.length > 0 
-        ? Math.round(quizzes.reduce((sum, quiz) => sum + (quiz.averageScore || 0), 0) / quizzes.length)
+      const totalParticipants = quizzes.reduce((sum, quiz) => sum + (quiz.participants?.length || 0), 0);
+      // Calculate average score from participants
+      const allParticipants = quizzes.flatMap(quiz => quiz.participants || []);
+      const averageScore = allParticipants.length > 0 
+        ? Math.round(allParticipants.reduce((sum, participant) => sum + (participant.score || 0), 0) / allParticipants.length)
         : 0;
       
       setStats({
@@ -266,7 +268,7 @@ export default function IIMBBADBEPage() {
                 
                 {upcomingQuizzes.length === 0 ? (
                   <EmptyState
-                    type="empty"
+                    type="quiz"
                     title="No Upcoming Quizzes"
                     description="Create your first live quiz to get started"
                     actionLabel="Create Quiz"
