@@ -144,9 +144,22 @@ export class PDFProcessor {
       warnings: [] as string[]
     };
     
+    // ENHANCED: Handle continuous text without line breaks
+    let processedText = text;
+    
+    // If we have very few lines but lots of text, it's likely continuous
     const lines = text.split('\n').filter(line => line.trim());
-    parsingStats.totalLines = lines.length;
-    console.log('Number of non-empty lines:', lines.length);
+    if (lines.length <= 3 && text.length > 100) {
+      console.log('🔧 Detected continuous text - applying enhanced parsing...');
+      // Add spaces before question numbers to help with parsing
+      processedText = text.replace(/([A-D]\))([A-Z])/g, '$1 $2');
+      processedText = processedText.replace(/(\d+\.)([A-Z])/g, '$1 $2');
+      processedText = processedText.replace(/(Q\d+\.)([A-Z])/g, '$1 $2');
+    }
+    
+    const processedLines = processedText.split('\n').filter(line => line.trim());
+    parsingStats.totalLines = processedLines.length;
+    console.log('Number of non-empty lines:', processedLines.length);
     
     // CRITICAL #4: Fallback Mechanisms - Multiple parsing strategies
     const questions: ExtractedQuestion[] = [];
@@ -156,8 +169,8 @@ export class PDFProcessor {
     let inAnswerKey = false;
     let parsingStrategy = 'standard'; // Track which strategy we're using
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+    for (let i = 0; i < processedLines.length; i++) {
+      const line = processedLines[i];
       const trimmedLine = line.trim();
       
       console.log(`Line ${i + 1}:`, trimmedLine);
@@ -230,6 +243,54 @@ export class PDFProcessor {
         };
         questionCounter++;
         continue;
+      }
+
+      // ENHANCED: Handle continuous text by splitting on question patterns
+      if (lines.length <= 3 && text.length > 100) {
+        // Try to split the entire text into questions
+        const questionSplits = trimmedLine.split(/(?=Q\d+\.|Question\d+\.|\d+\.)/i);
+        if (questionSplits.length > 1) {
+          console.log(`🔧 Found ${questionSplits.length} potential questions in continuous text`);
+          parsingStrategy = 'continuous-text';
+          
+          for (const split of questionSplits) {
+            if (split.trim().length < 10) continue; // Skip very short splits
+            
+            // Process each split as a potential question
+            const questionText = split.trim();
+            console.log(`🔍 Processing split:`, questionText.substring(0, 50) + '...');
+            
+            // Extract question number and text
+            const qMatch = questionText.match(/^(?:Q|Question)?(\d+)[\.:\)]?\s*(.+)$/i);
+            if (qMatch) {
+              const qNum = parseInt(qMatch[1]);
+              const qText = qMatch[2];
+              
+              // Save previous question if exists
+              if (currentQuestion && currentQuestion.text) {
+                const validation = this.validateQuestion(currentQuestion, questionCounter - 1);
+                if (validation.isValid) {
+                  const finalizedQuestion = this.finalizeQuestion(currentQuestion, questionCounter - 1, answerKey[questionCounter - 1]);
+                  questions.push(finalizedQuestion);
+                  console.log(`✅ Added validated question ${questionCounter - 1}:`, finalizedQuestion);
+                }
+              }
+              
+              // Start new question
+              currentQuestion = {
+                id: `q${qNum}`,
+                text: qText.trim(),
+                type: 'multiple-choice',
+                options: [],
+                correctAnswer: '',
+                points: 1
+              };
+              questionCounter = qNum + 1;
+              parsingStats.questionsFound++;
+            }
+          }
+          continue;
+        }
       }
 
       // Check for question number without text (e.g., "Q1." on one line, question text on next)
