@@ -1,13 +1,10 @@
 'use client'; // This component requires client-side state for the tabs
 
 import React, { useState } from 'react';
-import { UploadCloud, Plus, FileText } from 'lucide-react';
-import { PDFUploadArea } from '@/components/upload/PDFUploadArea';
-import { ExtractedQuiz } from '@/lib/pdf-processor';
+import { UploadCloud, Plus } from 'lucide-react';
 
 export function AddQuestionsCard() {
   const [activeTab, setActiveTab] = useState('manual');
-  const [extractedQuiz, setExtractedQuiz] = useState<ExtractedQuiz | null>(null);
 
   return (
     <div className="rounded-lg border border-[#E9ECEF] bg-white">
@@ -34,16 +31,7 @@ export function AddQuestionsCard() {
           >
             Bulk Upload
           </button>
-          <button
-            onClick={() => setActiveTab('pdf')}
-            className={`shrink-0 border-b-2 px-1 pb-4 text-sm font-medium ${
-              activeTab === 'pdf'
-                ? 'border-[#20C997] text-[#20C997]'
-                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-            }`}
-          >
-            PDF Upload
-          </button>
+
         </nav>
       </div>
 
@@ -98,24 +86,7 @@ export function AddQuestionsCard() {
           </div>
         )}
 
-        {activeTab === 'pdf' && (
-          <div>
-            {/* PDF Upload View */}
-            <PDFUploadArea
-              onQuizExtracted={(quiz) => {
-                setExtractedQuiz(quiz);
-                console.log('Extracted quiz:', quiz);
-                // Here you would typically save the quiz to your database
-              }}
-              onUploadStart={() => {
-                console.log('PDF upload started');
-              }}
-              onUploadComplete={() => {
-                console.log('PDF upload completed');
-              }}
-            />
-          </div>
-        )}
+
       </div>
     </div>
   );

@@ -5,8 +5,8 @@ if (typeof window !== 'undefined') {
   // Only import pdf.js on the client side
   import('pdfjs-dist').then((module) => {
     pdfjsLib = module;
-    // Set worker source to a reliable CDN
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+    // Disable worker to avoid CDN issues - use main thread instead
+    pdfjsLib.GlobalWorkerOptions.workerSrc = false;
   });
 }
 
