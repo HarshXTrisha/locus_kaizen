@@ -1,0 +1,38 @@
+QUIZ TITLE: General Knowledge
+
+Q1. What is the capital of France?
+A) London
+B) Paris ✓
+C) Berlin
+D) Madrid
+
+Q2. Which planet is known as the Red Planet?
+A) Venus
+B) Jupiter
+C) Mars ✓
+D) Saturn
+
+Q3. What is the largest mammal in the world?
+A) Elephant
+B) Blue Whale ✓
+C) Giraffe
+D) Great White Shark
+
+Q4. Who wrote the play "Romeo and Juliet"?
+A) Charles Dickens
+B) William Shakespeare ✓
+C) Jane Austen
+D) Mark Twain
+
+Q5. What is the chemical symbol for water?
+A) O2
+B) CO2
+C) H2O ✓
+D) NaCl
+
+ANSWER KEY:
+Q1: B
+Q2: C
+Q3: B
+Q4: B
+Q5: C

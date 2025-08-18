@@ -212,7 +212,7 @@ export default function UploadPage() {
               >
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
-                  PDF Upload
+                  PDF/TXT Upload
                 </div>
               </button>
             </nav>
