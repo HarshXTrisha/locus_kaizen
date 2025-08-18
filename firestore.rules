@@ -20,6 +20,16 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
+    function isModerator() {
+      // Check if user has moderator role in users collection
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'moderator';
+    }
+    
+    function isAdminOrModerator() {
+      return isAdmin() || isModerator();
+    }
+    
     function isPublished(quizData) {
       return quizData.isPublished == true;
     }
@@ -41,10 +51,11 @@ service cloud.firestore {
       
       // Allow update if:
       // - User is authenticated AND
-      // - User is creator OR user is admin
+      // - User is creator OR user is admin OR user is moderator
       allow update: if isAuthenticated() && (
         isCreator(resource.data) || 
-        isAdmin()
+        isAdmin() ||
+        isModerator()
       );
       
       // Allow delete if:
@@ -63,10 +74,11 @@ service cloud.firestore {
     match /quizResults/{resultId} {
       // Allow read if:
       // - User is authenticated AND
-      // - User owns the result OR user is admin OR user is quiz creator
+      // - User owns the result OR user is admin OR user is moderator OR user is quiz creator
       allow read: if isAuthenticated() && (
         isOwner(resource.data.userId) || 
         isAdmin() ||
+        isModerator() ||
         isCreator(get(/databases/$(database)/documents/quizzes/$(resource.data.quizId)).data)
       );
       
@@ -116,9 +128,10 @@ service cloud.firestore {
     
     // Analytics collection for quiz performance data
     match /analytics/{analyticsId} {
-      // Allow read if user is admin or quiz creator
+      // Allow read if user is admin, moderator, or quiz creator
       allow read: if isAuthenticated() && (
         isAdmin() ||
+        isModerator() ||
         isCreator(get(/databases/$(database)/documents/quizzes/$(resource.data.quizId)).data)
       );
       

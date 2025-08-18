@@ -502,16 +502,16 @@ export const getQuizAdminControls = async (quizId: string, userId: string): Prom
     // Get user role from Firestore users collection
     const userRole = await getUserRole(userId);
     const isAdmin = userRole?.role === 'admin';
-    const isCreatorRole = userRole?.role === 'creator';
+    const isModerator = userRole?.role === 'moderator';
     
     return {
-      canPublish: (isCreator || isAdmin) && !quizData.isPublished,
+      canPublish: (isCreator || isAdmin || isModerator) && !quizData.isPublished,
       canUnpublish: (isCreator || isAdmin) && quizData.isPublished,
-      canEdit: isCreator || isAdmin || isCreatorRole,
+      canEdit: isCreator || isAdmin || isModerator,
       canDelete: isCreator || isAdmin,
-      canViewAnalytics: isCreator || isAdmin,
+      canViewAnalytics: isCreator || isAdmin || isModerator,
       isAdmin,
-      isCreator: isCreator || isCreatorRole
+      isCreator: isCreator || isModerator
     };
   } catch (error) {
     console.error('Error getting admin controls:', error);
@@ -560,7 +560,7 @@ export const getUserQuizzesWithControls = async (userId: string): Promise<QuizWi
 };
 
 // Set user role in Firestore
-export async function setUserRole(userId: string, role: 'user' | 'admin' | 'creator') {
+export async function setUserRole(userId: string, role: 'user' | 'admin' | 'moderator') {
   try {
     const userRef = doc(db, 'users', userId);
     await setDoc(userRef, { role }, { merge: true });
@@ -585,5 +585,71 @@ export async function getUserRole(userId: string): Promise<{ role: string } | nu
   } catch (error) {
     console.error('Error getting user role:', error);
     return null;
+  }
+}
+
+// Set admin user (for spycook.jjn007@gmail.com)
+export async function setAdminUser() {
+  try {
+    // First, find the user by email
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', 'spycook.jjn007@gmail.com'));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      await setUserRole(userDoc.id, 'admin');
+      console.log('Admin role set for spycook.jjn007@gmail.com');
+      return userDoc.id;
+    } else {
+      console.log('User spycook.jjn007@gmail.com not found');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error setting admin user:', error);
+    throw error;
+  }
+}
+
+// Get all team members with their roles
+export async function getTeamMembers(): Promise<Array<{
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  createdAt: Date;
+}>> {
+  try {
+    const usersRef = collection(db, 'users');
+    const querySnapshot = await getDocs(usersRef);
+    
+    const teamMembers = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        email: data.email || '',
+        name: data.name || data.displayName || 'Unknown User',
+        role: data.role || 'user',
+        createdAt: data.createdAt?.toDate() || new Date()
+      };
+    });
+    
+    // Sort by role (admin first, then moderator, then user)
+    const roleOrder = { admin: 0, moderator: 1, user: 2 };
+    return teamMembers.sort((a, b) => roleOrder[a.role as keyof typeof roleOrder] - roleOrder[b.role as keyof typeof roleOrder]);
+  } catch (error) {
+    console.error('Error getting team members:', error);
+    throw error;
+  }
+}
+
+// Update team member role
+export async function updateTeamMemberRole(userId: string, newRole: 'user' | 'admin' | 'moderator') {
+  try {
+    await setUserRole(userId, newRole);
+    console.log(`Team member role updated to ${newRole} for user ${userId}`);
+  } catch (error) {
+    console.error('Error updating team member role:', error);
+    throw error;
   }
 }
