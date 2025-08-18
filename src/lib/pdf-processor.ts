@@ -31,14 +31,18 @@ export interface ExtractedQuiz {
 
 export class PDFProcessor {
   private static questionPatterns = {
-    questionNumber: /^Q(\d+)\.?\s*(.+)$/i,
-    optionA: /^A\)\s*(.+?)(?:\s*[✓*]|$)/i,
-    optionB: /^B\)\s*(.+?)(?:\s*[✓*]|$)/i,
-    optionC: /^C\)\s*(.+?)(?:\s*[✓*]|$)/i,
-    optionD: /^D\)\s*(.+?)(?:\s*[✓*]|$)/i,
-    trueFalse: /^(True|False)$/i,
-    answerKey: /^(?:ANSWERS?|ANSWER KEY):\s*$/i,
-    answerKeyEntry: /^Q(\d+):\s*([A-D])$/i,
+    // More flexible question patterns
+    questionNumber: /^(?:Q|Question)?(\d+)[\.:\)]?\s*(.+)$/i,
+    // Option patterns - more flexible
+    optionA: /^A[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
+    optionB: /^B[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
+    optionC: /^C[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
+    optionD: /^D[\.:\)]\s*(.+?)(?:\s*[✓*]|$)/i,
+    // Answer patterns
+    answerKey: /^(?:ANSWERS?|ANSWER KEY|Answer):\s*$/i,
+    answerKeyEntry: /^(?:Q|Question)?(\d+)[\.:\)]?\s*[A-D][\.:\)]?\s*(.+)$/i,
+    // Alternative answer format
+    answerLine: /^Answer:\s*[A-D][\.:\)]?\s*(.+)$/i,
   };
 
   /**
@@ -154,6 +158,25 @@ export class PDFProcessor {
         }
         continue;
       }
+
+      // Check for standalone answer lines (e.g., "Answer: C) Tokyo")
+      const answerLineMatch = trimmedLine.match(this.questionPatterns.answerLine);
+      if (answerLineMatch) {
+        console.log(`Found answer line:`, trimmedLine);
+        // Extract the option letter (A, B, C, or D)
+        const optionMatch = trimmedLine.match(/Answer:\s*([A-D])[\.:\)]?\s*(.+)$/i);
+        if (optionMatch && currentQuestion) {
+          const optionLetter = optionMatch[1];
+          const answerText = optionMatch[2].trim();
+          // Find the corresponding option text
+          const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+          if (currentQuestion.options && currentQuestion.options[optionIndex]) {
+            currentQuestion.correctAnswer = currentQuestion.options[optionIndex];
+            console.log(`Set correct answer to:`, currentQuestion.correctAnswer);
+          }
+        }
+        continue;
+      }
       
       // Check for question number
       const questionMatch = trimmedLine.match(this.questionPatterns.questionNumber);
@@ -178,6 +201,25 @@ export class PDFProcessor {
         };
         questionCounter++;
         continue;
+      }
+
+      // Fallback: If we find options without a question number, create a question
+      const hasOptions = this.questionPatterns.optionA.test(trimmedLine) || 
+                        this.questionPatterns.optionB.test(trimmedLine) || 
+                        this.questionPatterns.optionC.test(trimmedLine) || 
+                        this.questionPatterns.optionD.test(trimmedLine);
+      
+      if (hasOptions && !currentQuestion) {
+        console.log(`Found options without question number, creating question ${questionCounter}`);
+        currentQuestion = {
+          id: `q${questionCounter}`,
+          text: `Question ${questionCounter}`, // Default text
+          type: 'multiple-choice',
+          options: [],
+          correctAnswer: '',
+          points: 1
+        };
+        questionCounter++;
       }
 
       // Check for options
@@ -228,9 +270,31 @@ export class PDFProcessor {
             console.log(`Marked D as correct:`, optionText);
           }
         } else if (trimmedLine && currentQuestion.text && !trimmedLine.match(/^[A-D]\)/)) {
-          // Append to question text if it's not an option and not empty
-          currentQuestion.text += ' ' + trimmedLine;
-          console.log(`Appended to question text:`, trimmedLine);
+          // Check if this line contains multiple options (e.g., "B) Osaka C) Tokyo D) Hiroshima")
+          const multiOptionMatch = trimmedLine.match(/([A-D])[\.:\)]\s*([^A-D]+?)(?=\s+[A-D][\.:\)]|$)/gi);
+          if (multiOptionMatch && currentQuestion.options) {
+            console.log(`Found multiple options on same line:`, trimmedLine);
+            // Parse each option
+            multiOptionMatch.forEach(match => {
+              const optionMatch = match.match(/([A-D])[\.:\)]\s*(.+)/i);
+              if (optionMatch) {
+                const optionLetter = optionMatch[1];
+                const optionText = optionMatch[2].trim();
+                const optionIndex = optionLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+                
+                // Ensure we have enough options
+                while (currentQuestion.options!.length <= optionIndex) {
+                  currentQuestion.options!.push('');
+                }
+                currentQuestion.options![optionIndex] = optionText;
+                console.log(`Added option ${optionLetter}:`, optionText);
+              }
+            });
+          } else {
+            // Append to question text if it's not an option and not empty
+            currentQuestion.text += ' ' + trimmedLine;
+            console.log(`Appended to question text:`, trimmedLine);
+          }
         }
       }
     }
