@@ -13,11 +13,7 @@ import {
   BookOpen,
   BarChart3,
   Upload,
-  TrendingUp,
-  Star,
-  Users,
-  Zap,
-  Shield
+  TrendingUp
 } from '@/lib/icons';
 
 // Particle System Component
@@ -77,7 +73,6 @@ export default function Home() {
   const [scrollY, setScrollY] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [stats, setStats] = useState({ users: 0, quizzes: 0, questions: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -110,37 +105,7 @@ export default function Home() {
     }
   }, []);
 
-  // Animated statistics
-  useEffect(() => {
-    const animateStats = () => {
-      const targetStats = { users: 1250, quizzes: 3400, questions: 12500 };
-      const duration = 2000;
-      const steps = 60;
-      const stepDuration = duration / steps;
 
-      let currentStep = 0;
-      const interval = setInterval(() => {
-        currentStep++;
-        const progress = currentStep / steps;
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-
-        setStats({
-          users: Math.floor(targetStats.users * easeOut),
-          quizzes: Math.floor(targetStats.quizzes * easeOut),
-          questions: Math.floor(targetStats.questions * easeOut)
-        });
-
-        if (currentStep >= steps) {
-          clearInterval(interval);
-        }
-      }, stepDuration);
-
-      return () => clearInterval(interval);
-    };
-
-    const timer = setTimeout(animateStats, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -186,26 +151,7 @@ export default function Home() {
     }
   ];
 
-  const testimonials = [
-    {
-      name: "Dr. Sarah Johnson",
-      role: "University Professor",
-      content: "Locus has revolutionized how I create and manage assessments. The analytics are incredible!",
-      rating: 5
-    },
-    {
-      name: "Mike Chen",
-      role: "Corporate Trainer",
-      content: "The platform is intuitive and powerful. My team loves the interactive quiz features.",
-      rating: 5
-    },
-    {
-      name: "Emma Rodriguez",
-      role: "Online Educator",
-      content: "Perfect for remote learning. The real-time feedback helps students improve instantly.",
-      rating: 5
-    }
-  ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#E8F5E8] overflow-x-hidden">
@@ -331,30 +277,7 @@ export default function Home() {
             <span className="ml-2">- Continuous Improvement</span>
           </div>
 
-          {/* Statistics Section */}
-          <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-              <div className="flex items-center justify-center mb-2">
-                <Users className="h-6 w-6 text-[#20C997] mr-2" />
-                <span className="text-2xl font-bold text-[#212529]">{stats.users.toLocaleString()}+</span>
-              </div>
-              <p className="text-sm text-[#6C757D]">Active Users</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-              <div className="flex items-center justify-center mb-2">
-                <BookOpen className="h-6 w-6 text-[#20C997] mr-2" />
-                <span className="text-2xl font-bold text-[#212529]">{stats.quizzes.toLocaleString()}+</span>
-              </div>
-              <p className="text-sm text-[#6C757D]">Quizzes Created</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-              <div className="flex items-center justify-center mb-2">
-                <Zap className="h-6 w-6 text-[#20C997] mr-2" />
-                <span className="text-2xl font-bold text-[#212529]">{stats.questions.toLocaleString()}+</span>
-              </div>
-              <p className="text-sm text-[#6C757D]">Questions Answered</p>
-            </div>
-          </div>
+
 
           <div className={`flex flex-col sm:flex-row gap-6 justify-center transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             {isAuthenticated ? (
@@ -469,53 +392,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section with Glassmorphism */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-[#212529] mb-6 leading-tight tracking-tight">
-              What Our Users Say
-            </h2>
-            <p className="text-xl md:text-2xl text-[#6C757D] max-w-3xl mx-auto leading-relaxed font-normal">
-              Join thousands of educators and learners who trust Locus for their assessment needs.
-            </p>
-            <div className="flex items-center justify-center mt-6 text-sm text-[#6C757D] font-medium">
-              <span className="mr-2">Powered by</span>
-              <span className="font-semibold text-[#20C997]">Kaizen</span>
-              <span className="ml-2">- Continuous Improvement</span>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={index}
-                className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-2 group"
-              >
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-[#6C757D] mb-6 leading-relaxed font-normal italic">
-                  &ldquo;{testimonial.content}&rdquo;
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white font-bold text-lg">
-                      {testimonial.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-[#212529]">{testimonial.name}</h4>
-                    <p className="text-sm text-[#6C757D]">{testimonial.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* Quick Access Section with Enhanced Hover Effects */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
