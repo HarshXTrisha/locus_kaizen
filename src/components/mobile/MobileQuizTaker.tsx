@@ -114,6 +114,58 @@ export default function MobileQuizTaker() {
     loadQuiz();
   }, [quizId, user, isAuthenticated, router]);
 
+  const handleSubmit = useCallback(async () => {
+    if (!quizData || !user || isSubmitted) return;
+
+    try {
+      setSubmitting(true);
+      console.log('📱 Submitting quiz answers...');
+
+      // Calculate results
+      let correctAnswers = 0;
+      const totalQuestions = quizData.questions.length;
+      const timeTaken = (quizData.timeLimit * 60) - timeRemaining;
+
+      answers.forEach(answer => {
+        const question = quizData.questions.find(q => q.id === answer.questionId);
+        if (question && answer.selectedOption === question.options[question.correctAnswer]) {
+          correctAnswers++;
+        }
+      });
+
+      const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+      // Save result to Firebase
+      const resultId = await saveQuizResult({
+        quizId: quizData.id,
+        userId: user.id,
+        score,
+        totalQuestions,
+        correctAnswers,
+        timeTaken,
+        completedAt: new Date(),
+        answers: answers.map(answer => ({
+          questionId: answer.questionId,
+          userAnswer: answer.selectedOption,
+          isCorrect: quizData.questions.find(q => q.id === answer.questionId)?.options[quizData.questions.find(q => q.id === answer.questionId)?.correctAnswer || 0] === answer.selectedOption || false,
+          points: quizData.questions.find(q => q.id === answer.questionId)?.options[quizData.questions.find(q => q.id === answer.questionId)?.correctAnswer || 0] === answer.selectedOption ? 1 : 0
+        }))
+      });
+
+      console.log('📱 Quiz result saved:', resultId);
+      setIsSubmitted(true);
+      showSuccess('Quiz Completed!', `You scored ${score}% (${correctAnswers}/${totalQuestions} correct)`);
+      
+      // Navigate to results page
+      router.push(`/results/${resultId}`);
+    } catch (error) {
+      console.error('📱 Error submitting quiz:', error);
+      showError('Failed to submit quiz', 'Please try again');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [quizData, user, isSubmitted, timeRemaining, answers, router]);
+
   // Timer effect
   useEffect(() => {
     if (timeRemaining > 0 && !isSubmitted && quizData) {
@@ -175,61 +227,6 @@ export default function MobileQuizTaker() {
       setCurrentQuestion(prev => prev - 1);
     }
   }, [currentQuestion]);
-
-  const handleSubmit = useCallback(async () => {
-    if (!quizData || !user || isSubmitted) return;
-
-    try {
-      setSubmitting(true);
-      console.log('📱 Submitting quiz answers...');
-
-      // Calculate results
-      let correctAnswers = 0;
-      const totalQuestions = quizData.questions.length;
-      const timeTaken = (quizData.timeLimit * 60) - timeRemaining;
-
-      answers.forEach(answer => {
-        const question = quizData.questions.find(q => q.id === answer.questionId);
-        if (question && answer.selectedOption === question.options[question.correctAnswer]) {
-          correctAnswers++;
-        }
-      });
-
-      const score = Math.round((correctAnswers / totalQuestions) * 100);
-
-      // Save result to Firebase
-      const resultId = await saveQuizResult({
-        quizId: quizData.id,
-        userId: user.id,
-        score,
-        totalQuestions,
-        correctAnswers,
-        timeTaken,
-        completedAt: new Date(),
-        answers: answers.map(answer => ({
-          questionId: answer.questionId,
-          userAnswer: answer.selectedOption,
-          isCorrect: quizData.questions.find(q => q.id === answer.questionId)?.options[quizData.questions.find(q => q.id === answer.questionId)?.correctAnswer || 0] === answer.selectedOption || false,
-          points: quizData.questions.find(q => q.id === answer.questionId)?.options[quizData.questions.find(q => q.id === answer.questionId)?.correctAnswer || 0] === answer.selectedOption ? 1 : 0
-        }))
-      });
-
-      console.log('📱 Quiz result saved:', resultId);
-      setIsSubmitted(true);
-      showSuccess('Quiz Completed!', `You scored ${score}% (${correctAnswers}/${totalQuestions} correct)`);
-
-      // Navigate to results page
-      setTimeout(() => {
-        router.push(`/results/${resultId}`);
-      }, 2000);
-
-    } catch (error) {
-      console.error('❌ Error submitting quiz:', error);
-      showError('Submission Failed', 'Failed to submit quiz results');
-    } finally {
-      setSubmitting(false);
-    }
-  }, [quizData, user, answers, timeRemaining, isSubmitted, router]);
 
   // Question Navigation Component
   const QuestionNavigation = () => {
