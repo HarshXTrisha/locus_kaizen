@@ -8,6 +8,7 @@ import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
 import { PageTransition } from '@/components/common/PageTransition';
 import { PerformanceMonitor } from '@/components/common/PerformanceMonitor';
 import { QueryProvider } from '@/lib/query-client';
+import { MobileAppWrapper } from '@/components/mobile/MobileAppWrapper';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,7 +34,9 @@ export default function RootLayout({
               <ClientInit />
               <PerformanceMonitor />
               <PageTransition>
-                {children}
+                <MobileAppWrapper>
+                  {children}
+                </MobileAppWrapper>
               </PageTransition>
             </NotificationProvider>
           </AuthProvider>
