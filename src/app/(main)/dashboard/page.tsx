@@ -274,7 +274,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-
+          
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <div className="flex items-center">
               <div className="p-3 bg-yellow-100 rounded-xl">
@@ -504,9 +504,9 @@ export default function DashboardPage() {
                 Delete
               </button>
             </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }
