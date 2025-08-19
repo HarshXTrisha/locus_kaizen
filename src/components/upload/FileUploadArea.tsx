@@ -42,7 +42,7 @@ export function FileUploadArea({
   const downloadJSONTemplate = () => {
     const template = {
       title: "Sample MCQ Quiz",
-      description: "A comprehensive MCQ quiz covering multiple topics",
+      description: "A comprehensive MCQ quiz covering multiple topics (MCQ only - test portal requirement)",
       subject: "General Knowledge",
       questions: [
         {
@@ -144,7 +144,7 @@ export function FileUploadArea({
   const downloadTXTTemplate = () => {
     const template = `Quiz Title: Sample MCQ Quiz
 Subject: General Knowledge
-Description: A comprehensive MCQ quiz covering multiple topics
+Description: A comprehensive MCQ quiz covering multiple topics (MCQ only - test portal requirement)
 
 Q1. What is the capital of France?
 A) London
@@ -536,6 +536,17 @@ Correct Answer: C`;
               Drag and drop {fileType.toUpperCase()} files here, or click to browse. You can upload multiple files at once.
             </p>
             
+            {/* MCQ Only Notice */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+              <div className="flex items-center gap-2 text-yellow-800">
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-sm font-medium">Important: Test Portal Only Supports MCQ</span>
+              </div>
+              <p className="text-yellow-700 text-xs mt-1">
+                Only Multiple Choice Questions (MCQ) are supported in the test portal. True/False and Short Answer questions will not work properly.
+              </p>
+            </div>
+            
             {/* Supported Format */}
             <div className="flex justify-center gap-6 text-sm text-gray-500">
               <div className="flex items-center gap-2">
@@ -574,33 +585,17 @@ Correct Answer: C`;
           </p>
           
           {isJSON ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-1 gap-4 text-sm">
               <div className="bg-white p-3 rounded border border-blue-200">
-                <h6 className="font-medium text-blue-900 mb-1">Multiple Choice</h6>
-                <p className="text-blue-700 text-xs">Include options array with correctAnswer matching one option</p>
-              </div>
-                             <div className="bg-white p-3 rounded border border-blue-200">
-                 <h6 className="font-medium text-blue-900 mb-1">True/False</h6>
-                 <p className="text-blue-700 text-xs">Use options: [&quot;True&quot;, &quot;False&quot;] with correctAnswer: &quot;True&quot; or &quot;False&quot;</p>
-               </div>
-              <div className="bg-white p-3 rounded border border-blue-200">
-                <h6 className="font-medium text-blue-900 mb-1">Short Answer</h6>
-                <p className="text-blue-700 text-xs">No options needed, just correctAnswer text</p>
+                <h6 className="font-medium text-blue-900 mb-1">Multiple Choice Questions (MCQ) Only</h6>
+                <p className="text-blue-700 text-xs">Include options array with correctAnswer matching one option. <strong>Test portal only supports MCQ format.</strong></p>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-1 gap-4 text-sm">
               <div className="bg-white p-3 rounded border border-green-200">
-                <h6 className="font-medium text-green-900 mb-1">Multiple Choice</h6>
-                <p className="text-green-700 text-xs">Q1. Question text<br/>A) Option 1<br/>B) Option 2<br/>Correct Answer: A</p>
-              </div>
-              <div className="bg-white p-3 rounded border border-green-200">
-                <h6 className="font-medium text-green-900 mb-1">True/False</h6>
-                <p className="text-green-700 text-xs">Q1. Question text<br/>A) True<br/>B) False<br/>Correct Answer: A</p>
-              </div>
-              <div className="bg-white p-3 rounded border border-green-200">
-                <h6 className="font-medium text-green-900 mb-1">Short Answer</h6>
-                <p className="text-green-700 text-xs">Q1. Question text<br/>Correct Answer: Answer text</p>
+                <h6 className="font-medium text-green-900 mb-1">Multiple Choice Questions (MCQ) Only</h6>
+                <p className="text-green-700 text-xs">Q1. Question text<br/>A) Option 1<br/>B) Option 2<br/>C) Option 3<br/>D) Option 4<br/>Correct Answer: A<br/><strong>Test portal only supports MCQ format.</strong></p>
               </div>
             </div>
           )}

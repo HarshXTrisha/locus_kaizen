@@ -304,15 +304,27 @@ export default function MobileUpload() {
         {/* Instructions */}
         <div className={mobileClasses.card}>
           <h3 className={mobileClasses.text.h3 + " mb-3"}>How to Upload</h3>
+          
+          {/* MCQ Only Notice */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+            <div className="flex items-center gap-2 text-yellow-800">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm font-medium">Important: Test Portal Only Supports MCQ</span>
+            </div>
+            <p className="text-yellow-700 text-xs mt-1">
+              Only Multiple Choice Questions (MCQ) are supported in the test portal. True/False and Short Answer questions will not work properly.
+            </p>
+          </div>
+          
           <div className="space-y-2 text-sm text-gray-600">
             <div className="flex items-start gap-2">
               <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
-              <p><strong>JSON:</strong> Upload structured quiz data in JSON format</p>
+              <p><strong>JSON:</strong> Upload structured quiz data in JSON format (MCQ only)</p>
             </div>
 
             <div className="flex items-start gap-2">
               <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
-              <p><strong>TXT:</strong> Upload text files for question extraction</p>
+              <p><strong>TXT:</strong> Upload text files for question extraction (MCQ only)</p>
             </div>
           </div>
         </div>
