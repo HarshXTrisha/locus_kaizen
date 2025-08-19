@@ -1,9 +1,9 @@
 // Load Testing Configuration for 1000 Concurrent Users
-// This file contains the configuration for testing Locus with 1000 users simultaneously
+// This file contains the configuration for testing QuestAI with 1000 users simultaneously
 
 const loadTestConfig = {
   // Test Parameters
-  testName: "Locus 1000 User Load Test",
+  testName: "QuestAI 1000 User Load Test",
   targetUsers: 1000,
   rampUpTime: 300, // 5 minutes to reach 1000 users
   testDuration: 3600, // 1 hour test duration

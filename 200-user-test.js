@@ -37,7 +37,7 @@ const testUsers = [];
 for (let i = 0; i < 200; i++) {
   testUsers.push({
     id: `test_user_${i}`,
-    email: `testuser${i}@locus-test.com`,
+    email: `testuser${i}@questai-test.com`,
     name: `Test User ${i}`,
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`,
   });
@@ -132,7 +132,7 @@ export default function(data) {
         // Get question
         const questionRes = http.get(`${baseUrl}/api/live-quiz/${quizId}/question/${questionNum}`, {
           headers: {
-            'User-Agent': `Locus-Test-User-${user.id}`,
+            'User-Agent': `QuestAI-Test-User-${user.id}`,
             'X-User-ID': user.id
           }
         });
@@ -188,7 +188,7 @@ export default function(data) {
           const leaderboardStart = Date.now();
           const leaderboardRes = http.get(`${baseUrl}/api/live-quiz/${quizId}/leaderboard`, {
             headers: {
-              'User-Agent': `Locus-Test-User-${user.id}`,
+              'User-Agent': `QuestAI-Test-User-${user.id}`,
               'X-User-ID': user.id
             }
           });

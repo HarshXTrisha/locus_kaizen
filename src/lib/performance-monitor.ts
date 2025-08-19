@@ -1,4 +1,4 @@
-// Performance Monitoring Utility for Locus
+// Performance Monitoring Utility for QuestAI
 // Tracks key metrics and provides optimization insights
 
 interface PerformanceMetric {

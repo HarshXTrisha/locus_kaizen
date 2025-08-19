@@ -39,7 +39,7 @@ export function middleware(request: NextRequest) {
   // This prevents infinite redirect loops.
   
   // Only handle basic redirects that don't require auth state
-  if (pathname === '/login' && request.cookies.get('locus-store')?.value) {
+  if (pathname === '/login' && request.cookies.get('questai-store')?.value) {
     // If user has stored data, they might be authenticated
     // Let the client-side handle the redirect
     return NextResponse.next();

@@ -1,8 +1,6 @@
-# 📱 Mobile Optimization Guide for Locus
+# 📱 Mobile Optimization Guide for QuestAI
 
-## 🎯 **Complete Mobile Optimization Implementation**
-
-Your Locus personal test portal now has **full mobile optimization** that automatically detects mobile devices and renders mobile-specific components **without affecting your desktop version at all**.
+Your QuestAI personal test portal now has **full mobile optimization** that automatically detects mobile devices and renders mobile-specific components **without affecting your desktop version at all**.
 
 ## 🚀 **What's Been Implemented**
 
@@ -204,7 +202,7 @@ switch (pathname) {
 
 ## ✅ **Summary**
 
-Your Locus personal test portal now has **complete mobile optimization** that:
+Your QuestAI personal test portal now has **complete mobile optimization** that:
 
 ✅ **Automatically detects mobile devices**  
 ✅ **Renders mobile-specific components**  

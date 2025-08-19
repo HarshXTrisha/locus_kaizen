@@ -14,7 +14,7 @@ import { ServiceWorkerRegistration } from '@/components/common/ServiceWorkerRegi
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Locus - Quiz Platform',
+  title: 'QuestAI - Quiz Platform',
   description: 'Create, take, and analyze quizzes with ease',
   icons: {
     icon: '/favicon.ico',

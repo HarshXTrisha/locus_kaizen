@@ -1,6 +1,6 @@
-# 🚀 Load Test - 80 Users with 60 Questions Each
+# 🧪 Load Testing Guide for QuestAI
 
-This load test simulates 80 concurrent users taking a 60-question quiz on both desktop and mobile versions of the Locus test portal.
+This load test simulates 80 concurrent users taking a 60-question quiz on both desktop and mobile versions of the QuestAI test portal.
 
 ## 📊 Test Configuration
 
@@ -31,7 +31,7 @@ This load test simulates 80 concurrent users taking a 60-question quiz on both d
    npm install -g k6
    ```
 
-2. **Start the Locus application**:
+2. **Start the QuestAI application**:
    ```bash
    npm run dev
    ```

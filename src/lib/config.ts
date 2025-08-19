@@ -18,7 +18,7 @@ export const googleConfig = {
 
 // App Configuration
 export const appConfig = {
-  name: 'Locus',
+  name: 'QuestAI',
   version: '1.0.0',
   url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 };

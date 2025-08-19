@@ -92,7 +92,7 @@ export function LoginForm() {
     <div className="w-full">
       <div className="text-center mb-10">
         <h2 className="text-4xl font-bold text-[#212529] mb-4 leading-tight tracking-tight">Welcome Back!</h2>
-        <p className="text-lg text-[#6C757D] font-normal leading-relaxed">Sign in with your Google account to continue your learning journey with Locus.</p>
+        <p className="text-gray-600 text-center">Sign in to continue your learning journey with QuestAI.</p>
       </div>
 
       <div className="space-y-8">

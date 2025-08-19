@@ -9,7 +9,7 @@ export function AppHeader() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Replace with your SVG logo if you have it */}
-            <h1 className="text-2xl font-bold text-gray-900">Locus</h1>
+            <h1 className="text-2xl font-bold text-gray-900">QuestAI</h1>
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Dashboard</a>

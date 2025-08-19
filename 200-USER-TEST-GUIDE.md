@@ -1,15 +1,15 @@
-# 🎯 200-User Load Test Guide for Locus
+# 🎯 200-User Load Test Guide for QuestAI
 
 ## Quick Start
 
 ### Prerequisites
 - Node.js installed
 - K6 installed (`npm install -g k6`)
-- Locus development server running
+- QuestAI development server running
 
 ### Step 1: Start Development Server
 ```bash
-cd locus
+cd questai
 npm run dev
 ```
 
@@ -232,4 +232,4 @@ If you encounter issues:
 
 ---
 
-**Ready to test your Locus platform with 200 concurrent users? Run `npm run test:200-users:run` and watch the magic happen! 🚀**
+**Ready to test your QuestAI platform with 200 concurrent users? Run `npm run test:200-users:run` and watch the magic happen! 🚀**

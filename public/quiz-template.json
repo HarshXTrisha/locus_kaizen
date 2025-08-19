@@ -1,0 +1,24 @@
+{
+  "description": "This is a sample quiz template showing the required JSON format for uploading structured MCQ quiz data to QuestAI. This template contains only multiple-choice questions.",
+  "title": "Sample Quiz Template",
+  "questions": [
+    {
+      "question": "What is the capital of France?",
+      "options": ["London", "Berlin", "Paris", "Madrid"],
+      "correctAnswer": 2,
+      "explanation": "Paris is the capital and largest city of France."
+    },
+    {
+      "question": "Which planet is known as the Red Planet?",
+      "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+      "correctAnswer": 1,
+      "explanation": "Mars is called the Red Planet due to its reddish appearance."
+    },
+    {
+      "question": "What is 2 + 2?",
+      "options": ["3", "4", "5", "6"],
+      "correctAnswer": 1,
+      "explanation": "2 + 2 equals 4."
+    }
+  ]
+}

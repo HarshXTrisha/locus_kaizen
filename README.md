@@ -1,6 +1,6 @@
-# 🎯 Locus - Advanced Quiz Management Platform
+# 🎯 QuestAI - Advanced Quiz Management Platform
 
-A comprehensive, modern quiz management platform powered by Kaizen methodology, built with Next.js 14, TypeScript, Firebase, and cutting-edge web technologies. Locus provides an exceptional user experience with advanced features, mobile optimization, offline support, and enterprise-grade performance, all designed for continuous improvement.
+A comprehensive quiz management platform powered by Kaizen methodology, built with Next.js, TypeScript, Firebase, and cutting-edge web technologies. QuestAI provides an exceptional user experience with advanced features, mobile optimization, offline support, and enterprise-grade performance, all designed for continuous improvement.
 
 ## ✨ **Key Features**
 
@@ -111,7 +111,7 @@ A comprehensive, modern quiz management platform powered by Kaizen methodology, 
 ## 📁 **Project Structure**
 
 ```
-locus/
+questai/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── (main)/            # Main application pages
@@ -195,9 +195,9 @@ locus/
 - ✅ **Session Management**: Secure session handling
 - ✅ **Error Handling**: Comprehensive error management
 
-## 🧪 **Load Testing**
+## �� **Load Testing**
 
-Locus includes comprehensive load testing capabilities using k6:
+QuestAI includes comprehensive load testing capabilities using k6:
 
 ### **Available Load Tests**
 ```bash
@@ -374,7 +374,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ by the Locus Team**
+**Built with ❤️ by the QuestAI Team**
 
 *Transform your learning experience with the most advanced quiz management platform available.*
 
@@ -383,9 +383,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 **Contact**
 
 For questions, support, or collaboration:
-- **Email**: [contact@locus.com](mailto:contact@locus.com)
+- **Email**: [contact@questai.com](mailto:contact@questai.com)
 - **GitHub**: [@HarshXTrisha](https://github.com/HarshXTrisha)
-- **Project**: [Locus Kaizen](https://github.com/HarshXTrisha/locus_kaizen)
+- **Project**: [QuestAI Kaizen](https://github.com/HarshXTrisha/locus_kaizen)
 
 ---
 

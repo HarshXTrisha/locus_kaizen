@@ -1,6 +1,6 @@
 {
-  "name": "Locus - Quiz Management Platform",
-  "short_name": "Locus",
+  "name": "QuestAI - Quiz Management Platform",
+  "short_name": "QuestAI",
   "description": "A comprehensive quiz management platform for modern learning and assessment",
   "start_url": "/",
   "display": "standalone",

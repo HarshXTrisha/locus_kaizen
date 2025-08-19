@@ -50,7 +50,7 @@ export function Sidebar() {
           <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center shadow-md">
             <BookOpen className="h-5 w-5 text-white" />
           </div>
-          {sidebarOpen && <span>Locus</span>}
+          {sidebarOpen && <span>QuestAI</span>}
         </Link>
         
         {/* Toggle Button */}

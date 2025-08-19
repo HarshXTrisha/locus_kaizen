@@ -204,7 +204,7 @@ export const useAppStore = create<AppState>()(
       clearNotifications: () => set({ notifications: [] }),
     }),
     {
-      name: 'locus-store',
+      name: 'questai-store',
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,

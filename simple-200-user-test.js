@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Simple 200-User Load Test for Locus
+// Simple 200-User Load Test for QuestAI
 // This script simulates 200 concurrent users taking a 100-question test
 
 const http = require('http');
@@ -34,7 +34,7 @@ class LoadTest {
     for (let i = 0; i < 200; i++) {
       users.push({
         id: `test_user_${i}`,
-        email: `testuser${i}@locus-test.com`,
+        email: `testuser${i}@questai-test.com`,
         name: `Test User ${i}`,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`,
       });
@@ -251,7 +251,7 @@ class LoadTest {
 
   // Start the load test
   async start() {
-    console.log('🚀 Starting 200-User Load Test for Locus');
+    console.log('🚀 Starting 200-User Load Test for QuestAI');
     console.log('='.repeat(60));
     console.log(`📊 Target: 200 users, 100 questions each`);
     console.log(`🌐 Base URL: ${this.baseUrl}`);

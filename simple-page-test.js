@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Simple Page Load Test for Locus
+// Simple Page Load Test for QuestAI
 // This script tests the existing pages with 200 simulated users
 
 const http = require('http');
@@ -31,7 +31,7 @@ class PageLoadTest {
     for (let i = 0; i < 200; i++) {
       users.push({
         id: `test_user_${i}`,
-        email: `testuser${i}@locus-test.com`,
+        email: `testuser${i}@questai-test.com`,
         name: `Test User ${i}`,
       });
     }
@@ -50,7 +50,7 @@ class PageLoadTest {
         path: url.pathname + url.search,
         method: method,
         headers: {
-          'User-Agent': 'Locus-Page-Load-Test'
+          'User-Agent': 'QuestAI-Page-Load-Test'
         }
       };
       
@@ -254,7 +254,7 @@ class PageLoadTest {
 
   // Start the load test
   async start() {
-    console.log('🚀 Starting 200-User Page Load Test for Locus');
+    console.log('🚀 Starting 200-User Page Load Test for QuestAI');
     console.log('='.repeat(60));
     console.log(`📊 Target: 200 users testing main pages`);
     console.log(`🌐 Base URL: ${this.baseUrl}`);

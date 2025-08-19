@@ -168,7 +168,7 @@ export default function Home() {
                   <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center hover:rotate-12 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[#20C997]/25">
                     <Target className="h-5 w-5 text-white" />
                   </div>
-                  Locus
+                  QuestAI
                 </h1>
               </div>
               <div className="ml-4 flex items-center text-xs text-[#6C757D] font-medium">
@@ -254,7 +254,7 @@ export default function Home() {
             ) : (
               <>
                 Master Your Knowledge with
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block hover:scale-105 transition-transform duration-300"> Locus</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block hover:scale-105 transition-transform duration-300"> QuestAI</span>
               </>
             )}
           </h1>
@@ -337,7 +337,7 @@ export default function Home() {
                 transform: featuresRef.current ? (scrollY > (featuresRef.current.offsetTop - window.innerHeight * 0.8) ? 'translateY(0)' : 'translateY(20px)') : 'translateY(0)',
               }}
             >
-              From quiz creation to detailed analytics, Locus provides all the tools you need 
+              From quiz creation to detailed analytics, QuestAI provides all the tools you need 
               for effective learning and assessment.
             </p>
             <div className="flex items-center justify-center mt-6 text-sm text-[#6C757D] font-medium">
@@ -490,7 +490,7 @@ export default function Home() {
           >
             {isAuthenticated 
               ? "Access your dashboard to continue your learning journey and explore new features."
-              : "Join educators and learners who trust Locus for their assessment and learning needs."
+              : "Join educators and learners who trust QuestAI for their assessment and learning needs."
             }
           </p>
           <div className="flex items-center justify-center mb-12 text-white/80 text-sm font-medium">
@@ -528,7 +528,7 @@ export default function Home() {
               <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center">
                 <Target className="h-5 w-5 text-white" />
               </div>
-              Locus
+              QuestAI
             </h3>
             <p className="text-xl text-gray-400 mb-6 leading-relaxed font-normal">
               The ultimate quiz management platform for modern learning and assessment.
@@ -539,7 +539,7 @@ export default function Home() {
               <span className="ml-2">- Continuous Improvement</span>
             </div>
             <div className="border-t border-gray-700 pt-8 text-center text-gray-400">
-              <p className="font-medium">&copy; 2024 Locus. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
+              <p className="font-medium">&copy; 2024 QuestAI. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
             </div>
           </div>
         </div>

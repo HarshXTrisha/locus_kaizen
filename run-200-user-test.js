@@ -6,7 +6,7 @@
 const { spawn } = require('child_process');
 const TestMonitor = require('./test-monitor');
 
-console.log('🎯 Locus 200-User Load Test Runner');
+console.log('🎯 QuestAI 200-User Load Test Runner');
 console.log('='.repeat(50));
 
 // Configuration
