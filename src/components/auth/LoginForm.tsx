@@ -92,7 +92,7 @@ export function LoginForm() {
     <div className="w-full">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-[#212529] mb-2">Welcome Back!</h2>
-        <p className="text-[#6C757D]">Sign in with your Google account to continue your learning journey with Locus(x)Kaizen.</p>
+        <p className="text-[#6C757D]">Sign in with your Google account to continue your learning journey with Locus.</p>
       </div>
 
       <div className="space-y-6">

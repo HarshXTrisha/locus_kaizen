@@ -1,6 +1,6 @@
-# 🎯 Locus(x)Kaizen - Advanced Quiz Management Platform
+# 🎯 Locus - Advanced Quiz Management Platform
 
-A comprehensive, modern quiz management platform powered by Kaizen methodology, built with Next.js 14, TypeScript, Firebase, and cutting-edge web technologies. Locus(x)Kaizen provides an exceptional user experience with advanced features, mobile optimization, offline support, and enterprise-grade performance, all designed for continuous improvement.
+A comprehensive, modern quiz management platform powered by Kaizen methodology, built with Next.js 14, TypeScript, Firebase, and cutting-edge web technologies. Locus provides an exceptional user experience with advanced features, mobile optimization, offline support, and enterprise-grade performance, all designed for continuous improvement.
 
 ## ✨ **Key Features**
 

@@ -28,7 +28,7 @@ export default function LoginPage() {
               <div className="w-16 h-16 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg flex items-center justify-center mr-4">
                 <Target className="h-8 w-8 text-white" />
               </div>
-                             <h1 className="text-4xl font-bold text-[#212529]">Locus<span className="text-[#20C997]">(x)</span>Kaizen</h1>
+                                                           <h1 className="text-4xl font-bold text-[#212529]">Locus</h1>
             </div>
                          <p className="text-lg text-[#6C757D] mb-2">Sign in with your Google account</p>
              <p className="text-sm text-[#6C757D]">Access your personalized learning dashboard powered by Kaizen</p>

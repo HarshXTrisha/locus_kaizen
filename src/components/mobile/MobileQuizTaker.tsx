@@ -232,8 +232,10 @@ export default function MobileQuizTaker() {
   const QuestionNavigation = () => {
     const questionStatuses = quizData?.questions.map((question, index) => {
       const answer = answers.find(a => a.questionId === question.id);
+      const hasBeenVisited = index <= currentQuestion; // Track if question has been visited
+      
       if (!answer || answer.selectedOption === '') {
-        return 'visited-unanswered';
+        return hasBeenVisited ? 'visited-unanswered' : 'unanswered';
       }
       if (answer.isFlagged) return 'flagged';
       return 'answered';
@@ -242,7 +244,7 @@ export default function MobileQuizTaker() {
     const statusCounts = {
       answered: questionStatuses.filter(s => s === 'answered').length,
       flagged: questionStatuses.filter(s => s === 'flagged').length,
-      unanswered: questionStatuses.filter(s => s === 'visited-unanswered').length,
+      unanswered: questionStatuses.filter(s => s === 'unanswered').length,
       visitedUnanswered: questionStatuses.filter(s => s === 'visited-unanswered').length
     };
 
@@ -275,11 +277,26 @@ export default function MobileQuizTaker() {
             const isAnswered = answer && answer.selectedOption !== '';
             const isFlagged = answer?.isFlagged || false;
             const isCurrent = index === currentQuestion;
+            const hasBeenVisited = index <= currentQuestion;
 
             let statusClass = 'bg-gray-200 text-gray-600';
-            if (isCurrent) statusClass = 'bg-blue-500 text-white ring-2 ring-blue-300';
-            else if (isFlagged) statusClass = 'bg-red-500 text-white';
-            else if (isAnswered) statusClass = 'bg-green-500 text-white';
+            
+            // Priority order: Current > Answered > Flagged > Visited > Unanswered
+            if (isCurrent) {
+              statusClass = 'bg-blue-500 text-white ring-2 ring-blue-300';
+            } else if (isAnswered) {
+              // Answered questions should be green, even if flagged
+              statusClass = 'bg-green-500 text-white';
+            } else if (isFlagged) {
+              // Only show red for flagged questions that aren't answered
+              statusClass = 'bg-red-500 text-white';
+            } else if (hasBeenVisited) {
+              // Visited but unanswered questions
+              statusClass = 'bg-yellow-500 text-white';
+            } else {
+              // Not visited questions
+              statusClass = 'bg-gray-200 text-gray-600';
+            }
 
             return (
               <button

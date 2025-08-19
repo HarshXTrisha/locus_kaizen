@@ -209,7 +209,7 @@ export default function Home() {
                   <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-2 flex items-center justify-center">
                     <Target className="h-5 w-5 text-white" />
                   </div>
-                  Locus<span className="text-[#20C997]">(x)</span>Kaizen
+                  Locus
                 </h1>
               </div>
               <div className="ml-4 flex items-center text-xs text-[#6C757D]">
@@ -278,7 +278,7 @@ export default function Home() {
               ) : (
                 <>
                   Master Your Knowledge with
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block animate-pulse"> Locus(x)Kaizen</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block animate-pulse"> Locus</span>
                 </>
               )}
             </h1>
@@ -436,7 +436,7 @@ export default function Home() {
               Everything You Need to Succeed
             </h2>
                                   <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
-              From quiz creation to detailed analytics, Locus(x)Kaizen provides all the tools you need 
+              From quiz creation to detailed analytics, Locus provides all the tools you need 
               for effective learning and continuous improvement.
             </p>
           <div className="flex items-center justify-center mt-4 text-sm text-[#6C757D]">
@@ -484,7 +484,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[#212529] mb-4">
-              Why Choose Locus(x)Kaizen?
+              Why Choose Locus?
             </h2>
                                   <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
               Built with modern technologies and Kaizen principles for continuous improvement and the best user experience.
@@ -526,7 +526,7 @@ export default function Home() {
               Quick Access
             </h2>
                                   <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
-              Jump directly to any section of the Locus(x)Kaizen platform with these quick links.
+              Jump directly to any section of the Locus platform with these quick links.
             </p>
           <div className="flex items-center justify-center mt-4 text-sm text-[#6C757D]">
             <span className="mr-2">Powered by</span>
@@ -625,7 +625,7 @@ export default function Home() {
           <p className="text-xl text-white/90 mb-6 max-w-3xl mx-auto leading-relaxed">
             {isAuthenticated 
               ? "Access your dashboard to continue your learning journey and explore new features."
-              : "Join educators and learners who trust Locus(x)Kaizen for their assessment and continuous improvement needs."
+              : "Join educators and learners who trust Locus for their assessment and continuous improvement needs."
             }
           </p>
           <div className="flex items-center justify-center mb-10 text-white/80 text-sm">
@@ -662,7 +662,7 @@ export default function Home() {
                 <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center">
                   <Target className="h-5 w-5 text-white" />
                 </div>
-                Locus<span className="text-[#20C997]">(x)</span>Kaizen
+                Locus
               </h3>
               <p className="text-gray-400 text-lg leading-relaxed mb-4">
                 The ultimate quiz management platform powered by Kaizen methodology for continuous improvement.
@@ -701,7 +701,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
-            <p className="text-lg">&copy; 2024 Locus(x)Kaizen. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
+            <p className="text-lg">&copy; 2024 Locus. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
             <p className="text-sm mt-2">Powered by <span className="font-bold text-[#20C997]">Kaizen</span> - Continuous Improvement</p>
           </div>
         </div>
