@@ -41,8 +41,8 @@ export function FileUploadArea({
 
   const downloadJSONTemplate = () => {
     const template = {
-      title: "Sample Quiz",
-      description: "A comprehensive quiz covering multiple topics",
+      title: "Sample MCQ Quiz",
+      description: "A comprehensive MCQ quiz covering multiple topics",
       subject: "General Knowledge",
       questions: [
         {
@@ -57,46 +57,72 @@ export function FileUploadArea({
           id: "q2",
           text: "Which planet is known as the Red Planet?",
           type: "multiple-choice",
-          options: ["Earth", "Mars", "Jupiter", "Venus"],
+          options: ["Venus", "Mars", "Jupiter", "Saturn"],
           correctAnswer: "Mars",
           points: 1
         },
         {
           id: "q3",
-          text: "Is the Earth round?",
-          type: "true-false",
-          options: ["True", "False"],
-          correctAnswer: "True",
+          text: "What is the chemical symbol for gold?",
+          type: "multiple-choice",
+          options: ["Ag", "Au", "Fe", "Cu"],
+          correctAnswer: "Au",
           points: 1
         },
         {
           id: "q4",
-          text: "What is 2 + 2?",
-          type: "short-answer",
-          correctAnswer: "4",
+          text: "What is the largest ocean on Earth?",
+          type: "multiple-choice",
+          options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+          correctAnswer: "Pacific Ocean",
           points: 1
         },
         {
           id: "q5",
-          text: "Which programming language is known as the language of the web?",
+          text: "Who wrote 'Romeo and Juliet'?",
           type: "multiple-choice",
-          options: ["Python", "Java", "JavaScript", "C++"],
-          correctAnswer: "JavaScript",
-          points: 2
+          options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+          correctAnswer: "William Shakespeare",
+          points: 1
         },
         {
           id: "q6",
-          text: "The sun rises in the east.",
-          type: "true-false",
-          options: ["True", "False"],
-          correctAnswer: "True",
+          text: "Which programming language is known as the 'language of the web'?",
+          type: "multiple-choice",
+          options: ["Python", "Java", "JavaScript", "C++"],
+          correctAnswer: "JavaScript",
           points: 1
         },
         {
           id: "q7",
-          text: "What is the chemical symbol for gold?",
-          type: "short-answer",
-          correctAnswer: "Au",
+          text: "What is the main component of the sun?",
+          type: "multiple-choice",
+          options: ["Liquid Lava", "Molten Iron", "Hot Gases", "Solid Rock"],
+          correctAnswer: "Hot Gases",
+          points: 1
+        },
+        {
+          id: "q8",
+          text: "Which of the following is NOT a primary color?",
+          type: "multiple-choice",
+          options: ["Red", "Blue", "Green", "Yellow"],
+          correctAnswer: "Yellow",
+          points: 1
+        },
+        {
+          id: "q9",
+          text: "What is the largest mammal in the world?",
+          type: "multiple-choice",
+          options: ["African Elephant", "Blue Whale", "Giraffe", "Polar Bear"],
+          correctAnswer: "Blue Whale",
+          points: 1
+        },
+        {
+          id: "q10",
+          text: "Which year did World War II end?",
+          type: "multiple-choice",
+          options: ["1943", "1944", "1945", "1946"],
+          correctAnswer: "1945",
           points: 1
         }
       ]
@@ -116,9 +142,9 @@ export function FileUploadArea({
   };
 
   const downloadTXTTemplate = () => {
-    const template = `Quiz Title: Sample Quiz
+    const template = `Quiz Title: Sample MCQ Quiz
 Subject: General Knowledge
-Description: A comprehensive quiz covering multiple topics
+Description: A comprehensive MCQ quiz covering multiple topics
 
 Q1. What is the capital of France?
 A) London
@@ -128,34 +154,67 @@ D) Madrid
 Correct Answer: C
 
 Q2. Which planet is known as the Red Planet?
-A) Earth
+A) Venus
 B) Mars
 C) Jupiter
-D) Venus
+D) Saturn
 Correct Answer: B
 
-Q3. Is the Earth round?
-A) True
-B) False
-Correct Answer: A
+Q3. What is the chemical symbol for gold?
+A) Ag
+B) Au
+C) Fe
+D) Cu
+Correct Answer: B
 
-Q4. What is 2 + 2?
-Correct Answer: 4
+Q4. What is the largest ocean on Earth?
+A) Atlantic Ocean
+B) Indian Ocean
+C) Arctic Ocean
+D) Pacific Ocean
+Correct Answer: D
 
-Q5. Which programming language is known as the language of the web?
+Q5. Who wrote 'Romeo and Juliet'?
+A) Charles Dickens
+B) William Shakespeare
+C) Jane Austen
+D) Mark Twain
+Correct Answer: B
+
+Q6. Which programming language is known as the 'language of the web'?
 A) Python
 B) Java
 C) JavaScript
 D) C++
 Correct Answer: C
 
-Q6. The sun rises in the east.
-A) True
-B) False
-Correct Answer: A
+Q7. What is the main component of the sun?
+A) Liquid Lava
+B) Molten Iron
+C) Hot Gases
+D) Solid Rock
+Correct Answer: C
 
-Q7. What is the chemical symbol for gold?
-Correct Answer: Au`;
+Q8. Which of the following is NOT a primary color?
+A) Red
+B) Blue
+C) Green
+D) Yellow
+Correct Answer: D
+
+Q9. What is the largest mammal in the world?
+A) African Elephant
+B) Blue Whale
+C) Giraffe
+D) Polar Bear
+Correct Answer: B
+
+Q10. Which year did World War II end?
+A) 1943
+B) 1944
+C) 1945
+D) 1946
+Correct Answer: C`;
 
     const blob = new Blob([template], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
