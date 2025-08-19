@@ -21,7 +21,11 @@
     "test:200-users:simple": "node simple-200-user-test.js",
     "test:200-users:pages": "node simple-page-test.js",
     "artillery:test": "artillery run artillery-config.yml",
-    "performance:monitor": "node performance-monitor.js"
+    "performance:monitor": "node performance-monitor.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "load-test": "k6 run load-test-80-users-60-questions.js",
+    "load-test-local": "k6 run --env BASE_URL=http://localhost:3000 load-test-80-users-60-questions.js",
+    "load-test-prod": "k6 run --env BASE_URL=https://your-production-domain.com load-test-80-users-60-questions.js"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.85.4",
