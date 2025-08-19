@@ -7,7 +7,6 @@ import { useAppStore } from '@/lib/store';
 
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
-import { AppHeader } from '@/components/common/AppHeader';
 import { ExtractedQuestion, ExtractedQuiz } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 import { createQuiz, ALLOWED_SUBJECTS } from '@/lib/firebase-quiz';
@@ -113,9 +112,6 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <AppHeader />
-      
       {/* Main Content */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
