@@ -20,10 +20,7 @@ const FileUploadArea = dynamic(
   { ssr: false }
 );
 
-const PDFUploadArea = dynamic(
-  () => import('@/components/upload/PDFUploadArea').then(mod => ({ default: mod.PDFUploadArea })),
-  { ssr: false }
-);
+
 
 export default function MobileUpload() {
   const router = useRouter();
@@ -31,7 +28,7 @@ export default function MobileUpload() {
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
   const [extractedQuiz, setExtractedQuiz] = useState<ExtractedQuiz | null>(null);
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
-  const [activeTab, setActiveTab] = useState<'json' | 'pdf' | 'txt'>('json');
+  const [activeTab, setActiveTab] = useState<'json' | 'txt'>('json');
   const [quizData, setQuizData] = useState({
     title: '',
     description: '',
@@ -56,17 +53,7 @@ export default function MobileUpload() {
     }));
   };
 
-  const handlePDFQuizExtracted = (quiz: ExtractedQuiz) => {
-    console.log('📱 PDF quiz extracted:', quiz.title, quiz.questions.length);
-    setExtractedQuiz(quiz);
-    setExtractedQuestions(quiz.questions);
-    setQuizData(prev => ({
-      ...prev,
-      title: quiz.title,
-      description: quiz.description || `Quiz extracted from PDF with ${quiz.questions.length} questions`,
-      subject: quiz.subject
-    }));
-  };
+
 
   const handleTXTQuizExtracted = (quiz: ExtractedQuiz) => {
     console.log('📱 TXT quiz extracted:', quiz.title, quiz.questions.length);
@@ -166,12 +153,11 @@ export default function MobileUpload() {
         <div className="flex">
           {[
             { id: 'json', label: 'JSON', icon: FileText },
-            { id: 'pdf', label: 'PDF', icon: File },
             { id: 'txt', label: 'TXT', icon: FileText }
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'json' | 'pdf' | 'txt')}
+              onClick={() => setActiveTab(tab.id as 'json' | 'txt')}
               className={`flex-1 py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? 'border-[#20C997] text-[#20C997]'
@@ -195,11 +181,7 @@ export default function MobileUpload() {
               accept=".json"
             />
           )}
-          {activeTab === 'pdf' && (
-            <PDFUploadArea
-              onQuizExtracted={handlePDFQuizExtracted}
-            />
-          )}
+
           {activeTab === 'txt' && (
             <PDFUploadArea
               onQuizExtracted={handleTXTQuizExtracted}
@@ -326,10 +308,7 @@ export default function MobileUpload() {
               <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
               <p><strong>JSON:</strong> Upload structured quiz data in JSON format</p>
             </div>
-            <div className="flex items-start gap-2">
-              <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
-              <p><strong>PDF:</strong> Upload PDF documents to extract questions automatically</p>
-            </div>
+
             <div className="flex items-start gap-2">
               <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
               <p><strong>TXT:</strong> Upload text files for question extraction</p>

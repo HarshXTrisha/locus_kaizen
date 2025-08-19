@@ -23,14 +23,7 @@ const FileUploadArea = dynamic(
   }
 );
 
-// Dynamically import PDFUploadArea to prevent SSR issues
-const PDFUploadArea = dynamic(
-  () => import('@/components/upload/PDFUploadArea').then(mod => ({ default: mod.PDFUploadArea })),
-  { 
-    ssr: false,
-    loading: () => <LoadingSpinner size="xl" text="Loading PDF component..." />
-  }
-);
+
 
 export default function UploadPage() {
   const router = useRouter();
@@ -38,7 +31,7 @@ export default function UploadPage() {
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
   const [extractedQuiz, setExtractedQuiz] = useState<ExtractedQuiz | null>(null);
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
-  const [activeTab, setActiveTab] = useState<'json' | 'pdf' | 'txt'>('json');
+  const [activeTab, setActiveTab] = useState<'json' | 'txt'>('json');
   const [quizData, setQuizData] = useState({
     title: '',
     description: '',
@@ -63,16 +56,7 @@ export default function UploadPage() {
     }));
   };
 
-  const handlePDFQuizExtracted = (quiz: ExtractedQuiz) => {
-    setExtractedQuiz(quiz);
-    setExtractedQuestions(quiz.questions);
-    setQuizData(prev => ({
-      ...prev,
-      title: quiz.title,
-      description: quiz.description || `Quiz extracted from PDF with ${quiz.questions.length} questions`,
-      subject: quiz.subject
-    }));
-  };
+
 
   const handleTXTQuizExtracted = (quiz: ExtractedQuiz) => {
     setExtractedQuiz(quiz);
@@ -138,7 +122,7 @@ export default function UploadPage() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Quiz</h1>
-          <p className="text-gray-600">Upload JSON files, PDF documents, or TXT files to create quizzes</p>
+          <p className="text-gray-600">Upload JSON files or TXT files to create quizzes</p>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
@@ -237,17 +221,7 @@ export default function UploadPage() {
                     <FileJson className="inline-block w-4 h-4 mr-2" />
                     JSON Upload
                   </button>
-                  <button
-                    onClick={() => setActiveTab('pdf')}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === 'pdf'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    <FileText className="inline-block w-4 h-4 mr-2" />
-                    PDF Upload
-                  </button>
+
                   <button
                     onClick={() => setActiveTab('txt')}
                     className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -265,8 +239,6 @@ export default function UploadPage() {
             
             {activeTab === 'json' ? (
               <FileUploadArea onQuestionsExtracted={handleQuestionsExtracted} />
-            ) : activeTab === 'pdf' ? (
-              <PDFUploadArea onQuizExtracted={handlePDFQuizExtracted} />
             ) : (
               <FileUploadArea onQuestionsExtracted={handleQuestionsExtracted} />
             )}
