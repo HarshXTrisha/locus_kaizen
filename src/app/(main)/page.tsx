@@ -211,6 +211,10 @@ export default function Home() {
                   </div>
                   Locus
                 </h1>
+                <div className="ml-4 flex items-center text-xs text-[#6C757D]">
+                  <span className="mr-1">Powered by</span>
+                  <span className="font-bold text-[#20C997]">Kaizen</span>
+                </div>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -371,6 +375,11 @@ export default function Home() {
             <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
               A modern quiz platform designed for educators and learners who value simplicity and effectiveness.
             </p>
+            <div className="flex items-center justify-center mt-4 text-sm text-[#6C757D]">
+              <span className="mr-2">Powered by</span>
+              <span className="font-bold text-[#20C997]">Kaizen</span>
+              <span className="ml-2">- Continuous Improvement</span>
+            </div>
           </div>
 
           {/* Testimonials */}
@@ -426,10 +435,15 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-[#212529] mb-4">
               Everything You Need to Succeed
             </h2>
-            <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
-              From quiz creation to detailed analytics, Locus provides all the tools you need 
-              for effective learning and assessment.
-            </p>
+                      <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
+            From quiz creation to detailed analytics, Locus provides all the tools you need 
+            for effective learning and assessment.
+          </p>
+          <div className="flex items-center justify-center mt-4 text-sm text-[#6C757D]">
+            <span className="mr-2">Powered by</span>
+            <span className="font-bold text-[#20C997]">Kaizen</span>
+            <span className="ml-2">- Continuous Improvement</span>
+          </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -472,9 +486,14 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-[#212529] mb-4">
               Why Choose Locus?
             </h2>
-            <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
-              Built with modern technologies and best practices for the best user experience.
-            </p>
+                      <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
+            Built with modern technologies and best practices for the best user experience.
+          </p>
+          <div className="flex items-center justify-center mt-4 text-sm text-[#6C757D]">
+            <span className="mr-2">Powered by</span>
+            <span className="font-bold text-[#20C997]">Kaizen</span>
+            <span className="ml-2">- Continuous Improvement</span>
+          </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -506,9 +525,14 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-[#212529] mb-4">
               Quick Access
             </h2>
-            <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
-              Jump directly to any section of the platform with these quick links.
-            </p>
+                      <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
+            Jump directly to any section of the platform with these quick links.
+          </p>
+          <div className="flex items-center justify-center mt-4 text-sm text-[#6C757D]">
+            <span className="mr-2">Powered by</span>
+            <span className="font-bold text-[#20C997]">Kaizen</span>
+            <span className="ml-2">- Continuous Improvement</span>
+          </div>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
@@ -598,12 +622,17 @@ export default function Home() {
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             {isAuthenticated ? 'Ready to Continue Learning?' : 'Ready to Get Started?'}
           </h2>
-          <p className="text-xl text-white/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-white/90 mb-6 max-w-3xl mx-auto leading-relaxed">
             {isAuthenticated 
               ? "Access your dashboard to continue your learning journey and explore new features."
               : "Join educators and learners who trust Locus for their assessment and learning needs."
             }
           </p>
+          <div className="flex items-center justify-center mb-10 text-white/80 text-sm">
+            <span className="mr-2">Powered by</span>
+            <span className="font-bold text-white">Kaizen</span>
+            <span className="ml-2">- Continuous Improvement</span>
+          </div>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {isAuthenticated ? (
               <Link 
