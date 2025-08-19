@@ -6,6 +6,8 @@ import { NotificationProvider } from '@/components/common/NotificationSystem';
 import { ClientInit } from '@/components/common/ClientInit';
 import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
 import { PageTransition } from '@/components/common/PageTransition';
+import { PerformanceMonitor } from '@/components/common/PerformanceMonitor';
+import { QueryProvider } from '@/lib/query-client';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,14 +27,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <NotificationProvider>
-            <ClientInit />
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </NotificationProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <ClientInit />
+              <PerformanceMonitor />
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </NotificationProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

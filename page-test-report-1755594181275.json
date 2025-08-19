@@ -1,0 +1,20 @@
+{
+  "testInfo": {
+    "name": "200-User Page Load Test",
+    "totalUsers": 200,
+    "duration": "0m 40s",
+    "startTime": "2025-08-19T09:02:21.243Z",
+    "endTime": "2025-08-19T09:03:01.274Z"
+  },
+  "results": {
+    "completedUsers": 200,
+    "totalRequests": 1400,
+    "successfulRequests": 0,
+    "failedRequests": 1400,
+    "successRate": 0
+  },
+  "performance": {
+    "requestsPerSecond": 35,
+    "usersPerMinute": 300
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "testInfo": {
+    "name": "200-User Load Test",
+    "totalUsers": 200,
+    "totalQuestions": 100,
+    "duration": "0m 39s",
+    "startTime": "2025-08-19T08:59:26.034Z",
+    "endTime": "2025-08-19T09:00:05.068Z"
+  },
+  "results": {
+    "completedUsers": 0,
+    "successRate": 0,
+    "averageResponseTime": 0,
+    "totalQuestionsAnswered": 0,
+    "leaderboardUpdates": 0,
+    "errors": 200
+  },
+  "performance": {
+    "questionsPerSecond": 0,
+    "usersPerMinute": 0
+  }
+}

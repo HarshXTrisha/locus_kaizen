@@ -9,9 +9,23 @@
     "lint": "next lint",
     "deploy:firestore": "firebase deploy --only firestore",
     "deploy:storage": "firebase deploy --only storage",
-    "deploy:rules": "firebase deploy --only firestore:rules,storage"
+    "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "load-test:small": "k6 run load-test-script.js --env BASE_URL=http://localhost:3000 --stage 100:5m",
+    "load-test:medium": "k6 run load-test-script.js --env BASE_URL=http://localhost:3000 --stage 500:10m",
+    "load-test:large": "k6 run load-test-script.js --env BASE_URL=http://localhost:3000 --stage 1000:15m",
+    "load-test:full": "k6 run load-test-script.js --env BASE_URL=http://localhost:3000",
+    "test:200-users": "k6 run 200-user-test.js --env BASE_URL=http://localhost:3000",
+    "test:200-users:prod": "k6 run 200-user-test.js --env BASE_URL=https://your-production-url.com",
+    "test:200-users:run": "node run-200-user-test.js",
+    "test:200-users:monitor": "node test-monitor.js",
+    "test:200-users:simple": "node simple-200-user-test.js",
+    "test:200-users:pages": "node simple-page-test.js",
+    "artillery:test": "artillery run artillery-config.yml",
+    "performance:monitor": "node performance-monitor.js"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.85.4",
+    "@tanstack/react-query-devtools": "^5.85.4",
     "@types/mongoose": "^5.11.96",
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
@@ -33,10 +47,13 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "artillery": "^2.0.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
+    "ioredis": "^5.3.0",
     "postcss": "^8",
+    "redis": "^4.6.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
