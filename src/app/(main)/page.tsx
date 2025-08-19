@@ -126,10 +126,10 @@ export default function Home() {
   ];
 
   const stats = [
-    { number: "100+", label: "Quizzes Created", icon: <Target className="h-6 w-6" /> },
-    { number: "50K+", label: "Questions Answered", icon: <CheckCircle className="h-6 w-6" /> },
-    { number: "95%", label: "User Satisfaction", icon: <Star className="h-6 w-6" /> },
-    { number: "24/7", label: "Availability", icon: <Clock className="h-6 w-6" /> }
+    { number: "Modern", label: "Tech Stack", icon: <Monitor className="h-6 w-6" /> },
+    { number: "Secure", label: "Authentication", icon: <Shield className="h-6 w-6" /> },
+    { number: "Mobile", label: "Optimized", icon: <Smartphone className="h-6 w-6" /> },
+    { number: "Real-time", label: "Analytics", icon: <BarChart3 className="h-6 w-6" /> }
   ];
 
   const benefits = [
@@ -159,21 +159,21 @@ export default function Home() {
     {
       name: "Sarah Johnson",
       role: "Educational Consultant",
-      content: "Locus has transformed how I create and manage assessments. The analytics are incredibly insightful!",
+      content: "Locus provides a clean, intuitive interface for creating and managing assessments. The analytics help me track student progress effectively.",
       rating: 5,
       avatar: "SJ"
     },
     {
       name: "Michael Chen",
       role: "Corporate Trainer",
-      content: "The mobile experience is flawless. My team can take quizzes anywhere, anytime. Highly recommended!",
+      content: "The mobile-optimized experience works seamlessly across devices. Perfect for remote training sessions.",
       rating: 5,
       avatar: "MC"
     },
     {
       name: "Dr. Emily Rodriguez",
       role: "University Professor",
-      content: "The quiz creation tools are intuitive and the results analysis helps me understand student performance better.",
+      content: "Clean design and straightforward quiz creation. The results analysis gives me valuable insights into student understanding.",
       rating: 5,
       avatar: "ER"
     }
@@ -182,18 +182,18 @@ export default function Home() {
   const trustSignals = [
     {
       icon: <Shield className="h-8 w-8 text-[#20C997]" />,
-      title: "Enterprise Security",
-      description: "Bank-level encryption and secure data handling"
+      title: "Secure & Private",
+      description: "Firebase-powered authentication and data protection"
     },
     {
       icon: <Award className="h-8 w-8 text-[#20C997]" />,
-      title: "99.9% Uptime",
-      description: "Reliable service with guaranteed availability"
+      title: "Modern Technology",
+      description: "Built with Next.js 14 and cutting-edge web technologies"
     },
     {
       icon: <Users className="h-8 w-8 text-[#20C997]" />,
-      title: "10,000+ Users",
-      description: "Trusted by educators and learners worldwide"
+      title: "User-Friendly",
+      description: "Intuitive design optimized for both desktop and mobile"
     }
   ];
 
@@ -252,6 +252,15 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#20C997]/10 via-transparent to-[#1BA085]/10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-[#20C997]/5 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#1BA085]/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-[#20C997]/3 to-[#1BA085]/3 rounded-full blur-3xl animate-pulse delay-500"></div>
+        </div>
+        
+        {/* Floating Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-32 left-20 w-4 h-4 bg-[#20C997]/20 rounded-full animate-bounce delay-1000"></div>
+          <div className="absolute top-48 right-32 w-6 h-6 bg-[#1BA085]/20 rounded-full animate-bounce delay-2000"></div>
+          <div className="absolute bottom-32 left-1/4 w-3 h-3 bg-[#20C997]/30 rounded-full animate-bounce delay-1500"></div>
+          <div className="absolute bottom-48 right-1/4 w-5 h-5 bg-[#1BA085]/25 rounded-full animate-bounce delay-3000"></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -260,12 +269,12 @@ export default function Home() {
             <h1 className={`text-4xl md:text-6xl lg:text-7xl font-bold text-[#212529] mb-6 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               {isAuthenticated ? (
                 <>
-                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085]">{user?.firstName || 'User'}!</span>
+                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] animate-pulse">{user?.firstName || 'User'}!</span>
                 </>
               ) : (
                 <>
                   Master Your Knowledge with
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block"> Locus</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block animate-pulse"> Locus</span>
                 </>
               )}
             </h1>
@@ -284,14 +293,14 @@ export default function Home() {
                 <>
                   <Link 
                     href="/dashboard"
-                    className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                    className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center shadow-lg hover:shadow-2xl"
                   >
                     Go to Dashboard
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <ArrowRight className="ml-2 h-5 w-5 animate-pulse" />
                   </Link>
                   <Link 
                     href="/create"
-                    className="bg-white text-[#20C997] border-2 border-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#20C997] hover:text-white transition-all duration-300 transform hover:scale-105"
+                    className="bg-white/90 backdrop-blur-sm text-[#20C997] border-2 border-[#20C997] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#20C997] hover:text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                   >
                     Create New Quiz
                   </Link>
@@ -299,24 +308,26 @@ export default function Home() {
               ) : (
                 <Link 
                   href="/login"
-                  className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                  className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center shadow-lg hover:shadow-2xl"
                 >
                   Sign In with Google
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-5 w-5 animate-pulse" />
                 </Link>
               )}
             </div>
 
             {/* Rotating Feature Highlight */}
             <div className={`max-w-2xl mx-auto transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-                <div className="flex items-center justify-center mb-4">
-                  {heroFeatures[currentFeature].icon}
+              <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 hover:scale-105">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg">
+                    {heroFeatures[currentFeature].icon}
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-[#212529] mb-2">
+                <h3 className="text-2xl font-bold text-[#212529] mb-3 text-center">
                   {heroFeatures[currentFeature].title}
                 </h3>
-                <p className="text-[#6C757D]">
+                <p className="text-[#6C757D] text-center text-lg">
                   {heroFeatures[currentFeature].description}
                 </p>
               </div>
@@ -326,21 +337,23 @@ export default function Home() {
       </section>
 
       {/* Enhanced Stats Section */}
-      <section className="py-16 bg-white/50 backdrop-blur-sm">
+      <section className="py-20 bg-gradient-to-r from-white/80 to-[#F8F9FA]/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className={`text-center transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                <div className="flex justify-center mb-3">
-                  <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-full text-white">
-                    {stat.icon}
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30 hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <div className="flex justify-center mb-4">
+                    <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl text-white shadow-lg">
+                      {stat.icon}
+                    </div>
                   </div>
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-[#20C997] mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-[#6C757D] font-medium text-sm md:text-base">
-                  {stat.label}
+                  <div className="text-3xl md:text-4xl font-bold text-[#20C997] mb-2">
+                    {stat.number}
+                  </div>
+                  <div className="text-[#6C757D] font-medium text-sm md:text-base">
+                    {stat.label}
+                  </div>
                 </div>
               </div>
             ))}
@@ -356,27 +369,27 @@ export default function Home() {
               Trusted by Educators Worldwide
             </h2>
             <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
-              Join thousands of educators and learners who trust Locus for their assessment needs.
+              A modern quiz platform designed for educators and learners who value simplicity and effectiveness.
             </p>
           </div>
 
           {/* Testimonials */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className={`bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-full flex items-center justify-center text-white font-semibold mr-4">
+              <div key={index} className={`bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <div className="flex items-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl flex items-center justify-center text-white font-bold text-lg mr-4 shadow-lg">
                     {testimonial.avatar}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-[#212529]">{testimonial.name}</h4>
+                    <h4 className="font-bold text-[#212529] text-lg">{testimonial.name}</h4>
                     <p className="text-sm text-[#6C757D]">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-[#6C757D] mb-4 italic">&ldquo;{testimonial.content}&rdquo;</p>
+                <p className="text-[#6C757D] mb-6 italic text-lg leading-relaxed">&ldquo;{testimonial.content}&rdquo;</p>
                 <div className="flex">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
               </div>
@@ -387,15 +400,19 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {trustSignals.map((signal, index) => (
               <div key={index} className={`text-center transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                <div className="flex justify-center mb-4">
-                  {signal.icon}
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105">
+                  <div className="flex justify-center mb-6">
+                    <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg">
+                      {signal.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#212529] mb-3">
+                    {signal.title}
+                  </h3>
+                  <p className="text-[#6C757D] text-lg">
+                    {signal.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-[#212529] mb-2">
-                  {signal.title}
-                </h3>
-                <p className="text-[#6C757D]">
-                  {signal.description}
-                </p>
               </div>
             ))}
           </div>
@@ -420,23 +437,25 @@ export default function Home() {
               <Link 
                 key={index} 
                 href={feature.link}
-                className={`group p-6 rounded-xl border-2 ${feature.color} hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                className={`group bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                <div className="flex items-start space-x-4">
+                <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    {feature.icon}
+                    <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      {feature.icon}
+                    </div>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-[#212529] mb-2 group-hover:text-[#20C997] transition-colors">
+                    <h3 className="text-2xl font-bold text-[#212529] mb-3 group-hover:text-[#20C997] transition-colors">
                       {feature.title}
                     </h3>
-                    <p className="text-[#6C757D] mb-4">
+                    <p className="text-[#6C757D] mb-6 text-lg leading-relaxed">
                       {feature.description}
                     </p>
-                    <div className="flex items-center text-[#20C997] font-medium">
+                    <div className="flex items-center text-[#20C997] font-semibold text-lg">
                       Explore
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform duration-300" />
                     </div>
                   </div>
                 </div>
@@ -461,15 +480,19 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => (
               <div key={index} className={`text-center transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                <div className="flex justify-center mb-4">
-                  {benefit.icon}
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105">
+                  <div className="flex justify-center mb-6">
+                    <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg">
+                      {benefit.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#212529] mb-3">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-[#6C757D] text-lg leading-relaxed">
+                    {benefit.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-[#212529] mb-2">
-                  {benefit.title}
-                </h3>
-                <p className="text-[#6C757D]">
-                  {benefit.description}
-                </p>
               </div>
             ))}
           </div>
@@ -488,62 +511,76 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             <Link 
               href="/dashboard"
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+              className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 text-center group"
             >
-              <BarChart3 className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Dashboard</span>
+              <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                <BarChart3 className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-[#212529] group-hover:text-[#20C997] transition-colors">Dashboard</span>
             </Link>
             
             <Link 
               href="/create"
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+              className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 text-center group"
             >
-              <Target className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Create Quiz</span>
+              <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                <Target className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-[#212529] group-hover:text-[#20C997] transition-colors">Create Quiz</span>
             </Link>
             
             <Link 
               href="/upload"
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+              className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 text-center group"
             >
-              <Upload className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Upload Files</span>
+              <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                <Upload className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-[#212529] group-hover:text-[#20C997] transition-colors">Upload Files</span>
             </Link>
             
             <Link 
               href="/results"
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+              className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 text-center group"
             >
-              <TrendingUp className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Results</span>
+              <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-[#212529] group-hover:text-[#20C997] transition-colors">Results</span>
             </Link>
             
             <Link 
               href="/settings"
-              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+              className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 text-center group"
             >
-              <Settings className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-              <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Settings</span>
+              <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                <Settings className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-[#212529] group-hover:text-[#20C997] transition-colors">Settings</span>
             </Link>
             
             {isAuthenticated ? (
               <button
                 onClick={handleSignOut}
-                className="bg-white p-6 rounded-lg border border-gray-200 hover:border-red-500 hover:shadow-md transition-all text-center group"
+                className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 text-center group"
               >
-                <LogOut className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                <span className="text-sm font-medium text-[#212529] group-hover:text-red-500">Sign Out</span>
+                <div className="p-4 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl shadow-lg mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                  <LogOut className="h-8 w-8 text-white" />
+                </div>
+                <span className="text-lg font-semibold text-[#212529] group-hover:text-red-500 transition-colors">Sign Out</span>
               </button>
             ) : (
               <Link 
                 href="/login"
-                className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all text-center group"
+                className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-white/30 hover:shadow-2xl transition-all duration-500 hover:scale-105 text-center group"
               >
-                <LogIn className="h-8 w-8 text-[#20C997] mx-auto mb-2" />
-                <span className="text-sm font-medium text-[#212529] group-hover:text-[#20C997]">Sign In</span>
+                <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                  <LogIn className="h-8 w-8 text-white" />
+                </div>
+                <span className="text-lg font-semibold text-[#212529] group-hover:text-[#20C997] transition-colors">Sign In</span>
               </Link>
             )}
           </div>
@@ -551,29 +588,34 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-[#20C997] to-[#1BA085]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+      <section className="py-20 bg-gradient-to-r from-[#20C997] to-[#1BA085] relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             {isAuthenticated ? 'Ready to Continue Learning?' : 'Ready to Get Started?'}
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 mb-10 max-w-3xl mx-auto leading-relaxed">
             {isAuthenticated 
               ? "Access your dashboard to continue your learning journey and explore new features."
-              : "Join thousands of users who are already using Locus to improve their learning and assessment experience."
+              : "Join educators and learners who trust Locus for their assessment and learning needs."
             }
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {isAuthenticated ? (
               <Link 
                 href="/dashboard"
-                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+                className="bg-white text-[#20C997] px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl"
               >
                 Go to Dashboard
               </Link>
             ) : (
               <Link 
                 href="/login"
-                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+                className="bg-white text-[#20C997] px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl"
               >
                 Sign In with Google
               </Link>
@@ -583,19 +625,23 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#212529] text-white py-12">
+      <footer className="bg-[#212529] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4 flex items-center">
-                <div className="w-6 h-6 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded mr-2 flex items-center justify-center">
-                  <Target className="h-4 w-4 text-white" />
+              <h3 className="text-2xl font-bold mb-6 flex items-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center">
+                  <Target className="h-5 w-5 text-white" />
                 </div>
                 Locus
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-lg leading-relaxed mb-4">
                 The ultimate quiz management platform for modern learning and assessment.
               </p>
+              <div className="flex items-center text-gray-400 text-sm">
+                <span className="mr-2">Powered by</span>
+                <span className="font-bold text-[#20C997]">Kaizen</span>
+              </div>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Features</h4>
@@ -625,8 +671,9 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Locus. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
+          <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
+            <p className="text-lg">&copy; 2024 Locus. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
+            <p className="text-sm mt-2">Powered by <span className="font-bold text-[#20C997]">Kaizen</span> - Continuous Improvement</p>
           </div>
         </div>
       </footer>
