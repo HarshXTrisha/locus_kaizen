@@ -13,6 +13,7 @@ import { ExtractedQuestion, ExtractedQuiz } from '@/lib/pdf-processor';
 import { createQuiz, ALLOWED_SUBJECTS } from '@/lib/firebase-quiz';
 import { getFirebaseAuth } from '@/lib/firebase-utils';
 import dynamic from 'next/dynamic';
+import { PDFUploadArea } from '../upload/PDFUploadArea';
 
 // Dynamically import upload components to prevent SSR issues
 const FileUploadArea = dynamic(

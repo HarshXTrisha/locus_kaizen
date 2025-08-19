@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
@@ -20,13 +20,32 @@ import {
   Star,
   Zap,
   Shield,
-  Globe
+  Globe,
+  Play,
+  Award,
+  Clock,
+  Smartphone,
+  Monitor,
+  Tablet
 } from '@/lib/icons';
 
 export default function Home() {
   const { user, isAuthenticated } = useAppStore();
   const { signOut } = useAuth();
   const router = useRouter();
+  const [currentFeature, setCurrentFeature] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+    
+    // Auto-rotate features
+    const interval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % 3);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -44,6 +63,24 @@ export default function Home() {
       router.push('/login');
     }
   };
+
+  const heroFeatures = [
+    {
+      icon: <Target className="h-12 w-12 text-white" />,
+      title: "Smart Quiz Creation",
+      description: "Create engaging quizzes with AI-powered question generation"
+    },
+    {
+      icon: <BarChart3 className="h-12 w-12 text-white" />,
+      title: "Real-time Analytics",
+      description: "Get instant insights into performance and learning progress"
+    },
+    {
+      icon: <Zap className="h-12 w-12 text-white" />,
+      title: "Lightning Fast",
+      description: "Optimized for speed with instant loading and smooth interactions"
+    }
+  ];
 
   const features = [
     {
@@ -91,10 +128,10 @@ export default function Home() {
   ];
 
   const stats = [
-    { number: "100+", label: "Quizzes Created" },
-    { number: "50K+", label: "Questions Answered" },
-    { number: "95%", label: "User Satisfaction" },
-    { number: "24/7", label: "Availability" }
+    { number: "100+", label: "Quizzes Created", icon: <Target className="h-6 w-6" /> },
+    { number: "50K+", label: "Questions Answered", icon: <CheckCircle className="h-6 w-6" /> },
+    { number: "95%", label: "User Satisfaction", icon: <Star className="h-6 w-6" /> },
+    { number: "24/7", label: "Availability", icon: <Clock className="h-6 w-6" /> }
   ];
 
   const benefits = [
@@ -120,41 +157,90 @@ export default function Home() {
     }
   ];
 
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Educational Consultant",
+      content: "Locus has transformed how I create and manage assessments. The analytics are incredibly insightful!",
+      rating: 5,
+      avatar: "SJ"
+    },
+    {
+      name: "Michael Chen",
+      role: "Corporate Trainer",
+      content: "The mobile experience is flawless. My team can take quizzes anywhere, anytime. Highly recommended!",
+      rating: 5,
+      avatar: "MC"
+    },
+    {
+      name: "Dr. Emily Rodriguez",
+      role: "University Professor",
+      content: "The quiz creation tools are intuitive and the results analysis helps me understand student performance better.",
+      rating: 5,
+      avatar: "ER"
+    }
+  ];
+
+  const trustSignals = [
+    {
+      icon: <Shield className="h-8 w-8 text-[#20C997]" />,
+      title: "Enterprise Security",
+      description: "Bank-level encryption and secure data handling"
+    },
+    {
+      icon: <Award className="h-8 w-8 text-[#20C997]" />,
+      title: "99.9% Uptime",
+      description: "Reliable service with guaranteed availability"
+    },
+    {
+      icon: <Users className="h-8 w-8 text-[#20C997]" />,
+      title: "10,000+ Users",
+      description: "Trusted by educators and learners worldwide"
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#E8F5E8]">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-[#212529]">Locus</h1>
+                <h1 className="text-2xl font-bold text-[#212529] flex items-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-2 flex items-center justify-center">
+                    <Target className="h-5 w-5 text-white" />
+                  </div>
+                  Locus
+                </h1>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               {isAuthenticated ? (
                 <>
-                  <span className="text-gray-600">Welcome, {user?.firstName || 'User'}!</span>
+                  <span className="hidden sm:block text-gray-600">Welcome, {user?.firstName || 'User'}!</span>
                   <Link 
                     href="/dashboard"
-                    className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-colors"
+                    className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-all duration-300 transform hover:scale-105"
                   >
                     Dashboard
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center"
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-300 flex items-center"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    <span className="hidden sm:inline">Sign Out</span>
                   </button>
                 </>
               ) : (
                 <Link 
                   href="/login"
-                  className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-colors"
+                  className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-all duration-300 transform hover:scale-105 flex items-center"
                 >
-                  Sign In with Google
+                  <LogIn className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Sign In with Google</span>
+                  <span className="sm:hidden">Sign In</span>
                 </Link>
               )}
             </div>
@@ -162,69 +248,156 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-[#212529] mb-6">
-            {isAuthenticated ? (
-              <>
-                Welcome back, <span className="text-[#20C997]">{user?.firstName || 'User'}!</span>
-              </>
-            ) : (
-              <>
-                Master Your Knowledge with
-                <span className="text-[#20C997]"> Locus</span>
-              </>
-            )}
-          </h1>
-          <p className="text-xl text-[#6C757D] mb-8 max-w-3xl mx-auto">
-            {isAuthenticated 
-              ? "Ready to continue your learning journey? Access your dashboard or explore our features."
-              : "A comprehensive quiz management platform that helps you create, take, and analyze quizzes with powerful analytics and beautiful insights. Sign in with your Google account to get started."
-            }
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {isAuthenticated ? (
-              <>
+      {/* Enhanced Hero Section */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#20C997]/10 via-transparent to-[#1BA085]/10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#20C997]/5 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#1BA085]/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center">
+            {/* Main Heading */}
+            <h1 className={`text-4xl md:text-6xl lg:text-7xl font-bold text-[#212529] mb-6 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              {isAuthenticated ? (
+                <>
+                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085]">{user?.firstName || 'User'}!</span>
+                </>
+              ) : (
+                <>
+                  Master Your Knowledge with
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block"> Locus</span>
+                </>
+              )}
+            </h1>
+
+            {/* Subtitle */}
+            <p className={`text-lg md:text-xl lg:text-2xl text-[#6C757D] mb-8 max-w-4xl mx-auto transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              {isAuthenticated 
+                ? "Ready to continue your learning journey? Access your dashboard or explore our features."
+                : "A comprehensive quiz management platform that helps you create, take, and analyze quizzes with powerful analytics and beautiful insights. Sign in with your Google account to get started."
+              }
+            </p>
+
+            {/* CTA Buttons */}
+            <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              {isAuthenticated ? (
+                <>
+                  <Link 
+                    href="/dashboard"
+                    className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                  >
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                  <Link 
+                    href="/create"
+                    className="bg-white text-[#20C997] border-2 border-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#20C997] hover:text-white transition-all duration-300 transform hover:scale-105"
+                  >
+                    Create New Quiz
+                  </Link>
+                </>
+              ) : (
                 <Link 
-                  href="/dashboard"
-                  className="bg-[#20C997] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1BA085] transition-colors flex items-center justify-center"
+                  href="/login"
+                  className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
                 >
-                  Go to Dashboard
+                  Sign In with Google
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
-                <Link 
-                  href="/create"
-                  className="bg-white text-[#20C997] border-2 border-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#20C997] hover:text-white transition-colors"
-                >
-                  Create New Quiz
-                </Link>
-              </>
-            ) : (
-              <Link 
-                href="/login"
-                className="bg-[#20C997] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1BA085] transition-colors flex items-center justify-center"
-              >
-                Sign In with Google
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            )}
+              )}
+            </div>
+
+            {/* Rotating Feature Highlight */}
+            <div className={`max-w-2xl mx-auto transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+                <div className="flex items-center justify-center mb-4">
+                  {heroFeatures[currentFeature].icon}
+                </div>
+                <h3 className="text-xl font-semibold text-[#212529] mb-2">
+                  {heroFeatures[currentFeature].title}
+                </h3>
+                <p className="text-[#6C757D]">
+                  {heroFeatures[currentFeature].description}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
+      {/* Enhanced Stats Section */}
+      <section className="py-16 bg-white/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className={`text-center transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <div className="flex justify-center mb-3">
+                  <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-full text-white">
+                    {stat.icon}
+                  </div>
+                </div>
                 <div className="text-3xl md:text-4xl font-bold text-[#20C997] mb-2">
                   {stat.number}
                 </div>
-                <div className="text-[#6C757D] font-medium">
+                <div className="text-[#6C757D] font-medium text-sm md:text-base">
                   {stat.label}
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section className="py-20 bg-gradient-to-r from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#212529] mb-4">
+              Trusted by Educators Worldwide
+            </h2>
+            <p className="text-xl text-[#6C757D] max-w-2xl mx-auto">
+              Join thousands of educators and learners who trust Locus for their assessment needs.
+            </p>
+          </div>
+
+          {/* Testimonials */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className={`bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-full flex items-center justify-center text-white font-semibold mr-4">
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-[#212529]">{testimonial.name}</h4>
+                    <p className="text-sm text-[#6C757D]">{testimonial.role}</p>
+                  </div>
+                </div>
+                <p className="text-[#6C757D] mb-4 italic">"{testimonial.content}"</p>
+                <div className="flex">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Trust Signals */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {trustSignals.map((signal, index) => (
+              <div key={index} className={`text-center transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <div className="flex justify-center mb-4">
+                  {signal.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-[#212529] mb-2">
+                  {signal.title}
+                </h3>
+                <p className="text-[#6C757D]">
+                  {signal.description}
+                </p>
               </div>
             ))}
           </div>
@@ -249,7 +422,8 @@ export default function Home() {
               <Link 
                 key={index} 
                 href={feature.link}
-                className={`group p-6 rounded-xl border-2 ${feature.color} hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}
+                className={`group p-6 rounded-xl border-2 ${feature.color} hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
@@ -288,7 +462,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className={`text-center transition-all duration-1000 delay-${index * 200} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                 <div className="flex justify-center mb-4">
                   {benefit.icon}
                 </div>
@@ -379,7 +553,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-[#20C997]">
+      <section className="py-20 bg-gradient-to-r from-[#20C997] to-[#1BA085]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             {isAuthenticated ? 'Ready to Continue Learning?' : 'Ready to Get Started?'}
@@ -394,14 +568,14 @@ export default function Home() {
             {isAuthenticated ? (
               <Link 
                 href="/dashboard"
-                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
               >
                 Go to Dashboard
               </Link>
             ) : (
               <Link 
                 href="/login"
-                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+                className="bg-white text-[#20C997] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
               >
                 Sign In with Google
               </Link>
@@ -415,7 +589,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">Locus</h3>
+              <h3 className="text-xl font-bold mb-4 flex items-center">
+                <div className="w-6 h-6 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded mr-2 flex items-center justify-center">
+                  <Target className="h-4 w-4 text-white" />
+                </div>
+                Locus
+              </h3>
               <p className="text-gray-400">
                 The ultimate quiz management platform for modern learning and assessment.
               </p>
