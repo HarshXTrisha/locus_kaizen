@@ -68,7 +68,7 @@ export default function TeamsPage() {
     };
 
     loadTeamData();
-  }, [user?.id]);
+  }, [user?.id, userRole]);
 
   const handleSetAdmin = async () => {
     try {

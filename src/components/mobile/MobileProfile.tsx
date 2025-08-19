@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { showError, showSuccess } from '@/components/common/NotificationSystem';
@@ -52,9 +53,11 @@ export default function MobileProfile() {
         <div className="relative inline-block mb-4">
           <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
             {profileData.avatar ? (
-              <img 
+              <Image 
                 src={profileData.avatar} 
                 alt="Profile" 
+                width={96}
+                height={96}
                 className="w-24 h-24 rounded-full object-cover"
               />
             ) : (

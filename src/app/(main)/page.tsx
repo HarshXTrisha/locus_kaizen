@@ -375,7 +375,7 @@ export default function Home() {
                     <p className="text-sm text-[#6C757D]">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-[#6C757D] mb-4 italic">"{testimonial.content}"</p>
+                <p className="text-[#6C757D] mb-4 italic">&ldquo;{testimonial.content}&rdquo;</p>
                 <div className="flex">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
