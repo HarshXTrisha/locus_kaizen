@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Upload, FileJson, X, CheckCircle, AlertCircle, Download, Plus } from 'lucide-react';
+import { Upload, FileJson, X, CheckCircle, AlertCircle, Download, Plus, FileText } from 'lucide-react';
 import { ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 
@@ -10,6 +10,7 @@ interface FileUploadAreaProps {
   onUploadStart?: () => void;
   onUploadComplete?: () => void;
   accept?: string;
+  fileType?: 'json' | 'txt';
 }
 
 interface QuizJSON {
@@ -30,7 +31,8 @@ export function FileUploadArea({
   onQuestionsExtracted, 
   onUploadStart, 
   onUploadComplete,
-  accept = ".json"
+  accept = ".json",
+  fileType = "json"
 }: FileUploadAreaProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -113,6 +115,61 @@ export function FileUploadArea({
     showSuccess('Template Downloaded', 'JSON template has been downloaded successfully');
   };
 
+  const downloadTXTTemplate = () => {
+    const template = `Quiz Title: Sample Quiz
+Subject: General Knowledge
+Description: A comprehensive quiz covering multiple topics
+
+Q1. What is the capital of France?
+A) London
+B) Berlin
+C) Paris
+D) Madrid
+Correct Answer: C
+
+Q2. Which planet is known as the Red Planet?
+A) Earth
+B) Mars
+C) Jupiter
+D) Venus
+Correct Answer: B
+
+Q3. Is the Earth round?
+A) True
+B) False
+Correct Answer: A
+
+Q4. What is 2 + 2?
+Correct Answer: 4
+
+Q5. Which programming language is known as the language of the web?
+A) Python
+B) Java
+C) JavaScript
+D) C++
+Correct Answer: C
+
+Q6. The sun rises in the east.
+A) True
+B) False
+Correct Answer: A
+
+Q7. What is the chemical symbol for gold?
+Correct Answer: Au`;
+
+    const blob = new Blob([template], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quiz-template.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showSuccess('Template Downloaded', 'TXT template has been downloaded successfully');
+  };
+
   const processJSONFile = async (file: File): Promise<ExtractedQuestion[]> => {
     try {
       // Check file size first (limit to 10MB for JSON files)
@@ -187,6 +244,96 @@ export function FileUploadArea({
     }
   };
 
+  const processTXTFile = async (file: File): Promise<ExtractedQuestion[]> => {
+    try {
+      // Check file size first (limit to 5MB for TXT files)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        throw new Error('File too large. Maximum size is 5MB for TXT files.');
+      }
+
+      const text = await file.text();
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      
+      const questions: ExtractedQuestion[] = [];
+      let currentQuestion: any = null;
+      let questionNumber = 1;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        // Check if this is a question line (starts with Q followed by number)
+        if (line.match(/^Q\d+\./)) {
+          // Save previous question if exists
+          if (currentQuestion && currentQuestion.text) {
+            questions.push(currentQuestion);
+          }
+          
+          // Start new question
+          const questionText = line.replace(/^Q\d+\.\s*/, '').trim();
+          currentQuestion = {
+            id: `q${questionNumber}`,
+            text: questionText,
+            type: 'multiple-choice' as const,
+            options: [],
+            correctAnswer: '',
+            points: 1
+          };
+          questionNumber++;
+        }
+        // Check if this is an option line (starts with A), B), C), D), etc.)
+        else if (line.match(/^[A-Z]\)/)) {
+          if (currentQuestion) {
+            const option = line.replace(/^[A-Z]\)\s*/, '').trim();
+            currentQuestion.options!.push(option);
+          }
+        }
+        // Check if this is a correct answer line
+        else if (line.toLowerCase().includes('correct answer:')) {
+          if (currentQuestion) {
+            const answer = line.replace(/correct answer:\s*/i, '').trim();
+            currentQuestion.correctAnswer = answer;
+            
+            // If no options were found, this might be a short answer question
+            if (currentQuestion.options!.length === 0) {
+              currentQuestion.type = 'short-answer';
+              delete currentQuestion.options;
+            }
+            // If only True/False options, mark as true-false
+            else if (currentQuestion.options!.length === 2 && 
+                     currentQuestion.options!.every((opt: string) => ['True', 'False'].includes(opt))) {
+              currentQuestion.type = 'true-false';
+            }
+          }
+        }
+        // If it's just text without special formatting, it might be a short answer question
+        else if (currentQuestion && !currentQuestion.correctAnswer && !line.match(/^[A-Z]\)/)) {
+          currentQuestion.text += ' ' + line;
+        }
+      }
+
+      // Add the last question if exists
+      if (currentQuestion && currentQuestion.text) {
+        questions.push(currentQuestion);
+      }
+
+      // Validate questions
+      if (questions.length === 0) {
+        throw new Error('No valid questions found in the TXT file. Please check the format.');
+      }
+
+      // Limit number of questions
+      const maxQuestions = 500;
+      if (questions.length > maxQuestions) {
+        throw new Error(`Too many questions. Maximum allowed is ${maxQuestions} questions. Your file contains ${questions.length} questions.`);
+      }
+
+      return questions;
+    } catch (error) {
+      throw new Error(`TXT parsing error: ${error instanceof Error ? error.message : 'Invalid TXT format'}`);
+    }
+  };
+
   const handleFileProcess = useCallback(async (files: File[]) => {
     setIsProcessing(true);
     setUploadedFiles(files);
@@ -200,12 +347,16 @@ export function FileUploadArea({
         const file = files[i];
         setProcessingStatus(`Processing file ${i + 1} of ${files.length}: ${file.name}...`);
         
-        if (file.type === 'application/json' || file.name.endsWith('.json')) {
+        if (fileType === 'json' && (file.type === 'application/json' || file.name.endsWith('.json'))) {
           const questions = await processJSONFile(file);
           allQuestions = [...allQuestions, ...questions];
           totalQuestions += questions.length;
+        } else if (fileType === 'txt' && (file.type === 'text/plain' || file.name.endsWith('.txt'))) {
+          const questions = await processTXTFile(file);
+          allQuestions = [...allQuestions, ...questions];
+          totalQuestions += questions.length;
         } else {
-          throw new Error(`Unsupported file type: ${file.name}. Please upload only JSON files.`);
+          throw new Error(`Unsupported file type: ${file.name}. Please upload only ${fileType.toUpperCase()} files.`);
         }
       }
 
@@ -227,22 +378,27 @@ export function FileUploadArea({
       setIsProcessing(false);
       onUploadComplete?.();
     }
-  }, [onQuestionsExtracted, onUploadStart, onUploadComplete]);
+  }, [onQuestionsExtracted, onUploadStart, onUploadComplete, fileType]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
 
-    const files = Array.from(e.dataTransfer.files).filter(file => 
-      file.type === 'application/json' || file.name.endsWith('.json')
-    );
+    const files = Array.from(e.dataTransfer.files).filter(file => {
+      if (fileType === 'json') {
+        return file.type === 'application/json' || file.name.endsWith('.json');
+      } else if (fileType === 'txt') {
+        return file.type === 'text/plain' || file.name.endsWith('.txt');
+      }
+      return false;
+    });
     
     if (files.length > 0) {
       handleFileProcess(files);
     } else {
-      showError('Invalid Files', 'Please upload only JSON files');
+      showError('Invalid Files', `Please upload only ${fileType.toUpperCase()} files`);
     }
-  }, [handleFileProcess]);
+  }, [handleFileProcess, fileType]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -257,23 +413,31 @@ export function FileUploadArea({
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      const jsonFiles = Array.from(files).filter(file => 
-        file.type === 'application/json' || file.name.endsWith('.json')
-      );
+      const validFiles = Array.from(files).filter(file => {
+        if (fileType === 'json') {
+          return file.type === 'application/json' || file.name.endsWith('.json');
+        } else if (fileType === 'txt') {
+          return file.type === 'text/plain' || file.name.endsWith('.txt');
+        }
+        return false;
+      });
       
-      if (jsonFiles.length > 0) {
-        handleFileProcess(jsonFiles);
+      if (validFiles.length > 0) {
+        handleFileProcess(validFiles);
       } else {
-        showError('Invalid Files', 'Please select only JSON files');
+        showError('Invalid Files', `Please select only ${fileType.toUpperCase()} files`);
       }
     }
-  }, [handleFileProcess]);
+  }, [handleFileProcess, fileType]);
 
   const clearUpload = () => {
     setUploadedFiles([]);
     setProcessingStatus('');
     onQuestionsExtracted([]);
   };
+
+  const isJSON = fileType === 'json';
+  const isTXT = fileType === 'txt';
 
   return (
     <div className="space-y-6">
@@ -288,84 +452,113 @@ export function FileUploadArea({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-          <input
-            type="file"
-                          accept={accept}
-            multiple
-            onChange={handleFileSelect}
+        <input
+          type="file"
+          accept={accept}
+          multiple
+          onChange={handleFileSelect}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         
         <div className="space-y-4">
           <div className="p-3 bg-[#20C997]/10 rounded-full w-fit mx-auto">
-            <Upload className="h-8 w-8 text-[#20C997]" />
-      </div>
+            {isJSON ? (
+              <FileJson className="h-8 w-8 text-[#20C997]" />
+            ) : (
+              <FileText className="h-8 w-8 text-[#20C997]" />
+            )}
+          </div>
 
-                    <div>
+          <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Upload JSON Quiz Files
+              Upload {fileType.toUpperCase()} Quiz Files
             </h3>
             <p className="text-gray-600 mb-4">
-              Drag and drop JSON files here, or click to browse. You can upload multiple files at once.
+              Drag and drop {fileType.toUpperCase()} files here, or click to browse. You can upload multiple files at once.
             </p>
             
             {/* Supported Format */}
             <div className="flex justify-center gap-6 text-sm text-gray-500">
               <div className="flex items-center gap-2">
-                <FileJson className="h-4 w-4 text-blue-500" />
-                <span>JSON Quiz Files (Multiple files supported)</span>
+                {isJSON ? (
+                  <FileJson className="h-4 w-4 text-blue-500" />
+                ) : (
+                  <FileText className="h-4 w-4 text-green-500" />
+                )}
+                <span>{fileType.toUpperCase()} Quiz Files (Multiple files supported)</span>
               </div>
             </div>
           </div>
-                    </div>
-                  </div>
-                  
-      {/* JSON Format Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        </div>
+      </div>
+      
+      {/* Format Instructions */}
+      <div className={`border rounded-lg p-6 ${isJSON ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}>
         <div className="flex items-center justify-between mb-4">
-          <h4 className="font-medium text-blue-900 text-lg">JSON Format Requirements</h4>
-                      <button
-            onClick={downloadJSONTemplate}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                      >
+          <h4 className={`font-medium text-lg ${isJSON ? 'text-blue-900' : 'text-green-900'}`}>
+            {fileType.toUpperCase()} Format Requirements
+          </h4>
+          <button
+            onClick={isJSON ? downloadJSONTemplate : downloadTXTTemplate}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors text-sm font-medium ${
+              isJSON ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'
+            }`}
+          >
             <Download className="h-4 w-4" />
             Download Template
-                      </button>
+          </button>
         </div>
         
         <div className="space-y-4">
-          <p className="text-blue-800 text-sm">
-            Your JSON files must follow this exact structure. Download the template above for a complete example.
+          <p className={`text-sm ${isJSON ? 'text-blue-800' : 'text-green-800'}`}>
+            Your {fileType.toUpperCase()} files must follow the exact structure. Download the template above for a complete example.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="bg-white p-3 rounded border border-blue-200">
-              <h6 className="font-medium text-blue-900 mb-1">Multiple Choice</h6>
-              <p className="text-blue-700 text-xs">Include options array with correctAnswer matching one option</p>
+          {isJSON ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-white p-3 rounded border border-blue-200">
+                <h6 className="font-medium text-blue-900 mb-1">Multiple Choice</h6>
+                <p className="text-blue-700 text-xs">Include options array with correctAnswer matching one option</p>
+              </div>
+                             <div className="bg-white p-3 rounded border border-blue-200">
+                 <h6 className="font-medium text-blue-900 mb-1">True/False</h6>
+                 <p className="text-blue-700 text-xs">Use options: [&quot;True&quot;, &quot;False&quot;] with correctAnswer: &quot;True&quot; or &quot;False&quot;</p>
+               </div>
+              <div className="bg-white p-3 rounded border border-blue-200">
+                <h6 className="font-medium text-blue-900 mb-1">Short Answer</h6>
+                <p className="text-blue-700 text-xs">No options needed, just correctAnswer text</p>
+              </div>
             </div>
-            <div className="bg-white p-3 rounded border border-blue-200">
-              <h6 className="font-medium text-blue-900 mb-1">True/False</h6>
-              <p className="text-blue-700 text-xs">Use options: [&quot;True&quot;, &quot;False&quot;] with correctAnswer: &quot;True&quot; or &quot;False&quot;</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-white p-3 rounded border border-green-200">
+                <h6 className="font-medium text-green-900 mb-1">Multiple Choice</h6>
+                <p className="text-green-700 text-xs">Q1. Question text<br/>A) Option 1<br/>B) Option 2<br/>Correct Answer: A</p>
+              </div>
+              <div className="bg-white p-3 rounded border border-green-200">
+                <h6 className="font-medium text-green-900 mb-1">True/False</h6>
+                <p className="text-green-700 text-xs">Q1. Question text<br/>A) True<br/>B) False<br/>Correct Answer: A</p>
+              </div>
+              <div className="bg-white p-3 rounded border border-green-200">
+                <h6 className="font-medium text-green-900 mb-1">Short Answer</h6>
+                <p className="text-green-700 text-xs">Q1. Question text<br/>Correct Answer: Answer text</p>
+              </div>
             </div>
-            <div className="bg-white p-3 rounded border border-blue-200">
-              <h6 className="font-medium text-blue-900 mb-1">Short Answer</h6>
-              <p className="text-blue-700 text-xs">No options needed, just correctAnswer text</p>
-                  </div>
-                </div>
+          )}
                 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className={`border rounded-lg p-3 ${isJSON ? 'bg-yellow-50 border-yellow-200' : 'bg-yellow-50 border-yellow-200'}`}>
             <h6 className="font-medium text-yellow-900 mb-1 text-sm">Upload Limits:</h6>
             <ul className="text-yellow-800 text-xs space-y-1">
-              <li>• Maximum file size: 10MB per file</li>
+              <li>• Maximum file size: {isJSON ? '10MB' : '5MB'} per file</li>
               <li>• Maximum questions: 500 per file</li>
               <li>• Maximum total questions: 1000 across all files</li>
               <li>• All question types must have a correctAnswer</li>
-              <li>• Multiple-choice questions must have at least 2 options</li>
+              {isJSON && <li>• Multiple-choice questions must have at least 2 options</li>}
               <li>• Points are optional and default to 1</li>
             </ul>
-                        </div>
-                    </div>
-                  </div>
+          </div>
+        </div>
+      </div>
 
       {/* Processing Status */}
       {isProcessing && (
@@ -388,17 +581,21 @@ export function FileUploadArea({
             >
               <X className="h-4 w-4" />
             </button>
-              </div>
+          </div>
               
           <div className="space-y-2">
             {uploadedFiles.map((file, index) => (
               <div key={index} className="flex items-center gap-3 p-2 bg-white rounded border">
-                <FileJson className="h-4 w-4 text-blue-500" />
+                {isJSON ? (
+                  <FileJson className="h-4 w-4 text-blue-500" />
+                ) : (
+                  <FileText className="h-4 w-4 text-green-500" />
+                )}
                 <span className="text-sm text-gray-900 flex-1">{file.name}</span>
                 <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
               </div>
             ))}
-              </div>
+          </div>
               
           {processingStatus && (
             <p className={`mt-3 text-sm ${
