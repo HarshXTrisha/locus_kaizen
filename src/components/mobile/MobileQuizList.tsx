@@ -33,10 +33,12 @@ export default function MobileQuizList() {
     const loadQuizzes = async () => {
       try {
         setLoading(true);
+        console.log('📱 Loading quizzes for user:', user.id);
         const userQuizzes = await getUserQuizzes(user.id);
+        console.log('📱 Quizzes loaded:', userQuizzes.length, 'quizzes');
         setQuizzes(userQuizzes);
       } catch (error) {
-        console.error('Error loading quizzes:', error);
+        console.error('❌ Error loading quizzes:', error);
         showError('Error', 'Failed to load quizzes');
       } finally {
         setLoading(false);
@@ -47,6 +49,7 @@ export default function MobileQuizList() {
   }, [user, isAuthenticated, router]);
 
   const handleDeleteQuiz = (quizId: string, quizTitle: string) => {
+    console.log('🖱️ Delete button clicked:', { quizId, quizTitle });
     setConfirmDelete({ open: true, quizId, quizTitle });
   };
 
@@ -55,18 +58,30 @@ export default function MobileQuizList() {
   };
 
   const confirmDeletion = async () => {
-    if (!confirmDelete.open || !confirmDelete.quizId) return;
+    if (!confirmDelete.open || !confirmDelete.quizId) {
+      console.log('❌ Delete validation failed:', { open: confirmDelete.open, quizId: confirmDelete.quizId });
+      return;
+    }
+
+    console.log('🗑️ Starting quiz deletion:', confirmDelete.quizId, confirmDelete.quizTitle);
 
     try {
       setDeletingQuiz(confirmDelete.quizId);
+      console.log('🔄 Calling deleteQuiz function...');
       await deleteQuiz(confirmDelete.quizId);
+      console.log('✅ Quiz deleted successfully from Firebase');
+      
       showSuccess('Quiz deleted', `"${confirmDelete.quizTitle}" has been removed.`);
       
       // Remove the quiz from the local state
-      setQuizzes(prev => prev.filter(quiz => quiz.id !== confirmDelete.quizId));
+      setQuizzes(prev => {
+        const filtered = prev.filter(quiz => quiz.id !== confirmDelete.quizId);
+        console.log('🔄 Updated local state:', { before: prev.length, after: filtered.length });
+        return filtered;
+      });
     } catch (error) {
-      console.error('Error deleting quiz:', error);
-      showError('Failed to delete quiz', 'An error occurred while deleting the quiz.');
+      console.error('❌ Error deleting quiz:', error);
+      showError('Failed to delete quiz', `Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setDeletingQuiz(null);
       closeConfirmModal();
