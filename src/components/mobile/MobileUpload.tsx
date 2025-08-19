@@ -1,311 +1,163 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { showError, showSuccess } from '@/components/common/NotificationSystem';
 import { 
   Upload, FileText, File, ArrowLeft, CheckCircle, AlertCircle,
-  Trash2, Download, Eye, Clock, Loader2, X
+  Trash2, Download, Eye, Clock, Loader2, X, Plus, Play
 } from 'lucide-react';
 import { mobileClasses } from '@/lib/mobile-detection';
+import { ExtractedQuestion, ExtractedQuiz } from '@/lib/pdf-processor';
+import { createQuiz, ALLOWED_SUBJECTS } from '@/lib/firebase-quiz';
+import { getFirebaseAuth } from '@/lib/firebase-utils';
+import dynamic from 'next/dynamic';
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  status: 'uploading' | 'processing' | 'completed' | 'error';
-  progress: number;
-  error?: string;
-  questions?: number;
-}
+// Dynamically import upload components to prevent SSR issues
+const FileUploadArea = dynamic(
+  () => import('@/components/upload/FileUploadArea').then(mod => ({ default: mod.FileUploadArea })),
+  { ssr: false }
+);
+
+const PDFUploadArea = dynamic(
+  () => import('@/components/upload/PDFUploadArea').then(mod => ({ default: mod.PDFUploadArea })),
+  { ssr: false }
+);
 
 export default function MobileUpload() {
   const router = useRouter();
-  const { user } = useAppStore();
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'upload' | 'history'>('upload');
+  const { user, isAuthenticated } = useAppStore();
+  const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
+  const [extractedQuiz, setExtractedQuiz] = useState<ExtractedQuiz | null>(null);
+  const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
+  const [activeTab, setActiveTab] = useState<'json' | 'pdf' | 'txt'>('json');
+  const [quizData, setQuizData] = useState({
+    title: '',
+    description: '',
+    subject: '',
+    timeLimit: 30,
+    passingScore: 0
+  });
 
-  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, user, router]);
 
-    const newFiles: UploadedFile[] = Array.from(files).map(file => ({
-      id: Date.now().toString() + Math.random(),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      status: 'uploading',
-      progress: 0
+  const handleQuestionsExtracted = (questions: ExtractedQuestion[]) => {
+    console.log('📱 JSON questions extracted:', questions.length);
+    setExtractedQuestions(questions);
+    setQuizData(prev => ({
+      ...prev,
+      title: `Quiz with ${questions.length} Questions`,
+      description: `Quiz created from uploaded JSON file(s) with ${questions.length} questions`
     }));
+  };
 
-    setUploadedFiles(prev => [...prev, ...newFiles]);
-    setIsUploading(true);
+  const handlePDFQuizExtracted = (quiz: ExtractedQuiz) => {
+    console.log('📱 PDF quiz extracted:', quiz.title, quiz.questions.length);
+    setExtractedQuiz(quiz);
+    setExtractedQuestions(quiz.questions);
+    setQuizData(prev => ({
+      ...prev,
+      title: quiz.title,
+      description: quiz.description || `Quiz extracted from PDF with ${quiz.questions.length} questions`,
+      subject: quiz.subject
+    }));
+  };
 
-    // Simulate upload process
-    newFiles.forEach((file, index) => {
-      simulateUpload(file.id, index);
-    });
-  }, []);
+  const handleTXTQuizExtracted = (quiz: ExtractedQuiz) => {
+    console.log('📱 TXT quiz extracted:', quiz.title, quiz.questions.length);
+    setExtractedQuiz(quiz);
+    setExtractedQuestions(quiz.questions);
+    setQuizData(prev => ({
+      ...prev,
+      title: quiz.title || `Quiz with ${quiz.questions.length} Questions`,
+      description: quiz.description || `Quiz extracted from TXT with ${quiz.questions.length} questions`,
+      subject: quiz.subject
+    }));
+  };
 
-  const simulateUpload = useCallback((fileId: string, delay: number) => {
-    setTimeout(() => {
-      setUploadedFiles(prev => 
-        prev.map(file => 
-          file.id === fileId 
-            ? { ...file, status: 'processing', progress: 50 }
-            : file
-        )
-      );
+  const handleCreateQuiz = async () => {
+    try {
+      console.log('📱 Creating quiz from extracted data...');
+      const auth = getFirebaseAuth();
+      if (!auth?.currentUser || !user) {
+        showError('Authentication Required', 'Please sign in to create quizzes');
+        return;
+      }
 
-      setTimeout(() => {
-        setUploadedFiles(prev => 
-          prev.map(file => 
-            file.id === fileId 
-              ? { 
-                  ...file, 
-                  status: 'completed', 
-                  progress: 100,
-                  questions: Math.floor(Math.random() * 20) + 5
-                }
-              : file
-          )
-        );
+      const questionsToUse = extractedQuiz ? extractedQuiz.questions : extractedQuestions;
+      
+      if (questionsToUse.length === 0) {
+        showError('No Questions', 'No questions available to create quiz');
+        return;
+      }
 
-        if (uploadedFiles.every(f => f.status === 'completed')) {
-          setIsUploading(false);
-        }
-      }, 2000);
-    }, delay * 1000);
-  }, [uploadedFiles]);
+      setIsCreatingQuiz(true);
 
-  const removeFile = useCallback((fileId: string) => {
-    setUploadedFiles(prev => prev.filter(file => file.id !== fileId));
-  }, []);
+      const quizId = await createQuiz({
+        title: quizData.title,
+        description: quizData.description,
+        subject: quizData.subject || 'General',
+        questions: questionsToUse,
+        timeLimit: quizData.timeLimit,
+        passingScore: quizData.passingScore,
+        createdBy: user.id
+      });
 
-  const retryUpload = useCallback((fileId: string) => {
-    setUploadedFiles(prev => 
-      prev.map(file => 
-        file.id === fileId 
-          ? { ...file, status: 'uploading', progress: 0, error: undefined }
-          : file
-      )
+      console.log('📱 Quiz created successfully:', quizId);
+      showSuccess('Quiz Created', 'Your quiz has been created successfully!');
+      
+      // Reset form
+      setExtractedQuestions([]);
+      setExtractedQuiz(null);
+      setQuizData({
+        title: '',
+        description: '',
+        subject: '',
+        timeLimit: 30,
+        passingScore: 0
+      });
+
+      // Navigate to quiz
+      router.push(`/quiz/${quizId}`);
+    } catch (error) {
+      console.error('❌ Error creating quiz:', error);
+      showError('Failed to Create Quiz', 'An error occurred while creating the quiz');
+    } finally {
+      setIsCreatingQuiz(false);
+    }
+  };
+
+  const hasQuestions = extractedQuestions.length > 0 || extractedQuiz;
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className={`${mobileClasses.container} flex items-center justify-center min-h-screen`}>
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
     );
-    simulateUpload(fileId, 0);
-  }, []);
-
-  const getFileIcon = (type: string) => {
-    if (type.includes('pdf')) return <FileText className="text-red-500" size={24} />;
-    if (type.includes('text') || type.includes('json')) return <File className="text-blue-500" size={24} />;
-    return <File className="text-gray-500" size={24} />;
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const renderUploadTab = () => (
-    <div className="space-y-4">
-      {/* Upload Area */}
-      <div className={mobileClasses.card}>
-        <div className="text-center py-8">
-          <Upload size={48} className="mx-auto text-gray-400 mb-4" />
-          <h3 className={mobileClasses.text.h3 + " mb-2"}>Upload Files</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Upload PDF, TXT, or JSON files to extract questions
-          </p>
-          
-          <label className="cursor-pointer">
-            <input
-              type="file"
-              multiple
-              accept=".pdf,.txt,.json"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-            <div className={mobileClasses.button.primary + " inline-flex items-center gap-2"}>
-              <Upload size={16} />
-              Choose Files
-            </div>
-          </label>
-          
-          <p className="text-xs text-gray-500 mt-2">
-            Supported formats: PDF, TXT, JSON (max 10MB each)
-          </p>
-        </div>
-      </div>
-
-      {/* File List */}
-      {uploadedFiles.length > 0 && (
-        <div className={mobileClasses.card}>
-          <h3 className={mobileClasses.text.h3 + " mb-3"}>Uploaded Files</h3>
-          
-          <div className="space-y-3">
-            {uploadedFiles.map((file) => (
-              <div key={file.id} className="border border-gray-200 rounded-lg p-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    {getFileIcon(file.type)}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-gray-900 truncate">
-                        {file.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {formatFileSize(file.size)}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => removeFile(file.id)}
-                    className="text-red-500 p-1"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                    <span>
-                      {file.status === 'uploading' && 'Uploading...'}
-                      {file.status === 'processing' && 'Processing...'}
-                      {file.status === 'completed' && 'Completed'}
-                      {file.status === 'error' && 'Error'}
-                    </span>
-                    <span>{file.progress}%</span>
-                  </div>
-                  
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        file.status === 'error' ? 'bg-red-500' : 'bg-green-500'
-                      }`}
-                      style={{ width: `${file.progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Status Icons */}
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-2">
-                    {file.status === 'uploading' && (
-                      <Loader2 size={14} className="animate-spin text-blue-500" />
-                    )}
-                    {file.status === 'processing' && (
-                      <Clock size={14} className="text-yellow-500" />
-                    )}
-                    {file.status === 'completed' && (
-                      <CheckCircle size={14} className="text-green-500" />
-                    )}
-                    {file.status === 'error' && (
-                      <AlertCircle size={14} className="text-red-500" />
-                    )}
-                    
-                    <span className="text-xs text-gray-600">
-                      {file.status === 'completed' && file.questions && 
-                        `${file.questions} questions extracted`
-                      }
-                      {file.status === 'error' && file.error}
-                    </span>
-                  </div>
-
-                  {file.status === 'error' && (
-                    <button
-                      onClick={() => retryUpload(file.id)}
-                      className="text-blue-600 text-xs font-medium"
-                    >
-                      Retry
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Upload Actions */}
-      {uploadedFiles.length > 0 && (
-        <div className="flex gap-3">
-          <button
-            onClick={() => setUploadedFiles([])}
-            className={mobileClasses.button.secondary + " flex-1"}
-            disabled={isUploading}
-          >
-            Clear All
-          </button>
-          <button
-            onClick={() => {
-              showSuccess('Upload Complete', 'All files have been processed successfully!');
-              router.push('/dashboard');
-            }}
-            className={mobileClasses.button.primary + " flex-1"}
-            disabled={isUploading || uploadedFiles.some(f => f.status !== 'completed')}
-          >
-            {isUploading ? 'Processing...' : 'Continue'}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-
-  const renderHistoryTab = () => (
-    <div className="space-y-4">
-      <div className={mobileClasses.card}>
-        <h3 className={mobileClasses.text.h3 + " mb-3"}>Upload History</h3>
-        
-        <div className="space-y-3">
-          {[
-            { id: '1', name: 'Math_Quiz_Questions.pdf', date: '2024-01-15', questions: 25, status: 'completed' },
-            { id: '2', name: 'Science_Test.txt', date: '2024-01-14', questions: 18, status: 'completed' },
-            { id: '3', name: 'History_Questions.json', date: '2024-01-13', questions: 30, status: 'completed' },
-          ].map((file) => (
-            <div key={file.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-              <div className="flex items-center gap-3">
-                <FileText size={20} className="text-gray-400" />
-                <div>
-                  <p className="font-medium text-sm text-gray-900">{file.name}</p>
-                  <p className="text-xs text-gray-500">{file.date} • {file.questions} questions</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <button className="p-1 text-gray-400 hover:text-gray-600">
-                  <Eye size={16} />
-                </button>
-                <button className="p-1 text-gray-400 hover:text-gray-600">
-                  <Download size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className={`${mobileClasses.container} min-h-screen bg-gray-50`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center gap-3">
+      <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
+        <div className="flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="p-2 text-gray-400 hover:text-gray-600"
+            className="p-2 text-gray-600 hover:text-gray-900"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft className="h-5 w-5" />
           </button>
-          <div>
-            <h1 className={mobileClasses.text.h1}>Upload Questions</h1>
-            <p className="text-xs text-gray-600">Extract questions from files</p>
-          </div>
+          <h1 className="text-lg font-semibold text-gray-900">Upload Files</h1>
+          <div className="w-10" /> {/* Spacer for centering */}
         </div>
       </div>
 
@@ -313,18 +165,20 @@ export default function MobileUpload() {
       <div className="bg-white border-b border-gray-200">
         <div className="flex">
           {[
-            { id: 'upload', label: 'Upload' },
-            { id: 'history', label: 'History' }
+            { id: 'json', label: 'JSON', icon: FileText },
+            { id: 'pdf', label: 'PDF', icon: File },
+            { id: 'txt', label: 'TXT', icon: FileText }
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 py-3 text-center text-sm font-medium border-b-2 transition-colors ${
+              onClick={() => setActiveTab(tab.id as 'json' | 'pdf' | 'txt')}
+              className={`flex-1 py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-green-500 text-green-600'
+                  ? 'border-[#20C997] text-[#20C997]'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
+              <tab.icon className="h-4 w-4 mx-auto mb-1" />
               {tab.label}
             </button>
           ))}
@@ -332,9 +186,156 @@ export default function MobileUpload() {
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        {activeTab === 'upload' && renderUploadTab()}
-        {activeTab === 'history' && renderHistoryTab()}
+      <div className="p-4 space-y-4">
+        {/* Upload Area */}
+        <div className={mobileClasses.card}>
+          {activeTab === 'json' && (
+            <FileUploadArea
+              onQuestionsExtracted={handleQuestionsExtracted}
+              accept=".json"
+            />
+          )}
+          {activeTab === 'pdf' && (
+            <PDFUploadArea
+              onQuizExtracted={handlePDFQuizExtracted}
+            />
+          )}
+          {activeTab === 'txt' && (
+            <PDFUploadArea
+              onQuizExtracted={handleTXTQuizExtracted}
+            />
+          )}
+        </div>
+
+        {/* Quiz Creation Form */}
+        {hasQuestions && (
+          <div className={mobileClasses.card}>
+            <h3 className={mobileClasses.text.h3 + " mb-4"}>Create Quiz</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Quiz Title
+                </label>
+                <input
+                  type="text"
+                  value={quizData.title}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
+                  placeholder="Enter quiz title"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={quizData.description}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
+                  rows={3}
+                  placeholder="Enter quiz description"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
+                <select
+                  value={quizData.subject}
+                  onChange={(e) => setQuizData(prev => ({ ...prev, subject: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
+                >
+                  <option value="">Select subject</option>
+                  {ALLOWED_SUBJECTS.map(subject => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Time Limit (min)
+                  </label>
+                  <input
+                    type="number"
+                    value={quizData.timeLimit}
+                    onChange={(e) => setQuizData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) || 30 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
+                    min="1"
+                    max="180"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Passing Score (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={quizData.passingScore}
+                    onChange={(e) => setQuizData(prev => ({ ...prev, passingScore: parseInt(e.target.value) || 0 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#20C997] focus:border-transparent"
+                    min="0"
+                    max="100"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 text-blue-800">
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    {extractedQuestions.length} questions ready
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCreateQuiz}
+                disabled={isCreatingQuiz || !quizData.title}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                  isCreatingQuiz || !quizData.title
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-[#20C997] text-white hover:bg-[#1BA085]'
+                }`}
+              >
+                {isCreatingQuiz ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating Quiz...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Create Quiz
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Instructions */}
+        <div className={mobileClasses.card}>
+          <h3 className={mobileClasses.text.h3 + " mb-3"}>How to Upload</h3>
+          <div className="space-y-2 text-sm text-gray-600">
+            <div className="flex items-start gap-2">
+              <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
+              <p><strong>JSON:</strong> Upload structured quiz data in JSON format</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
+              <p><strong>PDF:</strong> Upload PDF documents to extract questions automatically</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <div className="w-2 h-2 bg-[#20C997] rounded-full mt-2 flex-shrink-0" />
+              <p><strong>TXT:</strong> Upload text files for question extraction</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

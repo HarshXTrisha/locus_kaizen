@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { showError, showSuccess } from '@/components/common/NotificationSystem';
 import { 
   ArrowLeft, ArrowRight, Clock, CheckCircle, XCircle,
-  Flag, BookOpen, Target, Users, Timer, AlertTriangle
+  Flag, BookOpen, Target, Users, Timer, AlertTriangle, Loader2
 } from 'lucide-react';
 import { mobileClasses } from '@/lib/mobile-detection';
+import { getQuiz } from '@/lib/firebase-quiz';
+import { saveQuizResult } from '@/lib/firebase-quiz';
+import { getFirebaseAuth } from '@/lib/firebase-utils';
 
 interface Question {
   id: string;
@@ -27,57 +30,77 @@ interface QuizData {
 
 export default function MobileQuizTaker() {
   const router = useRouter();
-  const { user } = useAppStore();
+  const params = useParams();
+  const { user, isAuthenticated } = useAppStore();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(new Set());
-  const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes
+  const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes default
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [quizData, setQuizData] = useState<QuizData | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Mock quiz data
-  const quizData: QuizData = {
-    id: '1',
-    title: 'Mathematics Quiz',
-    description: 'Test your knowledge in mathematics',
-    timeLimit: 30,
-    questions: [
-      {
-        id: '1',
-        text: 'What is the formula for calculating the area of a circle?',
-        options: ['A = πr²', 'A = 2πr', 'A = πd', 'A = r²'],
-        correctAnswer: 0
-      },
-      {
-        id: '2',
-        text: 'Solve for x: 2x + 5 = 13',
-        options: ['x = 4', 'x = 8', 'x = 6', 'x = 3'],
-        correctAnswer: 0
-      },
-      {
-        id: '3',
-        text: 'What is the square root of 144?',
-        options: ['12', '14', '10', '16'],
-        correctAnswer: 0
-      },
-      {
-        id: '4',
-        text: 'If a triangle has angles of 45°, 45°, and 90°, what type of triangle is it?',
-        options: ['Equilateral', 'Isosceles', 'Scalene', 'Right'],
-        correctAnswer: 1
-      },
-      {
-        id: '5',
-        text: 'What is the value of π (pi) to two decimal places?',
-        options: ['3.12', '3.14', '3.16', '3.18'],
-        correctAnswer: 1
+  // Get quiz ID from URL
+  const quizId = params?.id as string;
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      router.replace('/login');
+      return;
+    }
+
+    if (!quizId) {
+      showError('Error', 'Quiz ID not found');
+      router.push('/quiz');
+      return;
+    }
+
+    const loadQuiz = async () => {
+      try {
+        setLoading(true);
+        console.log('📱 Loading quiz:', quizId);
+        const quiz = await getQuiz(quizId);
+        
+        if (!quiz) {
+          showError('Quiz Not Found', 'The quiz you are looking for does not exist');
+          router.push('/quiz');
+          return;
+        }
+
+        // Convert quiz data to the format expected by the component
+        const convertedQuiz: QuizData = {
+          id: quiz.id,
+          title: quiz.title,
+          description: quiz.description,
+          timeLimit: quiz.timeLimit,
+          questions: quiz.questions.map((q, index) => ({
+            id: q.id || `q${index}`,
+            text: q.text,
+            options: q.options || [],
+            correctAnswer: q.options ? q.options.indexOf(q.correctAnswer) : 0
+          }))
+        };
+
+        setQuizData(convertedQuiz);
+        setTimeRemaining(convertedQuiz.timeLimit * 60); // Convert minutes to seconds
+        console.log('📱 Quiz loaded:', convertedQuiz.title, convertedQuiz.questions.length, 'questions');
+      } catch (error) {
+        console.error('❌ Error loading quiz:', error);
+        showError('Error', 'Failed to load quiz');
+        router.push('/quiz');
+      } finally {
+        setLoading(false);
       }
-    ]
-  };
+    };
+
+    loadQuiz();
+  }, [quizId, user, isAuthenticated, router]);
 
   // Timer effect
   useEffect(() => {
-    if (timeRemaining > 0 && !isSubmitted) {
+    if (timeRemaining > 0 && !isSubmitted && quizData) {
       const timer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
@@ -90,7 +113,7 @@ export default function MobileQuizTaker() {
 
       return () => clearInterval(timer);
     }
-  }, [timeRemaining, isSubmitted]);
+  }, [timeRemaining, isSubmitted, quizData]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -118,10 +141,10 @@ export default function MobileQuizTaker() {
   }, []);
 
   const handleNextQuestion = useCallback(() => {
-    if (currentQuestion < quizData.questions.length - 1) {
+    if (quizData && currentQuestion < quizData.questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     }
-  }, [currentQuestion, quizData.questions.length]);
+  }, [currentQuestion, quizData]);
 
   const handlePrevQuestion = useCallback(() => {
     if (currentQuestion > 0) {
@@ -129,228 +152,265 @@ export default function MobileQuizTaker() {
     }
   }, [currentQuestion]);
 
-  const handleSubmit = useCallback(() => {
-    setIsSubmitted(true);
-    const answeredCount = Object.keys(answers).length;
-    const totalQuestions = quizData.questions.length;
-    
-    showSuccess(
-      'Quiz Submitted', 
-      `You answered ${answeredCount} out of ${totalQuestions} questions.`
+  const handleSubmit = useCallback(async () => {
+    if (!quizData || !user || isSubmitted) return;
+
+    try {
+      setSubmitting(true);
+      console.log('📱 Submitting quiz answers...');
+
+      // Calculate results
+      let correctAnswers = 0;
+      const totalQuestions = quizData.questions.length;
+      const timeTaken = (quizData.timeLimit * 60) - timeRemaining;
+
+      quizData.questions.forEach((question, index) => {
+        const userAnswer = answers[question.id];
+        if (userAnswer !== undefined && userAnswer === question.correctAnswer) {
+          correctAnswers++;
+        }
+      });
+
+      const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+      // Save result to Firebase
+      const resultId = await saveQuizResult({
+        quizId: quizData.id,
+        userId: user.id,
+        score,
+        totalQuestions,
+        correctAnswers,
+        timeTaken,
+        completedAt: new Date(),
+        answers: Object.entries(answers).map(([questionId, answerIndex]) => ({
+          questionId,
+          userAnswer: quizData.questions.find(q => q.id === questionId)?.options[answerIndex] || '',
+          isCorrect: answerIndex === quizData.questions.find(q => q.id === questionId)?.correctAnswer,
+          points: answerIndex === quizData.questions.find(q => q.id === questionId)?.correctAnswer ? 1 : 0
+        }))
+      });
+
+      console.log('📱 Quiz result saved:', resultId);
+      setIsSubmitted(true);
+      showSuccess('Quiz Completed!', `You scored ${score}% (${correctAnswers}/${totalQuestions} correct)`);
+
+      // Navigate to results page
+      setTimeout(() => {
+        router.push(`/results/${resultId}`);
+      }, 2000);
+
+    } catch (error) {
+      console.error('❌ Error submitting quiz:', error);
+      showError('Submission Failed', 'Failed to submit quiz results');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [quizData, user, answers, timeRemaining, isSubmitted, router]);
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className={`${mobileClasses.container} flex items-center justify-center min-h-screen`}>
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
     );
-    
-    // Navigate to results after a delay
-    setTimeout(() => {
-      router.push('/results');
-    }, 2000);
-  }, [answers, quizData.questions.length, router]);
+  }
 
-  const currentQuestionData = quizData.questions[currentQuestion];
-  const isAnswered = answers[currentQuestionData.id] !== undefined;
-  const isFlagged = flaggedQuestions.has(currentQuestionData.id);
-
-  const renderQuestion = () => (
-    <div className="space-y-4">
-      {/* Question Header */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600">
-          Question {currentQuestion + 1} of {quizData.questions.length}
-        </span>
-        <button
-          onClick={() => handleFlagQuestion(currentQuestionData.id)}
-          className={`p-2 rounded-lg ${
-            isFlagged ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          <Flag size={16} />
-        </button>
-      </div>
-
-      {/* Question Text */}
-      <div className={mobileClasses.card}>
-        <h3 className={mobileClasses.text.h3 + " mb-4"}>
-          {currentQuestionData.text}
-        </h3>
-
-        {/* Options */}
-        <div className="space-y-3">
-          {currentQuestionData.options.map((option, index) => (
-            <label
-              key={index}
-              className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                answers[currentQuestionData.id] === index
-                  ? 'border-green-500 bg-green-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <input
-                type="radio"
-                name={`question-${currentQuestionData.id}`}
-                checked={answers[currentQuestionData.id] === index}
-                onChange={() => handleAnswerSelect(currentQuestionData.id, index)}
-                className="sr-only"
-              />
-              <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
-                answers[currentQuestionData.id] === index
-                  ? 'border-green-500 bg-green-500'
-                  : 'border-gray-300'
-              }`}>
-                {answers[currentQuestionData.id] === index && (
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                )}
-              </div>
-              <span className="text-sm text-gray-900">{option}</span>
-            </label>
-          ))}
+  if (loading) {
+    return (
+      <div className={`${mobileClasses.container} flex items-center justify-center min-h-screen`}>
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">Loading quiz...</p>
         </div>
       </div>
+    );
+  }
 
-      {/* Navigation */}
-      <div className="flex gap-3">
-        <button
-          onClick={handlePrevQuestion}
-          disabled={currentQuestion === 0}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
-            currentQuestion === 0
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          <ArrowLeft size={16} className="inline mr-2" />
-          Previous
-        </button>
-        
-        {currentQuestion === quizData.questions.length - 1 ? (
-          <button
-            onClick={() => setShowConfirmSubmit(true)}
-            className="flex-1 py-3 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
-          >
-            Submit Quiz
-          </button>
-        ) : (
-          <button
-            onClick={handleNextQuestion}
-            className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
-          >
-            Next
-            <ArrowRight size={16} className="inline ml-2" />
-          </button>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderQuestionNavigation = () => (
-    <div className={mobileClasses.card}>
-      <h3 className={mobileClasses.text.h3 + " mb-3"}>Question Navigation</h3>
-      
-      <div className="grid grid-cols-5 gap-2">
-        {quizData.questions.map((question, index) => {
-          const isAnswered = answers[question.id] !== undefined;
-          const isFlagged = flaggedQuestions.has(question.id);
-          const isCurrent = index === currentQuestion;
-          
-          return (
-            <button
-              key={question.id}
-              onClick={() => setCurrentQuestion(index)}
-              className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                isCurrent
-                  ? 'bg-blue-600 text-white'
-                  : isAnswered
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-600'
-              } ${isFlagged ? 'ring-2 ring-yellow-400' : ''}`}
-            >
-              {index + 1}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="flex items-center justify-between mt-3 text-xs text-gray-600">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-green-100 rounded"></div>
-          <span>Answered</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-yellow-100 rounded ring-1 ring-yellow-400"></div>
-          <span>Flagged</span>
+  if (!quizData) {
+    return (
+      <div className={`${mobileClasses.container} flex items-center justify-center min-h-screen`}>
+        <div className="text-center">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-red-400" />
+          <p className="text-gray-600">Quiz not found</p>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  const currentQ = quizData.questions[currentQuestion];
+  const answeredQuestions = Object.keys(answers).length;
+  const totalQuestions = quizData.questions.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`${mobileClasses.container} min-h-screen bg-gray-50`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
+      <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 text-gray-400 hover:text-gray-600"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <div>
-              <h1 className={mobileClasses.text.h1}>{quizData.title}</h1>
-              <p className="text-xs text-gray-600">{quizData.description}</p>
-            </div>
+          <button
+            onClick={() => router.back()}
+            className="p-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="text-center">
+            <h1 className="text-sm font-semibold text-gray-900">{quizData.title}</h1>
+            <p className="text-xs text-gray-500">Question {currentQuestion + 1} of {totalQuestions}</p>
           </div>
-          
-          {/* Timer */}
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-lg ${
-            timeRemaining < 300 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
-          }`}>
-            <Clock size={16} />
-            <span className="font-mono text-sm">{formatTime(timeRemaining)}</span>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-red-500" />
+            <span className="text-sm font-mono text-red-600">{formatTime(timeRemaining)}</span>
           </div>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="w-full bg-gray-200 h-1">
+      <div className="bg-white border-b border-gray-200 px-4 py-2">
+        <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+          <span>Progress: {answeredQuestions}/{totalQuestions}</span>
+          <span>{Math.round((answeredQuestions / totalQuestions) * 100)}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
-            className="bg-green-500 h-1 transition-all duration-300"
-            style={{ width: `${((currentQuestion + 1) / quizData.questions.length) * 100}%` }}
+            className="bg-[#20C997] h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(answeredQuestions / totalQuestions) * 100}%` }}
           />
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4 space-y-4">
-        {renderQuestion()}
-        {renderQuestionNavigation()}
+      {/* Question Content */}
+      <div className="p-4 space-y-6">
+        {/* Question */}
+        <div className={mobileClasses.card}>
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-[#20C997]" />
+              <span className="text-sm font-medium text-gray-600">Question {currentQuestion + 1}</span>
+            </div>
+            <button
+              onClick={() => handleFlagQuestion(currentQ.id)}
+              className={`p-2 rounded-full transition-colors ${
+                flaggedQuestions.has(currentQ.id) 
+                  ? 'text-red-500 bg-red-50' 
+                  : 'text-gray-400 hover:text-red-500'
+              }`}
+            >
+              <Flag className="h-4 w-4" />
+            </button>
+          </div>
+
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">{currentQ.text}</h2>
+
+          {/* Options */}
+          <div className="space-y-3">
+            {currentQ.options.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleAnswerSelect(currentQ.id, index)}
+                className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
+                  answers[currentQ.id] === index
+                    ? 'border-[#20C997] bg-[#20C997] text-white'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    answers[currentQ.id] === index
+                      ? 'border-white'
+                      : 'border-gray-300'
+                  }`}>
+                    {answers[currentQ.id] === index && (
+                      <CheckCircle className="h-4 w-4" />
+                    )}
+                  </div>
+                  <span className="font-medium">{option}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={handlePrevQuestion}
+            disabled={currentQuestion === 0}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              currentQuestion === 0
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Previous
+          </button>
+
+          <div className="flex items-center gap-2">
+            {currentQuestion < totalQuestions - 1 ? (
+              <button
+                onClick={handleNextQuestion}
+                className="flex items-center gap-2 px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
+              >
+                Next
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowConfirmSubmit(true)}
+                disabled={submitting}
+                className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Submit Quiz
+                    <CheckCircle className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Confirm Submit Modal */}
+      {/* Submit Confirmation Modal */}
       {showConfirmSubmit && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowConfirmSubmit(false)} />
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-2xl w-full max-w-sm p-6">
             <div className="text-center">
-              <AlertTriangle size={48} className="mx-auto text-yellow-500 mb-4" />
-              <h3 className={mobileClasses.text.h2 + " mb-2"}>Submit Quiz?</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to submit your quiz? You cannot change your answers after submission.
+              <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Submit Quiz?
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                You have answered {answeredQuestions} out of {totalQuestions} questions. 
+                Are you sure you want to submit?
               </p>
               
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowConfirmSubmit(false)}
-                  className={mobileClasses.button.secondary + " flex-1"}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  Continue
                 </button>
                 <button
-                  onClick={() => {
-                    setShowConfirmSubmit(false);
-                    handleSubmit();
-                  }}
-                  className={mobileClasses.button.primary + " flex-1"}
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                 >
-                  Submit
+                  {submitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                  ) : (
+                    'Submit'
+                  )}
                 </button>
               </div>
             </div>
