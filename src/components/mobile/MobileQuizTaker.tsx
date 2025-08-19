@@ -100,10 +100,8 @@ export default function MobileQuizTaker() {
           isFlagged: false
         }));
         setAnswers(initialAnswers);
-        
-        console.log('📱 Quiz loaded:', convertedQuiz.title, convertedQuiz.questions.length, 'questions');
       } catch (error) {
-        console.error('❌ Error loading quiz:', error);
+        console.error('Error loading quiz:', error);
         showError('Error', 'Failed to load quiz');
         router.push('/quiz');
       } finally {
@@ -112,88 +110,37 @@ export default function MobileQuizTaker() {
     };
 
     loadQuiz();
-  }, [quizId, user, isAuthenticated, router]);
-
-  const handleSubmit = useCallback(async () => {
-    if (!quizData || !user || isSubmitted) return;
-
-    try {
-      setSubmitting(true);
-      console.log('📱 Submitting quiz answers...');
-
-      // Calculate results
-      let correctAnswers = 0;
-      const totalQuestions = quizData.questions.length;
-      const timeTaken = (quizData.timeLimit * 60) - timeRemaining;
-
-      answers.forEach(answer => {
-        const question = quizData.questions.find(q => q.id === answer.questionId);
-        if (question && answer.selectedOption === question.options[question.correctAnswer]) {
-          correctAnswers++;
-        }
-      });
-
-      const score = Math.round((correctAnswers / totalQuestions) * 100);
-
-      // Save result to Firebase
-      const resultId = await saveQuizResult({
-        quizId: quizData.id,
-        userId: user.id,
-        score,
-        totalQuestions,
-        correctAnswers,
-        timeTaken,
-        completedAt: new Date(),
-        answers: answers.map(answer => ({
-          questionId: answer.questionId,
-          userAnswer: answer.selectedOption,
-          isCorrect: quizData.questions.find(q => q.id === answer.questionId)?.options[quizData.questions.find(q => q.id === answer.questionId)?.correctAnswer || 0] === answer.selectedOption || false,
-          points: quizData.questions.find(q => q.id === answer.questionId)?.options[quizData.questions.find(q => q.id === answer.questionId)?.correctAnswer || 0] === answer.selectedOption ? 1 : 0
-        }))
-      });
-
-      console.log('📱 Quiz result saved:', resultId);
-      setIsSubmitted(true);
-      showSuccess('Quiz Completed!', `You scored ${score}% (${correctAnswers}/${totalQuestions} correct)`);
-      
-      // Navigate to results page
-      router.push(`/results/${resultId}`);
-    } catch (error) {
-      console.error('📱 Error submitting quiz:', error);
-      showError('Failed to submit quiz', 'Please try again');
-    } finally {
-      setSubmitting(false);
-    }
-  }, [quizData, user, isSubmitted, timeRemaining, answers, router]);
+  }, [quizId, isAuthenticated, user, router]);
 
   // Timer effect
   useEffect(() => {
-    if (timeRemaining > 0 && !isSubmitted && quizData) {
-      const timer = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1) {
-            handleSubmit();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (timeRemaining <= 0 || isSubmitted) return;
 
-      return () => clearInterval(timer);
-    }
-  }, [timeRemaining, isSubmitted, quizData, handleSubmit]);
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          // Auto-submit when time runs out
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeRemaining, isSubmitted]);
 
   const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleAnswerSelect = useCallback((questionId: string, selectedOption: string) => {
+  const handleAnswerSelect = useCallback((questionId: string, option: string) => {
     setAnswers(prev => 
       prev.map(answer => 
         answer.questionId === questionId 
-          ? { ...answer, selectedOption }
+          ? { ...answer, selectedOption: option }
           : answer
       )
     );
@@ -227,6 +174,59 @@ export default function MobileQuizTaker() {
       setCurrentQuestion(prev => prev - 1);
     }
   }, [currentQuestion]);
+
+  const handleSubmit = useCallback(async () => {
+    if (submitting || isSubmitted) return;
+
+    try {
+      setSubmitting(true);
+      const auth = getFirebaseAuth();
+      
+      if (!auth?.currentUser || !quizData) {
+        showError('Error', 'Authentication or quiz data not available');
+        return;
+      }
+
+      // Convert answers to the correct format
+      const formattedAnswers = answers.map(answer => {
+        const question = quizData.questions.find(q => q.id === answer.questionId);
+        const isCorrect = question && answer.selectedOption === question.options[question.correctAnswer];
+        return {
+          questionId: answer.questionId,
+          userAnswer: answer.selectedOption,
+          isCorrect: isCorrect || false,
+          points: isCorrect ? 1 : 0
+        };
+      });
+
+      // Calculate score
+      const correctAnswers = formattedAnswers.filter(a => a.isCorrect).length;
+      const score = Math.round((correctAnswers / quizData.questions.length) * 100);
+
+      const resultId = await saveQuizResult({
+        quizId: quizData.id,
+        userId: auth.currentUser.uid,
+        score,
+        totalQuestions: quizData.questions.length,
+        correctAnswers,
+        timeTaken: (quizData.timeLimit * 60) - timeRemaining,
+        completedAt: new Date(),
+        answers: formattedAnswers
+      });
+
+      setIsSubmitted(true);
+      showSuccess('Success', 'Quiz submitted successfully!');
+      
+      // Redirect to results page
+      router.push(`/results/${resultId}`);
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      showError('Error', 'Failed to submit quiz. Please try again.');
+    } finally {
+      setSubmitting(false);
+      setShowConfirmSubmit(false);
+    }
+  }, [submitting, isSubmitted, quizData, answers, timeRemaining, router]);
 
   // Question Navigation Component
   const QuestionNavigation = () => {
@@ -375,20 +375,59 @@ export default function MobileQuizTaker() {
   const totalQuestions = quizData.questions.length;
 
   return (
-    <div className={`${mobileClasses.container} min-h-screen bg-gray-50`}>
-      {/* Mobile Navigation Toggle */}
-      <div className="fixed top-4 right-4 z-50">
-        <button
-          onClick={() => setShowMobileNav(!showMobileNav)}
-          className="bg-white p-3 rounded-lg shadow-lg border border-gray-200"
-        >
-          {showMobileNav ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+    <div className={`${mobileClasses.container} min-h-screen bg-gray-50 pb-24`}>
+      {/* Header with Timer */}
+      <div className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-20">
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => router.back()}
+            className="p-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="text-center flex-1 mx-4">
+            <h1 className="text-sm font-semibold text-gray-900 truncate">{quizData.title}</h1>
+          </div>
+          <button
+            onClick={() => setShowMobileNav(!showMobileNav)}
+            className="p-2 text-gray-600 hover:text-gray-900"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
+        
+        {/* Timer and Progress Row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-red-500" />
+            <span className="text-sm font-mono text-red-600 font-semibold">{formatTime(timeRemaining)}</span>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-gray-500">Question {currentQuestion + 1} of {totalQuestions}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-500">{answeredQuestions}/{totalQuestions}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+          <span>Progress</span>
+          <span>{Math.round((answeredQuestions / totalQuestions) * 100)}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-[#20C997] h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(answeredQuestions / totalQuestions) * 100}%` }}
+          />
+        </div>
       </div>
 
       {/* Mobile Navigation Overlay */}
       {showMobileNav && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setShowMobileNav(false)}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={() => setShowMobileNav(false)}>
           <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-xl p-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-900">Question Navigation</h3>
@@ -400,40 +439,6 @@ export default function MobileQuizTaker() {
           </div>
         </div>
       )}
-
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="p-2 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="text-center">
-            <h1 className="text-sm font-semibold text-gray-900">{quizData.title}</h1>
-            <p className="text-xs text-gray-500">Question {currentQuestion + 1} of {totalQuestions}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-red-500" />
-            <span className="text-sm font-mono text-red-600">{formatTime(timeRemaining)}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="bg-white border-b border-gray-200 px-4 py-2">
-        <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-          <span>Progress: {answeredQuestions}/{totalQuestions}</span>
-          <span>{Math.round((answeredQuestions / totalQuestions) * 100)}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-[#20C997] h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(answeredQuestions / totalQuestions) * 100}%` }}
-          />
-        </div>
-      </div>
 
       {/* Question Content */}
       <div className="p-4 space-y-6">
@@ -487,15 +492,15 @@ export default function MobileQuizTaker() {
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
+        {/* Navigation Buttons */}
+        <div className="flex items-center justify-between pt-4">
           <button
             onClick={handlePrevQuestion}
             disabled={currentQuestion === 0}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors ${
               currentQuestion === 0
                 ? 'text-gray-400 cursor-not-allowed'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-600 hover:text-gray-900 bg-white border border-gray-200'
             }`}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -506,37 +511,53 @@ export default function MobileQuizTaker() {
             {currentQuestion < totalQuestions - 1 ? (
               <button
                 onClick={handleNextQuestion}
-                className="flex items-center gap-2 px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
+                className="flex items-center gap-2 px-4 py-3 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
               >
                 Next
                 <ArrowRight className="h-4 w-4" />
               </button>
             ) : (
-              <div className="w-16"></div>
+              <div className="w-20"></div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Persistent Submit Button */}
-      <div className="fixed bottom-6 right-6 z-30">
-        <button
-          onClick={() => setShowConfirmSubmit(true)}
-          disabled={submitting || isSubmitted}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-full shadow-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium disabled:opacity-50 hover:shadow-xl"
-        >
-          {submitting ? (
-            <>
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Submitting...
-            </>
-          ) : (
-            <>
-              <CheckCircle className="h-5 w-5" />
-              Submit Quiz
-            </>
-          )}
-        </button>
+      {/* Fixed Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowMobileNav(true)}
+              className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900"
+            >
+              <Menu className="h-4 w-4" />
+              <span className="text-sm">Navigation</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-red-500" />
+              <span className="text-sm font-mono text-red-600">{formatTime(timeRemaining)}</span>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => setShowConfirmSubmit(true)}
+            disabled={submitting || isSubmitted}
+            className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium disabled:opacity-50"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Submit
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Submit Confirmation Modal */}
