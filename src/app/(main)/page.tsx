@@ -21,12 +21,10 @@ import {
   Zap,
   Shield,
   Globe,
-  Play,
   Award,
   Clock,
   Smartphone,
-  Monitor,
-  Tablet
+  Monitor
 } from '@/lib/icons';
 
 export default function Home() {
