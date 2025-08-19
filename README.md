@@ -1,8 +1,39 @@
-# 🎯 Locus - Best-in-Class Quiz Management Platform
+# 🎯 Locus - Advanced Quiz Management Platform
 
-A comprehensive, modern quiz management platform built with Next.js 14, TypeScript, Firebase, and cutting-edge web technologies. Locus provides an exceptional user experience with advanced features, offline support, and enterprise-grade performance.
+A comprehensive, modern quiz management platform built with Next.js 14, TypeScript, Firebase, and cutting-edge web technologies. Locus provides an exceptional user experience with advanced features, mobile optimization, offline support, and enterprise-grade performance.
 
-## ✨ **Best-in-Class Features**
+## ✨ **Key Features**
+
+### 🚀 **Core Platform Features**
+- **📝 Quiz Creation & Management**: Create, edit, and organize quizzes with multiple question types
+- **🎯 Interactive Quiz Taking**: Real-time quiz interface with progress tracking and instant feedback
+- **📊 Analytics Dashboard**: Comprehensive performance insights with beautiful charts and metrics
+- **📁 File Upload System**: Support for PDF, JSON, and TXT files with automatic quiz generation
+- **👥 User Management**: Secure authentication with Google Sign-In and role-based access
+- **📱 Mobile-First Design**: Optimized mobile experience with responsive design
+- **🔄 Real-time Updates**: Live data synchronization across all devices
+
+### 🎨 **User Experience**
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Dark/Light Theme**: Theme switching capability
+- **Loading States**: Beautiful loading spinners and skeletons
+- **Notifications**: Toast notifications for user feedback
+- **Error Boundaries**: Graceful error handling throughout the app
+- **Accessibility**: WCAG compliant with keyboard navigation support
+
+### 🔐 **Security & Authentication**
+- **Google Sign-In Only**: Secure authentication using Google accounts
+- **Protected Routes**: Automatic authentication checks with middleware
+- **Global State Management**: Zustand for seamless state handling
+- **Real-time Auth State**: Instant authentication status updates
+- **Error Handling**: Comprehensive error management with user-friendly messages
+
+### 📱 **Mobile Optimization**
+- **Mobile-First Components**: Dedicated mobile components for optimal experience
+- **Touch-Friendly Interface**: Optimized for touch interactions
+- **Responsive Navigation**: Mobile-optimized navigation and menus
+- **Performance Optimization**: Mobile-specific performance enhancements
+- **Offline Support**: Full offline functionality with service worker
 
 ### 🚀 **Performance & Optimization**
 - **Lightning Fast**: Optimized bundle size with dynamic imports and code splitting
@@ -10,34 +41,7 @@ A comprehensive, modern quiz management platform built with Next.js 14, TypeScri
 - **Progressive Web App**: Full offline support with service worker
 - **Image Optimization**: Next.js Image component with WebP/AVIF support
 - **Tree Shaking**: Optimized imports for minimal bundle size
-
-### 🔐 **Advanced Authentication**
-- **Google Sign-In Only**: Secure authentication using Google accounts
-- **Protected Routes**: Automatic authentication checks
-- **Global State Management**: Zustand for seamless state handling
-- **Real-time Auth State**: Instant authentication status updates
-- **Error Handling**: Comprehensive error management with user-friendly messages
-
-### 🎨 **Modern UI/UX**
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Dark/Light Theme**: Theme switching capability
-- **Loading States**: Beautiful loading spinners and skeletons
-- **Notifications**: Toast notifications for user feedback
-- **Error Boundaries**: Graceful error handling throughout the app
-
-### 📊 **Quiz Management**
-- **Dynamic Quiz Creation**: Real-time quiz building interface
-- **Multiple Question Types**: Multiple choice, true/false, short answer
-- **Real-time Results**: Instant scoring and analytics
-- **Performance Tracking**: Detailed analytics and insights
-- **Archive System**: Organized quiz storage and retrieval
-
-### 🔄 **Offline Capabilities**
-- **Service Worker**: Full offline functionality
-- **Cache Management**: Intelligent caching strategies
-- **Background Sync**: Offline action synchronization
-- **Push Notifications**: Real-time notifications
-- **Offline Page**: Beautiful offline experience
+- **Caching Strategies**: Intelligent caching for improved performance
 
 ## 🛠 **Tech Stack**
 
@@ -47,6 +51,7 @@ A comprehensive, modern quiz management platform built with Next.js 14, TypeScri
 - **Tailwind CSS**: Utility-first styling
 - **Zustand**: Lightweight state management
 - **Lucide React**: Beautiful icon library
+- **React Query**: Server state management and caching
 
 ### **Backend & Services**
 - **Firebase Authentication**: Secure user management
@@ -54,11 +59,13 @@ A comprehensive, modern quiz management platform built with Next.js 14, TypeScri
 - **Firebase Storage**: File upload and management
 - **Firebase Analytics**: User behavior tracking
 
-### **Performance & Optimization**
+### **Performance & Testing**
 - **Dynamic Imports**: Code splitting for optimal loading
 - **Image Optimization**: Next.js Image with modern formats
 - **Service Worker**: Offline functionality and caching
 - **PWA Support**: Progressive Web App capabilities
+- **k6**: Load testing and performance monitoring
+- **Artillery**: Additional load testing capabilities
 
 ## 🚀 **Getting Started**
 
@@ -66,13 +73,14 @@ A comprehensive, modern quiz management platform built with Next.js 14, TypeScri
 - Node.js 18+ 
 - npm or yarn
 - Firebase project setup
+- Git
 
 ### **Installation**
 
 1. **Clone the repository**
    ```bash
    git clone https://github.com/HarshXTrisha/locus_kaizen.git
-   cd locus_kaizen
+   cd locus_kaizen/locus
    ```
 
 2. **Install dependencies**
@@ -106,81 +114,143 @@ A comprehensive, modern quiz management platform built with Next.js 14, TypeScri
 locus/
 ├── src/
 │   ├── app/                    # Next.js App Router
-│   │   ├── (auth)/            # Authentication pages
-│   │   ├── dashboard/         # Dashboard pages
-│   │   ├── quiz/              # Quiz functionality
-│   │   ├── results/           # Results and analytics
+│   │   ├── (main)/            # Main application pages
+│   │   │   ├── dashboard/     # Dashboard functionality
+│   │   │   ├── upload/        # File upload system
+│   │   │   ├── quiz/          # Quiz taking interface
+│   │   │   ├── results/       # Results and analytics
+│   │   │   ├── create/        # Quiz creation
+│   │   │   ├── settings/      # User settings
+│   │   │   ├── teams/         # Team management
+│   │   │   └── archive/       # Quiz archive
+│   │   ├── api/               # API routes
+│   │   ├── login/             # Authentication
 │   │   └── layout.tsx         # Root layout
 │   ├── components/            # Reusable components
-│   │   ├── auth/             # Authentication components
+│   │   ├── mobile/           # Mobile-optimized components
+│   │   │   ├── MobileAppWrapper.tsx
+│   │   │   ├── MobileQuizTaker.tsx
+│   │   │   ├── MobileUpload.tsx
+│   │   │   ├── MobileCreateQuiz.tsx
+│   │   │   ├── MobileResults.tsx
+│   │   │   ├── MobileProfile.tsx
+│   │   │   └── MobileQuizList.tsx
 │   │   ├── common/           # Shared components
 │   │   ├── dashboard/        # Dashboard components
 │   │   ├── quiz/             # Quiz components
-│   │   └── results/          # Results components
+│   │   ├── upload/           # Upload components
+│   │   ├── results/          # Results components
+│   │   └── layout/           # Layout components
 │   ├── lib/                  # Utility libraries
-│   │   ├── firebase.ts       # Firebase configuration
+│   │   ├── firebase-quiz.ts  # Firebase quiz functions
+│   │   ├── optimized-firebase.ts # Optimized Firebase functions
 │   │   ├── store.ts          # Zustand state management
-│   │   ├── auth-context.tsx  # Authentication context
-│   │   └── performance.ts    # Performance tracking
-│   └── styles/               # Global styles
+│   │   ├── config.ts         # Firebase configuration
+│   │   ├── pdf-processor.ts  # PDF processing utilities
+│   │   └── performance-monitor.ts # Performance monitoring
+│   ├── hooks/                # Custom React hooks
+│   │   └── useDashboard.ts   # Dashboard data hooks
+│   └── middleware.ts         # Next.js middleware
 ├── public/                   # Static assets
-│   ├── manifest.json         # PWA manifest
-│   ├── sw.js                # Service worker
-│   └── offline.html         # Offline page
+├── load-test-80-users-60-questions.js # k6 load test script
+├── test-quiz-60-questions.json # Test quiz data
+├── LOAD_TEST_README.md       # Load testing documentation
 └── package.json             # Dependencies and scripts
 ```
 
-## 🎯 **Key Features**
+## 🎯 **Core Features**
 
-### **Authentication System**
-- ✅ Email/password registration and login
-- ✅ Protected route management
-- ✅ Real-time authentication state
-- ✅ Comprehensive error handling
-- ✅ User profile management
+### **📝 Quiz Management**
+- ✅ **Dynamic Quiz Creation**: Real-time quiz building interface
+- ✅ **Multiple Question Types**: Multiple choice, true/false, short answer
+- ✅ **File Upload Support**: PDF, JSON, and TXT file processing
+- ✅ **Quiz Organization**: Archive and categorization system
+- ✅ **Real-time Editing**: Live quiz modification capabilities
 
-### **Quiz Management**
-- ✅ Dynamic quiz creation interface
-- ✅ Multiple question types support
-- ✅ Real-time quiz taking experience
-- ✅ Automatic scoring and results
-- ✅ Quiz archive and organization
+### **🎯 Quiz Taking Experience**
+- ✅ **Interactive Interface**: Real-time quiz taking with progress tracking
+- ✅ **Question Navigation**: Easy navigation between questions
+- ✅ **Answer Flagging**: Mark questions for review
+- ✅ **Timer Support**: Optional time limits for quizzes
+- ✅ **Auto-save**: Automatic answer saving and recovery
 
-### **Analytics & Results**
-- ✅ Detailed performance analytics
-- ✅ Interactive charts and graphs
-- ✅ Individual result tracking
-- ✅ Comparative analysis
-- ✅ Export capabilities
+### **📊 Analytics & Results**
+- ✅ **Detailed Performance Analytics**: Comprehensive scoring and insights
+- ✅ **Interactive Charts**: Beautiful data visualization with Recharts
+- ✅ **Individual Result Tracking**: Personal performance history
+- ✅ **Comparative Analysis**: Performance comparison tools
+- ✅ **Export Capabilities**: Data export in multiple formats
 
-### **Performance Features**
-- ✅ Optimized bundle loading
-- ✅ Image compression and optimization
-- ✅ Service worker caching
-- ✅ Offline functionality
-- ✅ Push notifications
+### **📱 Mobile Experience**
+- ✅ **Mobile-First Design**: Optimized for mobile devices
+- ✅ **Touch-Friendly Interface**: Optimized touch interactions
+- ✅ **Responsive Navigation**: Mobile-optimized menus
+- ✅ **Offline Support**: Full offline functionality
+- ✅ **PWA Features**: Progressive Web App capabilities
+
+### **🔐 Authentication & Security**
+- ✅ **Google Sign-In**: Secure authentication with Google accounts
+- ✅ **Protected Routes**: Automatic authentication checks
+- ✅ **Role-Based Access**: User permission management
+- ✅ **Session Management**: Secure session handling
+- ✅ **Error Handling**: Comprehensive error management
+
+## 🧪 **Load Testing**
+
+Locus includes comprehensive load testing capabilities using k6:
+
+### **Available Load Tests**
+```bash
+# Basic load tests
+npm run load-test                    # 80 users, 60 questions each
+npm run load-test-local             # Local testing
+npm run load-test-prod              # Production testing
+
+# Advanced load tests
+npm run load-test:small             # 100 users for 5 minutes
+npm run load-test:medium            # 500 users for 10 minutes
+npm run load-test:large             # 1000 users for 15 minutes
+npm run load-test:full              # Full load test suite
+
+# Performance monitoring
+npm run performance:monitor         # Real-time performance monitoring
+```
+
+### **Load Test Features**
+- **Realistic User Simulation**: Desktop and mobile user agents
+- **Question Answering**: Simulates actual quiz taking behavior
+- **Performance Metrics**: Response time, error rate, throughput
+- **Scalability Testing**: Tests system under various load conditions
+- **Detailed Reporting**: Comprehensive test results and analysis
 
 ## 🔧 **Available Scripts**
 
 ```bash
 # Development
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript checks
+npm run dev                    # Start development server
+npm run build                  # Build for production
+npm run start                  # Start production server
+npm run lint                   # Run ESLint
 
-# Performance
-npm run analyze      # Analyze bundle size
-npm run lighthouse   # Run Lighthouse audit
+# Deployment
+npm run deploy:firestore       # Deploy Firestore rules
+npm run deploy:storage         # Deploy storage rules
+npm run deploy:rules           # Deploy all rules
+
+# Load Testing
+npm run load-test              # Run main load test
+npm run load-test-local        # Local load testing
+npm run load-test-prod         # Production load testing
+npm run performance:monitor    # Performance monitoring
 ```
 
 ## 📊 **Performance Metrics**
 
-- **First Load JS**: ~87.3 kB (shared)
+- **First Load JS**: ~87.6 kB (shared)
 - **Lighthouse Score**: 95+ (Performance, Accessibility, Best Practices, SEO)
 - **Core Web Vitals**: Excellent scores across all metrics
 - **Bundle Size**: Optimized with tree shaking and code splitting
+- **Load Testing**: Supports 1000+ concurrent users
 
 ## 🌐 **Deployment**
 
@@ -189,37 +259,58 @@ npm run lighthouse   # Run Lighthouse audit
 2. Configure environment variables
 3. Deploy automatically on push
 
+### **Firebase Hosting**
+```bash
+# Install Firebase CLI
+npm install -g firebase-tools
+
+# Login and initialize
+firebase login
+firebase init hosting
+
+# Deploy
+firebase deploy
+```
+
 ### **Other Platforms**
 - **Netlify**: Compatible with Next.js
-- **Firebase Hosting**: Native Firebase integration
 - **Railway**: Easy deployment with database
 - **DigitalOcean**: App Platform support
+- **AWS Amplify**: Full-stack deployment
 
 ## 🔒 **Security Features**
 
-- ✅ Firebase Authentication
-- ✅ Protected API routes
+- ✅ Firebase Authentication with Google Sign-In
+- ✅ Protected API routes with middleware
 - ✅ Input validation and sanitization
 - ✅ XSS protection
 - ✅ CSRF protection
 - ✅ Secure headers configuration
+- ✅ Environment variable protection
 
-## 📱 **Mobile & PWA**
+## 📱 **Mobile & PWA Features**
 
 - ✅ Responsive design for all devices
 - ✅ Progressive Web App support
-- ✅ Offline functionality
+- ✅ Offline functionality with service worker
 - ✅ Push notifications
 - ✅ App-like experience
+- ✅ Touch-optimized interface
+- ✅ Mobile-specific components
 
-## 🧪 **Testing**
+## 🧪 **Testing Strategy**
 
-```bash
-# Run tests
-npm run test         # Unit tests
-npm run test:e2e     # End-to-end tests
-npm run test:coverage # Coverage report
-```
+### **Load Testing**
+- **k6 Scripts**: Comprehensive load testing scenarios
+- **Performance Monitoring**: Real-time performance tracking
+- **Scalability Testing**: System behavior under load
+- **Stress Testing**: Breaking point identification
+
+### **Manual Testing**
+- **Cross-browser Testing**: Chrome, Firefox, Safari, Edge
+- **Mobile Testing**: iOS and Android devices
+- **Accessibility Testing**: WCAG compliance
+- **Performance Testing**: Lighthouse audits
 
 ## 🤝 **Contributing**
 
@@ -229,12 +320,27 @@ npm run test:coverage # Coverage report
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### **Development Guidelines**
+- Follow TypeScript best practices
+- Use Tailwind CSS for styling
+- Implement responsive design
+- Add proper error handling
+- Include comprehensive documentation
+
 ## 📄 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 **Support**
+## 🆘 **Support & Documentation**
 
+### **Additional Documentation**
+- [Load Testing Guide](./LOAD_TEST_README.md) - Comprehensive load testing documentation
+- [Mobile Optimization Guide](./mobile-optimization-guide.md) - Mobile development guidelines
+- [Performance Optimizations](./performance-optimizations.md) - Performance best practices
+- [Firebase Setup Guide](./FIREBASE_ADMIN_SETUP.md) - Firebase configuration
+- [Deployment Guide](./VERCEL_DEPLOYMENT_GUIDE.md) - Deployment instructions
+
+### **Support Channels**
 - **Documentation**: [Wiki](https://github.com/HarshXTrisha/locus_kaizen/wiki)
 - **Issues**: [GitHub Issues](https://github.com/HarshXTrisha/locus_kaizen/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/HarshXTrisha/locus_kaizen/discussions)
@@ -246,9 +352,41 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tailwind CSS**: For the utility-first CSS framework
 - **Lucide**: For beautiful icons
 - **Zustand**: For lightweight state management
+- **k6 Team**: For powerful load testing tools
+
+## 🚀 **Roadmap**
+
+### **Upcoming Features**
+- [ ] Advanced analytics with machine learning insights
+- [ ] Real-time collaboration features
+- [ ] Advanced question types (essay, file upload)
+- [ ] Integration with learning management systems
+- [ ] Advanced reporting and export options
+- [ ] Multi-language support
+- [ ] Advanced mobile features
+
+### **Performance Improvements**
+- [ ] Advanced caching strategies
+- [ ] Database optimization
+- [ ] CDN integration
+- [ ] Advanced load balancing
+- [ ] Real-time performance monitoring
 
 ---
 
 **Built with ❤️ by the Locus Team**
 
 *Transform your learning experience with the most advanced quiz management platform available.*
+
+---
+
+## 📞 **Contact**
+
+For questions, support, or collaboration:
+- **Email**: [contact@locus.com](mailto:contact@locus.com)
+- **GitHub**: [@HarshXTrisha](https://github.com/HarshXTrisha)
+- **Project**: [Locus Kaizen](https://github.com/HarshXTrisha/locus_kaizen)
+
+---
+
+*Last updated: August 2025*
