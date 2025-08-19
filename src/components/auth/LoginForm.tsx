@@ -90,23 +90,23 @@ export function LoginForm() {
 
   return (
     <div className="w-full">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-[#212529] mb-2">Welcome Back!</h2>
-        <p className="text-[#6C757D]">Sign in with your Google account to continue your learning journey with Locus.</p>
+      <div className="text-center mb-10">
+        <h2 className="text-4xl font-bold text-[#212529] mb-4 leading-tight tracking-tight">Welcome Back!</h2>
+        <p className="text-lg text-[#6C757D] font-normal leading-relaxed">Sign in with your Google account to continue your learning journey with Locus.</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="flex w-full items-center justify-center rounded-2xl bg-white px-6 py-4 text-lg font-semibold text-gray-700 border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-[#20C997] hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
+          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-gray-700 border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-[#20C997] hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
         >
           {isLoading ? (
             <ButtonLoader text="Signing In..." />
           ) : (
             <>
-              <div className="mr-3 group-hover:scale-110 transition-transform duration-300">
+              <div className="mr-4 group-hover:scale-110 transition-transform duration-300">
                 <GoogleIcon />
               </div>
               <span className="group-hover:text-[#20C997] transition-colors duration-300">
@@ -117,17 +117,17 @@ export function LoginForm() {
         </button>
 
         {/* Benefits */}
-        <div className="mt-8 space-y-4">
-          <div className="flex items-center text-sm text-[#6C757D]">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-3"></div>
+        <div className="mt-10 space-y-5">
+          <div className="flex items-center text-base text-[#6C757D] font-medium">
+            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
             <span>Secure authentication with Google</span>
           </div>
-          <div className="flex items-center text-sm text-[#6C757D]">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-3"></div>
+          <div className="flex items-center text-base text-[#6C757D] font-medium">
+            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
             <span>Access to all quiz features</span>
           </div>
-          <div className="flex items-center text-sm text-[#6C757D]">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-3"></div>
+          <div className="flex items-center text-base text-[#6C757D] font-medium">
+            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
             <span>Personalized learning dashboard</span>
           </div>
         </div>

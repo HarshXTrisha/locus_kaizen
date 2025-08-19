@@ -23,15 +23,15 @@ export default function LoginPage() {
 
         <div className="w-full max-w-md relative z-10">
           {/* Logo and Title */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg flex items-center justify-center mr-4">
                 <Target className="h-8 w-8 text-white" />
               </div>
-                                                           <h1 className="text-4xl font-bold text-[#212529]">Locus</h1>
+              <h1 className="text-5xl font-bold text-[#212529] tracking-tight">Locus</h1>
             </div>
-                         <p className="text-lg text-[#6C757D] mb-2">Sign in with your Google account</p>
-             <p className="text-sm text-[#6C757D]">Access your personalized learning dashboard powered by Kaizen</p>
+            <p className="text-xl text-[#6C757D] mb-3 font-medium leading-relaxed">Sign in with your Google account</p>
+            <p className="text-base text-[#6C757D] font-normal leading-relaxed">Access your personalized learning dashboard powered by Kaizen</p>
           </div>
           
           {/* Login Form */}
@@ -40,33 +40,33 @@ export default function LoginPage() {
           </div>
 
           {/* Features Preview */}
-          <div className="mt-8 grid grid-cols-2 gap-4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg border border-white/30">
-              <Zap className="h-6 w-6 text-[#20C997] mx-auto mb-2" />
-              <p className="text-xs font-medium text-[#212529]">Lightning Fast</p>
+          <div className="mt-10 grid grid-cols-2 gap-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center shadow-lg border border-white/30">
+              <Zap className="h-7 w-7 text-[#20C997] mx-auto mb-3" />
+              <p className="text-sm font-semibold text-[#212529] leading-tight">Lightning Fast</p>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg border border-white/30">
-              <Shield className="h-6 w-6 text-[#20C997] mx-auto mb-2" />
-              <p className="text-xs font-medium text-[#212529]">Secure</p>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center shadow-lg border border-white/30">
+              <Shield className="h-7 w-7 text-[#20C997] mx-auto mb-3" />
+              <p className="text-sm font-semibold text-[#212529] leading-tight">Secure</p>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg border border-white/30">
-              <Globe className="h-6 w-6 text-[#20C997] mx-auto mb-2" />
-              <p className="text-xs font-medium text-[#212529]">Cross-Platform</p>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center shadow-lg border border-white/30">
+              <Globe className="h-7 w-7 text-[#20C997] mx-auto mb-3" />
+              <p className="text-sm font-semibold text-[#212529] leading-tight">Cross-Platform</p>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg border border-white/30">
-              <Target className="h-6 w-6 text-[#20C997] mx-auto mb-2" />
-              <p className="text-xs font-medium text-[#212529]">Smart Analytics</p>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center shadow-lg border border-white/30">
+              <Target className="h-7 w-7 text-[#20C997] mx-auto mb-3" />
+              <p className="text-sm font-semibold text-[#212529] leading-tight">Smart Analytics</p>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-[#6C757D] mb-2">
+          <div className="mt-10 text-center">
+            <p className="text-sm text-[#6C757D] mb-3 font-medium leading-relaxed">
               New users will be automatically created when signing in with Google
             </p>
-            <div className="flex items-center justify-center text-xs text-[#6C757D]">
+            <div className="flex items-center justify-center text-xs text-[#6C757D] font-medium">
               <span className="mr-2">Powered by</span>
-              <span className="font-bold text-[#20C997]">Kaizen</span>
+              <span className="font-semibold text-[#20C997]">Kaizen</span>
               <span className="ml-2">- Continuous Improvement</span>
             </div>
           </div>
