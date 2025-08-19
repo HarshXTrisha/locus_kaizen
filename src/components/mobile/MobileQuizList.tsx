@@ -1,15 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { getUserQuizzes, deleteQuiz } from '@/lib/firebase-quiz';
-import { BookOpen, Clock, Target, Plus, Trash2, AlertCircle, Loader2 } from 'lucide-react';
-import Link from 'next/link';
 import { showError, showSuccess } from '@/components/common/NotificationSystem';
+import { 
+  BookOpen, Clock, Target, Plus, Trash2, AlertCircle, Loader2,
+  ArrowLeft, Play, Settings
+} from 'lucide-react';
+import Link from 'next/link';
+import { mobileClasses } from '@/lib/mobile-detection';
 
-export default function QuizPage() {
+export default function MobileQuizList() {
   const router = useRouter();
   const { user, isAuthenticated } = useAppStore();
   const [quizzes, setQuizzes] = useState<any[]>([]);
@@ -34,6 +37,7 @@ export default function QuizPage() {
         setQuizzes(userQuizzes);
       } catch (error) {
         console.error('Error loading quizzes:', error);
+        showError('Error', 'Failed to load quizzes');
       } finally {
         setLoading(false);
       }
@@ -56,7 +60,7 @@ export default function QuizPage() {
     try {
       setDeletingQuiz(confirmDelete.quizId);
       await deleteQuiz(confirmDelete.quizId);
-      showSuccess('Quiz deleted', `"${confirmDelete.quizTitle}" has been permanently removed.`);
+      showSuccess('Quiz deleted', `"${confirmDelete.quizTitle}" has been removed.`);
       
       // Remove the quiz from the local state
       setQuizzes(prev => prev.filter(quiz => quiz.id !== confirmDelete.quizId));
@@ -71,41 +75,51 @@ export default function QuizPage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="xl" text="Checking authentication..." />
+      <div className={`${mobileClasses.container} flex items-center justify-center min-h-screen`}>
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="xl" text="Loading quizzes..." />
+      <div className={`${mobileClasses.container} flex items-center justify-center min-h-screen`}>
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">Loading quizzes...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Quizzes</h1>
-              <p className="text-gray-600 mt-2">Take quizzes and track your progress</p>
-            </div>
-            <Link
-              href="/create"
-              className="flex items-center px-4 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Quiz
-            </Link>
-          </div>
+    <div className={`${mobileClasses.container} min-h-screen bg-gray-50`}>
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="p-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-lg font-semibold text-gray-900">My Quizzes</h1>
+          <Link
+            href="/create"
+            className="p-2 text-[#20C997] hover:text-[#1BA085]"
+          >
+            <Plus className="h-5 w-5" />
+          </Link>
         </div>
-        
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
         {quizzes.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center mt-8">
             <div className="text-gray-400 mb-4">
               <BookOpen className="h-16 w-16 mx-auto" />
             </div>
@@ -113,25 +127,27 @@ export default function QuizPage() {
             <p className="text-gray-600 mb-6">Create your first quiz to get started</p>
             <Link
               href="/create"
-              className="inline-flex items-center px-6 py-3 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-[#20C997] text-white rounded-xl hover:bg-[#1BA085] transition-colors"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Quiz
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {quizzes.map((quiz) => (
-              <div key={quiz.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{quiz.title}</h3>
+              <div key={quiz.id} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 text-base mb-1 truncate">
+                      {quiz.title}
+                    </h3>
                     <p className="text-sm text-gray-600">{quiz.subject}</p>
                   </div>
                   <button
                     onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}
                     disabled={deletingQuiz === quiz.id}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50 ml-2"
                     title="Delete quiz"
                   >
                     {deletingQuiz === quiz.id ? (
@@ -142,23 +158,31 @@ export default function QuizPage() {
                   </button>
                 </div>
                 
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Target className="h-4 w-4 mr-2" />
+                <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center">
+                    <Target className="h-4 w-4 mr-1" />
                     {quiz.questions.length} questions
                   </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Clock className="h-4 w-4 mr-2" />
-                    {quiz.timeLimit} minutes
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 mr-1" />
+                    {quiz.timeLimit} min
                   </div>
                 </div>
                 
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   <Link
                     href={`/quiz/${quiz.id}`}
-                    className="flex-1 bg-[#20C997] text-white text-center py-2 px-4 rounded-lg hover:bg-[#1BA085] transition-colors"
+                    className="flex-1 bg-[#20C997] text-white text-center py-3 px-4 rounded-xl hover:bg-[#1BA085] transition-colors flex items-center justify-center"
                   >
+                    <Play className="h-4 w-4 mr-2" />
                     Start Quiz
+                  </Link>
+                  <Link
+                    href={`/create?edit=${quiz.id}`}
+                    className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+                    title="Edit quiz"
+                  >
+                    <Settings className="h-4 w-4" />
                   </Link>
                 </div>
               </div>
@@ -169,12 +193,12 @@ export default function QuizPage() {
 
       {/* Delete Confirmation Modal */}
       {confirmDelete.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={closeConfirmModal} />
           <div
             role="dialog"
             aria-modal="true"
-            className="relative bg-white rounded-xl border border-gray-200 shadow-2xl w-full max-w-md mx-4 p-6"
+            className="relative bg-white rounded-xl border border-gray-200 shadow-2xl w-full max-w-sm p-6"
           >
             <div className="flex items-start gap-4">
               <div className="p-2 rounded-full bg-red-100 text-red-600">
@@ -186,7 +210,7 @@ export default function QuizPage() {
                 </h3>
                 <p className="text-sm text-gray-700 mb-2">{confirmDelete.quizTitle}</p>
                 <p className="text-sm text-gray-600">
-                  This action is permanent. Once deleted, you will no longer be able to access this quiz. This cannot be undone.
+                  This action is permanent and cannot be undone.
                 </p>
               </div>
             </div>

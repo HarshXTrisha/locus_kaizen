@@ -7,6 +7,7 @@ import MobileOptimizedDashboard from './MobileOptimizedDashboard';
 import MobileCreateQuiz from './MobileCreateQuiz';
 import MobileUpload from './MobileUpload';
 import MobileQuizTaker from './MobileQuizTaker';
+import MobileQuizList from './MobileQuizList';
 import MobileResults from './MobileResults';
 import MobileProfile from './MobileProfile';
 
@@ -35,7 +36,10 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
     if (pathname === '/upload') {
       return <MobileUpload />;
     }
-    if (pathname === '/quiz' || pathname.startsWith('/quiz/')) {
+    if (pathname === '/quiz') {
+      return <MobileQuizList />;
+    }
+    if (pathname.startsWith('/quiz/')) {
       return <MobileQuizTaker />;
     }
     if (pathname === '/results' || pathname.startsWith('/results/')) {
@@ -58,6 +62,7 @@ export {
   MobileCreateQuiz,
   MobileUpload,
   MobileQuizTaker,
+  MobileQuizList,
   MobileResults,
   MobileProfile
 };
