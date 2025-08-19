@@ -9,6 +9,7 @@ import { PageTransition } from '@/components/common/PageTransition';
 import { PerformanceMonitor } from '@/components/common/PerformanceMonitor';
 import { QueryProvider } from '@/lib/query-client';
 import { MobileAppWrapper } from '@/components/mobile/MobileAppWrapper';
+import { ServiceWorkerRegistration } from '@/components/common/ServiceWorkerRegistration';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -33,6 +35,7 @@ export default function RootLayout({
             <NotificationProvider>
               <ClientInit />
               <PerformanceMonitor />
+              <ServiceWorkerRegistration />
               <PageTransition>
                 <MobileAppWrapper>
                   {children}
