@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
@@ -21,9 +21,36 @@ export default function Home() {
   const { signOut } = useAuth();
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const heroRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsVisible(true);
+  }, []);
+
+  // Scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Mouse movement effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }
   }, []);
 
   const handleSignOut = async () => {
@@ -67,15 +94,15 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#E8F5E8]">
+    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#E8F5E8] overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-50 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight">
-                  <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center">
+                <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight hover:scale-105 transition-transform duration-300">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center hover:rotate-12 transition-transform duration-300">
                     <Target className="h-5 w-5 text-white" />
                   </div>
                   Locus
@@ -92,13 +119,13 @@ export default function Home() {
                   <span className="hidden sm:block text-gray-600 font-medium">Welcome, {user?.firstName || 'User'}!</span>
                   <Link 
                     href="/dashboard"
-                    className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-all duration-300 transform hover:scale-105 font-medium"
+                    className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-all duration-300 transform hover:scale-105 font-medium hover:shadow-lg"
                   >
                     Dashboard
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-300 flex items-center font-medium"
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-300 flex items-center font-medium hover:shadow-lg"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Sign Out</span>
@@ -107,7 +134,7 @@ export default function Home() {
               ) : (
                 <Link 
                   href="/login"
-                  className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-all duration-300 transform hover:scale-105 flex items-center font-medium"
+                  className="bg-[#20C997] text-white px-4 py-2 rounded-lg hover:bg-[#1BA085] transition-all duration-300 transform hover:scale-105 flex items-center font-medium hover:shadow-lg"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Sign In with Google</span>
@@ -119,23 +146,62 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className={`text-5xl md:text-7xl lg:text-8xl font-bold text-[#212529] mb-8 transition-all duration-1000 leading-tight tracking-tight ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+      {/* Hero Section with Parallax */}
+      <section ref={heroRef} className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            transform: `translateY(${scrollY * 0.5}px)`,
+          }}
+        >
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#20C997] rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#1BA085] rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        {/* Floating Elements with Mouse Follow */}
+        {typeof window !== 'undefined' && (
+          <>
+            <div 
+              className="absolute top-1/4 left-1/4 w-4 h-4 bg-[#20C997]/30 rounded-full transition-all duration-300 ease-out"
+              style={{
+                transform: `translate(${(mousePosition.x - window.innerWidth / 2) * 0.02}px, ${(mousePosition.y - window.innerHeight / 2) * 0.02}px)`,
+              }}
+            ></div>
+            <div 
+              className="absolute bottom-1/4 right-1/4 w-6 h-6 bg-[#1BA085]/30 rounded-full transition-all duration-300 ease-out"
+              style={{
+                transform: `translate(${(mousePosition.x - window.innerWidth / 2) * -0.02}px, ${(mousePosition.y - window.innerHeight / 2) * -0.02}px)`,
+              }}
+            ></div>
+          </>
+        )}
+
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <h1 
+            className={`text-5xl md:text-7xl lg:text-8xl font-bold text-[#212529] mb-8 transition-all duration-1000 leading-tight tracking-tight ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            style={{
+              transform: `translateY(${scrollY * 0.1}px)`,
+            }}
+          >
             {isAuthenticated ? (
               <>
-                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085]">{user?.firstName || 'User'}!</span>
+                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] hover:scale-105 transition-transform duration-300 inline-block">{user?.firstName || 'User'}!</span>
               </>
             ) : (
               <>
                 Master Your Knowledge with
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block"> Locus</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085] block hover:scale-105 transition-transform duration-300"> Locus</span>
               </>
             )}
           </h1>
 
-          <p className={`text-xl md:text-2xl lg:text-3xl text-[#6C757D] mb-10 max-w-5xl mx-auto transition-all duration-1000 delay-300 leading-relaxed font-normal ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <p 
+            className={`text-xl md:text-2xl lg:text-3xl text-[#6C757D] mb-10 max-w-5xl mx-auto transition-all duration-1000 delay-300 leading-relaxed font-normal ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            style={{
+              transform: `translateY(${scrollY * 0.05}px)`,
+            }}
+          >
             {isAuthenticated 
               ? "Ready to continue your learning journey? Access your dashboard or explore our features."
               : "A comprehensive quiz management platform that helps you create, take, and analyze quizzes with powerful analytics and beautiful insights."
@@ -153,39 +219,59 @@ export default function Home() {
               <>
                 <Link 
                   href="/dashboard"
-                  className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-10 py-5 rounded-xl text-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                  className="group bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-10 py-5 rounded-xl text-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center relative overflow-hidden"
                 >
-                  Go to Dashboard
-                  <ArrowRight className="ml-3 h-6 w-6" />
+                  <span className="relative z-10">Go to Dashboard</span>
+                  <ArrowRight className="ml-3 h-6 w-6 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#1BA085] to-[#20C997] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </Link>
                 <Link 
                   href="/create"
-                  className="bg-white text-[#20C997] border-2 border-[#20C997] px-10 py-5 rounded-xl text-xl font-semibold hover:bg-[#20C997] hover:text-white transition-all duration-300 transform hover:scale-105"
+                  className="group bg-white text-[#20C997] border-2 border-[#20C997] px-10 py-5 rounded-xl text-xl font-semibold hover:bg-[#20C997] hover:text-white transition-all duration-300 transform hover:scale-105 relative overflow-hidden"
                 >
-                  Create New Quiz
+                  <span className="relative z-10">Create New Quiz</span>
+                  <div className="absolute inset-0 bg-[#20C997] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                 </Link>
               </>
             ) : (
               <Link 
                 href="/login"
-                className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-10 py-5 rounded-xl text-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                className="group bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-10 py-5 rounded-xl text-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center relative overflow-hidden"
               >
-                Sign In with Google
-                <ArrowRight className="ml-3 h-6 w-6" />
+                <span className="relative z-10">Sign In with Google</span>
+                <ArrowRight className="ml-3 h-6 w-6 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#1BA085] to-[#20C997] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             )}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+      {/* Features Section with Staggered Animations */}
+      <section ref={featuresRef} className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#20C997] to-[#1BA085] transform rotate-12 scale-150"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-[#212529] mb-6 leading-tight tracking-tight">
+            <h2 
+              className="text-4xl md:text-5xl font-bold text-[#212529] mb-6 leading-tight tracking-tight transition-all duration-700"
+              style={{
+                opacity: featuresRef.current ? (scrollY > (featuresRef.current.offsetTop - window.innerHeight * 0.8) ? 1 : 0.3) : 1,
+                transform: featuresRef.current ? (scrollY > (featuresRef.current.offsetTop - window.innerHeight * 0.8) ? 'translateY(0)' : 'translateY(20px)') : 'translateY(0)',
+              }}
+            >
               Everything You Need to Succeed
             </h2>
-            <p className="text-xl md:text-2xl text-[#6C757D] max-w-3xl mx-auto leading-relaxed font-normal">
+            <p 
+              className="text-xl md:text-2xl text-[#6C757D] max-w-3xl mx-auto leading-relaxed font-normal transition-all duration-700 delay-200"
+              style={{
+                opacity: featuresRef.current ? (scrollY > (featuresRef.current.offsetTop - window.innerHeight * 0.8) ? 1 : 0.3) : 1,
+                transform: featuresRef.current ? (scrollY > (featuresRef.current.offsetTop - window.innerHeight * 0.8) ? 'translateY(0)' : 'translateY(20px)') : 'translateY(0)',
+              }}
+            >
               From quiz creation to detailed analytics, Locus provides all the tools you need 
               for effective learning and assessment.
             </p>
@@ -201,12 +287,16 @@ export default function Home() {
               <Link 
                 key={index} 
                 href={feature.link}
-                className={`group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className={`group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                style={{ 
+                  transitionDelay: `${index * 150}ms`,
+                  opacity: featuresRef.current ? (scrollY > (featuresRef.current.offsetTop - window.innerHeight * 0.6) ? 1 : 0) : 1,
+                  transform: featuresRef.current ? (scrollY > (featuresRef.current.offsetTop - window.innerHeight * 0.6) ? 'translateY(0)' : 'translateY(50px)') : 'translateY(0)',
+                }}
               >
                 <div className="text-center">
                   <div className="flex justify-center mb-6">
-                    <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <div className="p-4 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                       {feature.icon}
                     </div>
                   </div>
@@ -218,7 +308,7 @@ export default function Home() {
                   </p>
                   <div className="flex items-center justify-center text-[#20C997] font-semibold text-lg">
                     Explore
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform duration-300" />
                   </div>
                 </div>
               </Link>
@@ -228,7 +318,7 @@ export default function Home() {
       </section>
 
       {/* Quick Access Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-[#212529] mb-6 leading-tight tracking-tight">
@@ -247,55 +337,80 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <Link 
               href="/dashboard"
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center group"
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center relative overflow-hidden"
             >
-              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                 <BarChart3 className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight">Dashboard</span>
+              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight relative z-10">Dashboard</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#20C997]/5 to-[#1BA085]/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
             </Link>
             
             <Link 
               href="/create"
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center group"
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center relative overflow-hidden"
             >
-              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                 <Target className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight">Create Quiz</span>
+              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight relative z-10">Create Quiz</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#20C997]/5 to-[#1BA085]/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
             </Link>
             
             <Link 
               href="/upload"
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center group"
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center relative overflow-hidden"
             >
-              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                 <Upload className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight">Upload Files</span>
+              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight relative z-10">Upload Files</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#20C997]/5 to-[#1BA085]/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
             </Link>
             
             <Link 
               href="/results"
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center group"
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center relative overflow-hidden"
             >
-              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 transition-transform duration-300">
+              <div className="p-3 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-2xl mx-auto mb-4 w-fit group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight">Results</span>
+              <span className="text-xl font-bold text-[#212529] group-hover:text-[#20C997] transition-colors leading-tight relative z-10">Results</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#20C997]/5 to-[#1BA085]/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-[#20C997] to-[#1BA085] relative overflow-hidden">
+      {/* CTA Section with Enhanced Animations */}
+      <section ref={ctaRef} className="py-24 bg-gradient-to-r from-[#20C997] to-[#1BA085] relative overflow-hidden">
+        {/* Animated Background */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            transform: `translateY(${scrollY * 0.3}px)`,
+          }}
+        >
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent"></div>
+        </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-8 leading-tight tracking-tight">
+          <h2 
+            className="text-5xl md:text-6xl font-bold text-white mb-8 leading-tight tracking-tight transition-all duration-700"
+            style={{
+              opacity: ctaRef.current ? (scrollY > (ctaRef.current.offsetTop - window.innerHeight * 0.8) ? 1 : 0.3) : 1,
+              transform: ctaRef.current ? (scrollY > (ctaRef.current.offsetTop - window.innerHeight * 0.8) ? 'translateY(0)' : 'translateY(20px)') : 'translateY(0)',
+            }}
+          >
             {isAuthenticated ? 'Ready to Continue Learning?' : 'Ready to Get Started?'}
           </h2>
-          <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-4xl mx-auto leading-relaxed font-normal">
+          <p 
+            className="text-xl md:text-2xl text-white/90 mb-10 max-w-4xl mx-auto leading-relaxed font-normal transition-all duration-700 delay-200"
+            style={{
+              opacity: ctaRef.current ? (scrollY > (ctaRef.current.offsetTop - window.innerHeight * 0.8) ? 1 : 0.3) : 1,
+              transform: ctaRef.current ? (scrollY > (ctaRef.current.offsetTop - window.innerHeight * 0.8) ? 'translateY(0)' : 'translateY(20px)') : 'translateY(0)',
+            }}
+          >
             {isAuthenticated 
               ? "Access your dashboard to continue your learning journey and explore new features."
               : "Join educators and learners who trust Locus for their assessment and learning needs."
@@ -310,16 +425,18 @@ export default function Home() {
             {isAuthenticated ? (
               <Link 
                 href="/dashboard"
-                className="bg-white text-[#20C997] px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl"
+                className="group bg-white text-[#20C997] px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl relative overflow-hidden"
               >
-                Go to Dashboard
+                <span className="relative z-10">Go to Dashboard</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#20C997]/10 to-[#1BA085]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
               </Link>
             ) : (
               <Link 
                 href="/login"
-                className="bg-white text-[#20C997] px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl"
+                className="group bg-white text-[#20C997] px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl relative overflow-hidden"
               >
-                Sign In with Google
+                <span className="relative z-10">Sign In with Google</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#20C997]/10 to-[#1BA085]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
               </Link>
             )}
           </div>
