@@ -4,11 +4,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { 
-  getOptimizedDashboardData,
-  getUserStats,
-  clearAllCaches,
-  getCacheStats
-} from '@/lib/optimized-firebase';
+  getUserQuizzes,
+  getUserQuizResults,
+  deleteQuiz
+} from '@/lib/firebase-quiz';
 import { showError, showSuccess } from '@/components/common/NotificationSystem';
 import { 
   Plus, BookOpen, BarChart3, Clock, Users, TrendingUp, 
@@ -187,7 +186,7 @@ const MobileResultCard = React.memo(({ result }: { result: any }) => {
 });
 MobileResultCard.displayName = 'MobileResultCard';
 
-export default function MobileOptimizedDashboard() {
+export default function MobileDashboard() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAppStore();
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -229,7 +228,25 @@ export default function MobileOptimizedDashboard() {
     
     try {
       setLoading(true);
-      const data = await getOptimizedDashboardData(user.id);
+      
+      // Load data using original backend functions
+      const [quizzes, results] = await Promise.all([
+        getUserQuizzes(user.id),
+        getUserQuizResults(user.id)
+      ]);
+
+      // Format data similar to optimized version
+      const data = {
+        recentQuizzes: quizzes.slice(0, 5),
+        recentResults: results.slice(0, 5),
+        totalQuizzes: quizzes.length,
+        totalResults: results.length,
+        totalQuestions: quizzes.reduce((sum, quiz) => sum + (quiz.questions?.length || 0), 0),
+        averageScore: results.length > 0 
+          ? Math.round(results.reduce((sum, result) => sum + result.score, 0) / results.length)
+          : 0
+      };
+
       setDashboardData(data);
       setError(null);
     } catch (err) {
@@ -247,16 +264,21 @@ export default function MobileOptimizedDashboard() {
   }, [loadDashboardData]);
 
   const handleClearCache = useCallback(() => {
-    clearAllCaches();
-    showSuccess('Cache Cleared', 'All cached data has been cleared');
+    // No cache to clear in original backend
+    showSuccess('Data Refreshed', 'Dashboard data has been refreshed');
     loadDashboardData();
   }, [loadDashboardData]);
 
-  const handleDeleteQuiz = useCallback((quizId: string, quizTitle: string) => {
+  const handleDeleteQuiz = useCallback(async (quizId: string, quizTitle: string) => {
     if (confirm(`Are you sure you want to delete "${quizTitle}"?`)) {
-      // Implement delete logic
-      showSuccess('Quiz Deleted', `${quizTitle} has been deleted`);
-      loadDashboardData();
+      try {
+        await deleteQuiz(quizId);
+        showSuccess('Quiz Deleted', `${quizTitle} has been deleted`);
+        loadDashboardData();
+      } catch (error) {
+        console.error('Error deleting quiz:', error);
+        showError('Delete Failed', 'Failed to delete quiz');
+      }
     }
   }, [loadDashboardData]);
 

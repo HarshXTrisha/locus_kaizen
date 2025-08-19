@@ -3,7 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { useMobileDetection } from '@/lib/mobile-detection';
-import MobileOptimizedDashboard from './MobileOptimizedDashboard';
+import MobileDashboard from './MobileOptimizedDashboard';
 import MobileCreateQuiz from './MobileCreateQuiz';
 import MobileUpload from './MobileUpload';
 import MobileQuizTaker from './MobileQuizTaker';
@@ -28,7 +28,7 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
   const getMobileComponent = () => {
     // Check for specific routes
     if (pathname === '/dashboard') {
-      return <MobileOptimizedDashboard />;
+      return <MobileDashboard />;
     }
     if (pathname === '/create') {
       return <MobileCreateQuiz />;
@@ -58,7 +58,7 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
 
 // Export individual mobile components for direct use
 export {
-  MobileOptimizedDashboard,
+  MobileDashboard,
   MobileCreateQuiz,
   MobileUpload,
   MobileQuizTaker,
