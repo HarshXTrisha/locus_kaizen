@@ -39,24 +39,24 @@ export function Sidebar() {
   ];
 
   return (
-    <div className={`lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:z-50 lg:bg-white lg:border-r lg:border-gray-200 lg:shadow-lg transition-all duration-300 ${
+    <div className={`lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:z-50 lg:bg-neutral-light lg:border-r lg:border-gray-200 lg:shadow-lg transition-all duration-300 ${
       sidebarOpen ? 'lg:w-72' : 'lg:w-20'
     }`}>
       {/* Logo Section */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
+      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-neutral-light">
         <Link
           href="/dashboard"
-          className={`flex items-center gap-3 text-xl font-bold text-[#212529] hover:text-[#20C997] transition-colors ${
+          className={`flex items-center gap-3 text-xl font-bold text-neutral-dark hover:text-primary-1 transition-colors ${
             !sidebarOpen && 'justify-center w-full'
           }`}
         >
-          <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center shadow-md">
+          <div className="h-8 w-8 bg-gradient-to-br from-primary-1 to-primary-2 rounded-lg flex items-center justify-center shadow-md">
             <Target className="h-5 w-5 text-white" />
           </div>
           {sidebarOpen && (
             <div className="flex items-center">
-              <span className="text-[#20C997]">Quest</span>
-              <span className="text-[#212529]">AI</span>
+              <span className="text-primary-1">Quest</span>
+              <span className="text-neutral-dark">AI</span>
             </div>
           )}
         </Link>
@@ -84,8 +84,8 @@ export function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                 isActive
-                  ? 'bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white shadow-lg'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  ? 'bg-gradient-to-r from-primary-1 to-primary-2 text-white shadow-lg'
+                  : 'text-neutral-dark hover:bg-gray-100 hover:text-primary-2'
               }`}
             >
               <div className={`p-2 rounded-lg transition-colors ${

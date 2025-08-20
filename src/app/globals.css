@@ -37,15 +37,20 @@
 
 /* Critical CSS optimizations */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F4F7F9;
+  --foreground: #2F3542;
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --primary-teal: #2EC4B6;
+  --primary-navy: #21356B;
+  --accent-blue: #4A90E2;
+  --neutral-light: #F4F7F9;
+  --neutral-dark: #2F3542;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #21356B;
+    --foreground: #F4F7F9;
   }
 }
 
@@ -149,19 +154,19 @@
   }
 
   .hover-glow:hover {
-    box-shadow: 0 0 20px rgba(32, 201, 151, 0.3);
+    box-shadow: 0 0 20px rgba(46, 196, 182, 0.3);
   }
 
   /* Button animations */
   .btn-primary {
-    @apply bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-6 py-3 rounded-xl font-medium;
+    @apply bg-gradient-to-r from-primary-1 to-primary-2 text-white px-6 py-3 rounded-xl font-medium;
     transition: all 0.2s ease-out;
   }
 
   .btn-primary:hover {
-    @apply from-[#1BA085] to-[#20C997];
+    @apply from-primary-2 to-primary-1;
     transform: translateY(-1px);
-    box-shadow: 0 10px 25px -5px rgba(32, 201, 151, 0.3);
+    box-shadow: 0 10px 25px -5px rgba(46, 196, 182, 0.3);
   }
 
   .btn-primary:active {
@@ -185,7 +190,7 @@
 
   .input-focus:focus {
     transform: scale(1.02);
-    box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1);
+    box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.1);
   }
 }
 

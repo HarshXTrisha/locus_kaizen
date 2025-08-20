@@ -32,60 +32,60 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
           href="/create"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#20C997]/10 rounded-lg group-hover:bg-[#20C997]/20 transition-colors">
-              <Plus className="h-6 w-6 text-[#20C997]" />
+            <div className="p-3 bg-primary-1/10 rounded-lg group-hover:bg-primary-1/20 transition-colors">
+              <Plus className="h-6 w-6 text-primary-1" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Create Quiz</h3>
-              <p className="text-sm text-gray-600">Build a new quiz</p>
+              <h3 className="font-semibold text-neutral-dark">Create Quiz</h3>
+              <p className="text-sm text-neutral-dark/70">Build a new quiz</p>
             </div>
           </div>
         </Link>
 
         <Link
           href="/upload"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-              <BookOpen className="h-6 w-6 text-blue-600" />
+            <div className="p-3 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
+              <BookOpen className="h-6 w-6 text-accent" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Upload JSON</h3>
-              <p className="text-sm text-gray-600">Create from JSON files</p>
+              <h3 className="font-semibold text-neutral-dark">Upload JSON</h3>
+              <p className="text-sm text-neutral-dark/70">Create from JSON files</p>
             </div>
           </div>
         </Link>
 
         <Link
           href="/results"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-              <TrendingUp className="h-6 w-6 text-green-600" />
+            <div className="p-3 bg-primary-2/10 rounded-lg group-hover:bg-primary-2/20 transition-colors">
+              <TrendingUp className="h-6 w-6 text-primary-2" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">View Results</h3>
-              <p className="text-sm text-gray-600">Check performance</p>
+              <h3 className="font-semibold text-neutral-dark">View Results</h3>
+              <p className="text-sm text-neutral-dark/70">Check performance</p>
             </div>
           </div>
         </Link>
 
         <Link
           href="/archive"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-[#20C997] hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
-              <Target className="h-6 w-6 text-purple-600" />
+            <div className="p-3 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
+              <Target className="h-6 w-6 text-accent" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Quiz Archive</h3>
-              <p className="text-sm text-gray-600">Manage quizzes</p>
+              <h3 className="font-semibold text-neutral-dark">Quiz Archive</h3>
+              <p className="text-sm text-neutral-dark/70">Manage quizzes</p>
             </div>
           </div>
         </Link>

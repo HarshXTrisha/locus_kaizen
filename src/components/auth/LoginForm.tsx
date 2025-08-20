@@ -147,8 +147,8 @@ export function LoginForm() {
   return (
     <div className="w-full">
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-[#212529] mb-4 leading-tight tracking-tight">Welcome Back!</h2>
-        <p className="text-gray-600 text-center">Sign in to continue your learning journey with QuestAI.</p>
+        <h2 className="text-4xl font-bold text-neutral-dark mb-4 leading-tight tracking-tight">Welcome Back!</h2>
+        <p className="text-neutral-dark/70 text-center">Sign in to continue your learning journey with QuestAI.</p>
       </div>
 
       <div className="space-y-6">
@@ -157,7 +157,7 @@ export function LoginForm() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-gray-700 border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-[#20C997] hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
+          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-neutral-dark border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-primary-1 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
         >
           {isLoading && authProvider === 'google' ? (
             <ButtonLoader text="Signing In..." />
@@ -166,7 +166,7 @@ export function LoginForm() {
               <div className="mr-4 group-hover:scale-110 transition-transform duration-300">
                 <GoogleIcon />
               </div>
-              <span className="group-hover:text-[#20C997] transition-colors duration-300">
+              <span className="group-hover:text-primary-1 transition-colors duration-300">
                 Sign In with Google
               </span>
             </>
@@ -188,7 +188,7 @@ export function LoginForm() {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-gray-700 border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-[#20C997] hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
+          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-neutral-dark border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-primary-1 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
         >
           {isLoading && authProvider === 'microsoft' ? (
             <ButtonLoader text="Signing In..." />
@@ -197,7 +197,7 @@ export function LoginForm() {
               <div className="mr-4 group-hover:scale-110 transition-transform duration-300">
                 <MicrosoftIcon />
               </div>
-              <span className="group-hover:text-[#20C997] transition-colors duration-300">
+              <span className="group-hover:text-primary-1 transition-colors duration-300">
                 Sign In with Microsoft
               </span>
             </>
@@ -206,16 +206,16 @@ export function LoginForm() {
 
         {/* Benefits */}
         <div className="mt-10 space-y-5">
-          <div className="flex items-center text-base text-[#6C757D] font-medium">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
+          <div className="flex items-center text-base text-neutral-dark/70 font-medium">
+            <div className="w-2 h-2 bg-primary-1 rounded-full mr-4"></div>
             <span>Secure authentication with Google or Microsoft</span>
           </div>
-          <div className="flex items-center text-base text-[#6C757D] font-medium">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
+          <div className="flex items-center text-base text-neutral-dark/70 font-medium">
+            <div className="w-2 h-2 bg-primary-1 rounded-full mr-4"></div>
             <span>Access to all quiz features</span>
           </div>
-          <div className="flex items-center text-base text-[#6C757D] font-medium">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
+          <div className="flex items-center text-base text-neutral-dark/70 font-medium">
+            <div className="w-2 h-2 bg-primary-1 rounded-full mr-4"></div>
             <span>Personalized learning dashboard</span>
           </div>
         </div>

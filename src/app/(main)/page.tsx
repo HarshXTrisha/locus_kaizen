@@ -122,39 +122,39 @@ export default function Home() {
       title: "Quiz Creation",
       description: "Create custom quizzes with multiple question types and detailed analytics.",
       link: "/create",
-      color: "from-green-400/20 to-green-600/20",
-      borderColor: "border-green-400/30"
+      color: "from-primary-1/20 to-primary-2/20",
+      borderColor: "border-primary-1/30"
     },
     {
       icon: <BookOpen className="h-8 w-8 text-white" />,
       title: "Interactive Quizzes",
       description: "Take quizzes with real-time progress tracking and instant feedback.",
       link: "/quiz",
-      color: "from-blue-400/20 to-blue-600/20",
-      borderColor: "border-blue-400/30"
+      color: "from-accent/20 to-primary-1/20",
+      borderColor: "border-accent/30"
     },
     {
       icon: <BarChart3 className="h-8 w-8 text-white" />,
       title: "Analytics Dashboard",
       description: "Comprehensive analytics and performance insights with beautiful charts.",
       link: "/dashboard",
-      color: "from-purple-400/20 to-purple-600/20",
-      borderColor: "border-purple-400/30"
+      color: "from-primary-2/20 to-accent/20",
+      borderColor: "border-primary-2/30"
     },
     {
       icon: <Upload className="h-8 w-8 text-white" />,
       title: "File Management",
       description: "Upload and manage quiz files with secure cloud storage.",
       link: "/upload",
-      color: "from-indigo-400/20 to-indigo-600/20",
-      borderColor: "border-indigo-400/30"
+      color: "from-accent/20 to-primary-2/20",
+      borderColor: "border-accent/30"
     }
   ];
 
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#E8F5E8] overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-light via-white to-primary-1/5 overflow-x-hidden">
       {/* Particle System */}
       <ParticleSystem />
       
@@ -164,16 +164,16 @@ export default function Home() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight hover:scale-105 transition-all duration-300 group">
-                  <div className="w-8 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center hover:rotate-12 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[#20C997]/25">
+                <h1 className="text-2xl font-bold text-neutral-dark flex items-center tracking-tight hover:scale-105 transition-all duration-300 group">
+                  <div className="w-8 h-8 bg-gradient-to-r from-primary-1 to-primary-2 rounded-lg mr-3 flex items-center justify-center hover:rotate-12 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary-1/25">
                     <Target className="h-5 w-5 text-white" />
                   </div>
                   QuestAI
                 </h1>
               </div>
-              <div className="ml-4 flex items-center text-xs text-[#6C757D] font-medium">
+              <div className="ml-4 flex items-center text-xs text-neutral-dark/70 font-medium">
                 <span className="mr-1">Powered by</span>
-                <span className="font-semibold text-[#20C997]">Kaizen</span>
+                <span className="font-semibold text-primary-1">Kaizen</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -182,13 +182,13 @@ export default function Home() {
                   <span className="hidden sm:block text-gray-600 font-medium">Welcome, {user?.firstName || 'User'}!</span>
                   <Link 
                     href="/dashboard"
-                    className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-4 py-2 rounded-lg hover:shadow-lg hover:shadow-[#20C997]/25 transition-all duration-300 transform hover:scale-105 font-medium backdrop-blur-sm"
+                    className="bg-gradient-to-r from-primary-1 to-primary-2 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:shadow-primary-1/25 transition-all duration-300 transform hover:scale-105 font-medium backdrop-blur-sm"
                   >
                     Dashboard
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="bg-gray-600/80 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-gray-700/80 transition-all duration-300 flex items-center font-medium hover:shadow-lg"
+                    className="bg-neutral-dark/80 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-neutral-dark transition-all duration-300 flex items-center font-medium hover:shadow-lg"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Sign Out</span>
@@ -197,7 +197,7 @@ export default function Home() {
               ) : (
                 <Link 
                   href="/login"
-                  className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-4 py-2 rounded-lg hover:shadow-lg hover:shadow-[#20C997]/25 transition-all duration-300 transform hover:scale-105 flex items-center font-medium backdrop-blur-sm"
+                  className="bg-gradient-to-r from-primary-1 to-primary-2 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:shadow-primary-1/25 transition-all duration-300 transform hover:scale-105 flex items-center font-medium backdrop-blur-sm"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Sign In with Google</span>
