@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
@@ -66,84 +66,91 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-light via-white to-gray-100 overflow-x-hidden">
-      {/* Header with Glassmorphism */}
-      <header className="bg-white/10 backdrop-blur-xl shadow-lg border-b border-white/20 sticky top-0 z-50">
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      {/* Apple-style Header */}
+      <header className="bg-black/80 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-neutral-dark flex items-center tracking-tight">
-                  <div className="w-8 h-8 bg-gradient-to-r from-primary-1 to-primary-2 rounded-lg mr-3 flex items-center justify-center">
-                    <Target className="h-5 w-5 text-white" />
+                <h1 className="text-2xl font-bold text-white flex items-center tracking-tight">
+                  <div className="w-8 h-8 bg-white rounded-2xl mr-3 flex items-center justify-center">
+                    <Target className="h-5 w-5 text-black" />
                   </div>
                   QuestAI
                 </h1>
               </div>
-              <div className="ml-4 flex items-center text-xs text-neutral-dark/70 font-medium">
+              <div className="ml-4 flex items-center text-xs text-white/60 font-medium">
                 <span className="mr-1">Powered by</span>
-                <span className="font-semibold text-primary-1">Kaizen</span>
+                <span className="font-semibold text-white">Kaizen</span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <>
-                  <span className="hidden sm:block text-gray-600 font-medium">Welcome, {user?.firstName || 'User'}!</span>
+                          <div className="flex items-center space-x-4">
+                {isAuthenticated ? (
+                  <>
+                    <span className="hidden sm:block text-white/80 font-medium">Welcome, {user?.firstName || 'User'}!</span>
+                    <Link 
+                      href="/dashboard"
+                      className="bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-white/90 transition-all duration-300"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-full flex items-center font-medium hover:bg-white/20 transition-all duration-300"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Sign Out</span>
+                    </button>
+                  </>
+                ) : (
                   <Link 
-                    href="/dashboard"
-                    className="bg-gradient-to-r from-primary-1 to-primary-2 text-white px-4 py-2 rounded-lg font-medium backdrop-blur-sm"
+                    href="/login"
+                    className="bg-white text-black px-6 py-2 rounded-full flex items-center font-medium hover:bg-white/90 transition-all duration-300"
                   >
-                    Dashboard
+                    <LogIn className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Sign In</span>
+                    <span className="sm:hidden">Sign In</span>
                   </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="bg-neutral-dark/80 backdrop-blur-sm text-white px-4 py-2 rounded-lg flex items-center font-medium"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Sign Out</span>
-                  </button>
-                </>
-              ) : (
-                <Link 
-                  href="/login"
-                  className="bg-gradient-to-r from-primary-1 to-primary-2 text-white px-4 py-2 rounded-lg flex items-center font-medium backdrop-blur-sm"
-                >
-                  <LogIn className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Sign In with Google</span>
-                  <span className="sm:hidden">Sign In</span>
-                </Link>
-              )}
-            </div>
+                )}
+              </div>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Apple-style Hero Section */}
+      <section className="relative py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-neutral-dark mb-8 leading-tight tracking-tight">
+          <div className="mb-8">
+            <span className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/80 mb-6">
+              ✨ The Future of Learning
+            </span>
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-8 leading-none tracking-tight">
             {isAuthenticated ? (
               <>
-                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-1 to-primary-2">{user?.firstName || 'User'}!</span>
+                Welcome back, <br />
+                <span className="text-white">{user?.firstName || 'User'}!</span>
               </>
             ) : (
               <>
-                Master Your Knowledge with
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-1 to-primary-2 block"> QuestAI</span>
+                Master Your <br />
+                <span className="text-white">Knowledge</span>
               </>
             )}
           </h1>
 
-          <p className="text-xl md:text-2xl lg:text-3xl text-neutral-dark/70 mb-10 max-w-5xl mx-auto leading-relaxed font-normal">
+          <p className="text-2xl md:text-3xl lg:text-4xl text-white/70 mb-12 max-w-4xl mx-auto leading-relaxed font-light">
             {isAuthenticated 
               ? "Ready to continue your learning journey? Access your dashboard or explore our features."
               : "A comprehensive quiz management platform that helps you create, take, and analyze quizzes with powerful analytics and beautiful insights."
             }
           </p>
 
-          <div className="flex items-center justify-center mb-10 text-sm text-neutral-dark/70 font-medium">
+          <div className="flex items-center justify-center mb-12 text-sm text-white/60 font-medium">
             <span className="mr-2">Powered by</span>
-            <span className="font-semibold text-primary-1">Kaizen</span>
+            <span className="font-semibold text-white">Kaizen</span>
             <span className="ml-2">- Continuous Improvement</span>
           </div>
 
@@ -152,14 +159,14 @@ export default function Home() {
               <>
                 <Link 
                   href="/dashboard"
-                  className="bg-gradient-to-r from-primary-1 to-primary-2 text-white px-10 py-5 rounded-xl text-xl font-semibold flex items-center justify-center backdrop-blur-sm"
+                  className="bg-white text-black px-12 py-6 rounded-full text-xl font-semibold flex items-center justify-center hover:bg-white/90 transition-all duration-300 shadow-2xl"
                 >
                   <span>Go to Dashboard</span>
                   <ArrowRight className="ml-3 h-6 w-6" />
                 </Link>
                 <Link 
                   href="/create"
-                  className="bg-white/10 backdrop-blur-xl text-primary-1 border-2 border-primary-1/30 px-10 py-5 rounded-xl text-xl font-semibold"
+                  className="bg-white/10 backdrop-blur-xl text-white border-2 border-white/30 px-12 py-6 rounded-full text-xl font-semibold hover:bg-white/20 transition-all duration-300"
                 >
                   <span>Create New Quiz</span>
                 </Link>
@@ -167,9 +174,9 @@ export default function Home() {
             ) : (
               <Link 
                 href="/login"
-                className="bg-gradient-to-r from-primary-1 to-primary-2 text-white px-10 py-5 rounded-xl text-xl font-semibold flex items-center justify-center backdrop-blur-sm"
+                className="bg-white text-black px-12 py-6 rounded-full text-xl font-semibold flex items-center justify-center hover:bg-white/90 transition-all duration-300 shadow-2xl"
               >
-                <span>Sign In with Google</span>
+                <span>Get Started</span>
                 <ArrowRight className="ml-3 h-6 w-6" />
               </Link>
             )}
@@ -177,20 +184,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50/50 relative overflow-hidden">
+      {/* Apple-style Features Section */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white/5 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-neutral-dark mb-6 leading-tight tracking-tight">
-              Everything You Need to Succeed
+          <div className="text-center mb-24">
+            <span className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/80 mb-6">
+              ✨ Powerful Features
+            </span>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-none tracking-tight">
+              Everything You Need <br />
+              <span className="text-white/80">to Succeed</span>
             </h2>
-            <p className="text-xl md:text-2xl text-neutral-dark/70 max-w-3xl mx-auto leading-relaxed font-normal">
+            <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto leading-relaxed font-light">
               From quiz creation to detailed analytics, QuestAI provides all the tools you need 
               for effective learning and assessment.
             </p>
-            <div className="flex items-center justify-center mt-6 text-sm text-neutral-dark/70 font-medium">
+            <div className="flex items-center justify-center mt-8 text-sm text-white/60 font-medium">
               <span className="mr-2">Powered by</span>
-              <span className="font-semibold text-primary-1">Kaizen</span>
+              <span className="font-semibold text-white">Kaizen</span>
               <span className="ml-2">- Continuous Improvement</span>
             </div>
           </div>
@@ -200,21 +211,21 @@ export default function Home() {
               <Link 
                 key={index} 
                 href={feature.link}
-                className="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg"
+                className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-all duration-500 hover:scale-105"
               >
                 <div className="text-center">
-                  <div className="flex justify-center mb-6">
-                    <div className="p-4 bg-gradient-to-r from-primary-1 to-primary-2 rounded-2xl shadow-lg">
+                  <div className="flex justify-center mb-8">
+                    <div className="p-6 bg-white/10 backdrop-blur-sm rounded-3xl shadow-2xl group-hover:bg-white/20 transition-all duration-500">
                       {feature.icon}
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold text-neutral-dark mb-4 leading-tight">
+                  <h3 className="text-2xl font-bold text-white mb-4 leading-tight">
                     {feature.title}
                   </h3>
-                  <p className="text-neutral-dark/70 mb-6 leading-relaxed font-normal text-base">
+                  <p className="text-white/70 mb-8 leading-relaxed font-light text-base">
                     {feature.description}
                   </p>
-                  <div className="flex items-center justify-center text-primary-1 font-semibold text-lg">
+                  <div className="flex items-center justify-center text-white font-semibold text-lg group-hover:text-white/80 transition-colors duration-300">
                     Explore
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </div>
@@ -225,19 +236,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quick Access Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Apple-style Quick Access Section */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-neutral-dark mb-6 leading-tight tracking-tight">
-              Quick Access
+          <div className="text-center mb-24">
+            <span className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/80 mb-6">
+              ⚡ Quick Access
+            </span>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-none tracking-tight">
+              Jump Right In <br />
+              <span className="text-white/80">Get Started</span>
             </h2>
-            <p className="text-xl md:text-2xl text-neutral-dark/70 max-w-3xl mx-auto leading-relaxed font-normal">
+            <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto leading-relaxed font-light">
               Jump directly to any section of the platform with these quick links.
             </p>
-            <div className="flex items-center justify-center mt-6 text-sm text-neutral-dark/70 font-medium">
+            <div className="flex items-center justify-center mt-8 text-sm text-white/60 font-medium">
               <span className="mr-2">Powered by</span>
-              <span className="font-semibold text-primary-1">Kaizen</span>
+              <span className="font-semibold text-white">Kaizen</span>
               <span className="ml-2">- Continuous Improvement</span>
             </div>
           </div>
@@ -245,103 +260,106 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <Link 
               href="/dashboard"
-              className="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg text-center"
+              className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl text-center hover:bg-white/10 transition-all duration-500 hover:scale-105"
             >
-              <div className="p-3 bg-gradient-to-r from-primary-1 to-primary-2 rounded-2xl mx-auto mb-4 w-fit">
-                <BarChart3 className="h-6 w-6 text-white" />
+              <div className="p-4 bg-white/10 backdrop-blur-sm rounded-3xl mx-auto mb-6 w-fit shadow-2xl group-hover:bg-white/20 transition-all duration-500">
+                <BarChart3 className="h-8 w-8 text-white" />
               </div>
-              <span className="text-xl font-bold text-neutral-dark leading-tight">Dashboard</span>
+              <span className="text-xl font-bold text-white leading-tight">Dashboard</span>
             </Link>
             
             <Link 
               href="/create"
-              className="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg text-center"
+              className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl text-center hover:bg-white/10 transition-all duration-500 hover:scale-105"
             >
-              <div className="p-3 bg-gradient-to-r from-primary-1 to-primary-2 rounded-2xl mx-auto mb-4 w-fit">
-                <Target className="h-6 w-6 text-white" />
+              <div className="p-4 bg-white/10 backdrop-blur-sm rounded-3xl mx-auto mb-6 w-fit shadow-2xl group-hover:bg-white/20 transition-all duration-500">
+                <Target className="h-8 w-8 text-white" />
               </div>
-              <span className="text-xl font-bold text-neutral-dark leading-tight">Create Quiz</span>
+              <span className="text-xl font-bold text-white leading-tight">Create Quiz</span>
             </Link>
             
             <Link 
               href="/upload"
-              className="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg text-center"
+              className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl text-center hover:bg-white/10 transition-all duration-500 hover:scale-105"
             >
-              <div className="p-3 bg-gradient-to-r from-primary-1 to-primary-2 rounded-2xl mx-auto mb-4 w-fit">
-                <Upload className="h-6 w-6 text-white" />
+              <div className="p-4 bg-white/10 backdrop-blur-sm rounded-3xl mx-auto mb-6 w-fit shadow-2xl group-hover:bg-white/20 transition-all duration-500">
+                <Upload className="h-8 w-8 text-white" />
               </div>
-              <span className="text-xl font-bold text-neutral-dark leading-tight">Upload Files</span>
+              <span className="text-xl font-bold text-white leading-tight">Upload Files</span>
             </Link>
             
             <Link 
               href="/results"
-              className="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg text-center"
+              className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl text-center hover:bg-white/10 transition-all duration-500 hover:scale-105"
             >
-              <div className="p-3 bg-gradient-to-r from-primary-1 to-primary-2 rounded-2xl mx-auto mb-4 w-fit">
-                <TrendingUp className="h-6 w-6 text-white" />
+              <div className="p-4 bg-white/10 backdrop-blur-sm rounded-3xl mx-auto mb-6 w-fit shadow-2xl group-hover:bg-white/20 transition-all duration-500">
+                <TrendingUp className="h-8 w-8 text-white" />
               </div>
-              <span className="text-xl font-bold text-neutral-dark leading-tight">Results</span>
+              <span className="text-xl font-bold text-white leading-tight">Results</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-black to-gray-800 relative overflow-hidden">
+      {/* Apple-style CTA Section */}
+      <section className="py-32 bg-gradient-to-br from-white/5 to-white/10 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-8 leading-tight tracking-tight">
-            {isAuthenticated ? 'Ready to Continue Learning?' : 'Ready to Get Started?'}
+          <span className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/80 mb-6">
+            🚀 Ready to Launch
+          </span>
+          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-none tracking-tight">
+            {isAuthenticated ? 'Ready to Continue <br />Learning?' : 'Ready to Get <br />Started?'}
           </h2>
-          <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-4xl mx-auto leading-relaxed font-normal">
+          <p className="text-2xl md:text-3xl text-white/80 mb-12 max-w-4xl mx-auto leading-relaxed font-light">
             {isAuthenticated 
               ? "Access your dashboard to continue your learning journey and explore new features."
               : "Join educators and learners who trust QuestAI for their assessment and learning needs."
             }
           </p>
-          <div className="flex items-center justify-center mb-12 text-white/80 text-sm font-medium">
+          <div className="flex items-center justify-center mb-16 text-white/60 text-sm font-medium">
             <span className="mr-2">Powered by</span>
             <span className="font-semibold text-white">Kaizen</span>
             <span className="ml-2">- Continuous Improvement</span>
           </div>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {isAuthenticated ? (
-                              <Link 
-                  href="/dashboard"
-                  className="bg-white/10 backdrop-blur-xl text-white px-12 py-6 rounded-2xl text-2xl font-bold border border-white/20"
-                >
-                  <span>Go to Dashboard</span>
-                </Link>
-              ) : (
-                <Link 
-                  href="/login"
-                  className="bg-white/10 backdrop-blur-xl text-white px-12 py-6 rounded-2xl text-2xl font-bold border border-white/20"
-                >
-                  <span>Sign In with Google</span>
-                </Link>
-              )}
+              <Link 
+                href="/dashboard"
+                className="bg-white text-black px-16 py-8 rounded-full text-2xl font-bold hover:bg-white/90 transition-all duration-300 shadow-2xl"
+              >
+                <span>Go to Dashboard</span>
+              </Link>
+            ) : (
+              <Link 
+                href="/login"
+                className="bg-white text-black px-16 py-8 rounded-full text-2xl font-bold hover:bg-white/90 transition-all duration-300 shadow-2xl"
+              >
+                <span>Get Started</span>
+              </Link>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-neutral-dark text-white py-20">
+      {/* Apple-style Footer */}
+      <footer className="bg-black/50 backdrop-blur-2xl border-t border-white/10 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h3 className="text-3xl font-bold mb-6 flex items-center justify-center tracking-tight">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-1 to-primary-2 rounded-lg mr-3 flex items-center justify-center">
-                <Target className="h-5 w-5 text-white" />
+            <h3 className="text-4xl font-bold mb-8 flex items-center justify-center tracking-tight">
+              <div className="w-10 h-10 bg-white rounded-3xl mr-4 flex items-center justify-center">
+                <Target className="h-6 w-6 text-black" />
               </div>
               QuestAI
             </h3>
-            <p className="text-xl text-gray-400 mb-6 leading-relaxed font-normal">
+            <p className="text-xl text-white/60 mb-8 leading-relaxed font-light">
               The ultimate quiz management platform for modern learning and assessment.
             </p>
-            <div className="flex items-center justify-center text-gray-400 text-sm mb-10 font-medium">
+            <div className="flex items-center justify-center text-white/40 text-sm mb-12 font-medium">
               <span className="mr-2">Powered by</span>
-              <span className="font-semibold text-primary-1">Kaizen</span>
+              <span className="font-semibold text-white">Kaizen</span>
               <span className="ml-2">- Continuous Improvement</span>
             </div>
-            <div className="border-t border-gray-700 pt-8 text-center text-gray-400">
+            <div className="border-t border-white/10 pt-8 text-center text-white/40">
               <p className="font-medium">&copy; 2024 QuestAI. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
             </div>
           </div>
