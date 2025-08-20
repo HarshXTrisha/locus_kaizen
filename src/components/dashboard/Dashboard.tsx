@@ -32,60 +32,60 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
           href="/create"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
+          className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 group hover:scale-105"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-black/10 rounded-lg group-hover:bg-black/20 transition-colors">
-              <Plus className="h-6 w-6 text-black" />
+            <div className="p-3 bg-white/10 rounded-2xl group-hover:bg-white/20 transition-colors shadow-2xl">
+              <Plus className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-dark">Create Quiz</h3>
-              <p className="text-sm text-neutral-dark/70">Build a new quiz</p>
+              <h3 className="font-semibold text-white">Create Quiz</h3>
+              <p className="text-sm text-white/70">Build a new quiz</p>
             </div>
           </div>
         </Link>
 
         <Link
           href="/upload"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
+          className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 group hover:scale-105"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gray-600/10 rounded-lg group-hover:bg-gray-600/20 transition-colors">
-              <BookOpen className="h-6 w-6 text-gray-600" />
+            <div className="p-3 bg-white/10 rounded-2xl group-hover:bg-white/20 transition-colors shadow-2xl">
+              <BookOpen className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-dark">Upload JSON</h3>
-              <p className="text-sm text-neutral-dark/70">Create from JSON files</p>
+              <h3 className="font-semibold text-white">Upload JSON</h3>
+              <p className="text-sm text-white/70">Create from JSON files</p>
             </div>
           </div>
         </Link>
 
         <Link
           href="/results"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
+          className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 group hover:scale-105"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gray-800/10 rounded-lg group-hover:bg-gray-800/20 transition-colors">
-              <TrendingUp className="h-6 w-6 text-gray-800" />
+            <div className="p-3 bg-white/10 rounded-2xl group-hover:bg-white/20 transition-colors shadow-2xl">
+              <TrendingUp className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-dark">View Results</h3>
-              <p className="text-sm text-neutral-dark/70">Check performance</p>
+              <h3 className="font-semibold text-white">View Results</h3>
+              <p className="text-sm text-white/70">Check performance</p>
             </div>
           </div>
         </Link>
 
         <Link
           href="/archive"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
+          className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 group hover:scale-105"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gray-600/10 rounded-lg group-hover:bg-gray-600/20 transition-colors">
-              <Target className="h-6 w-6 text-gray-600" />
+            <div className="p-3 bg-white/10 rounded-2xl group-hover:bg-white/20 transition-colors shadow-2xl">
+              <Target className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-dark">Quiz Archive</h3>
-              <p className="text-sm text-neutral-dark/70">Manage quizzes</p>
+              <h3 className="font-semibold text-white">Quiz Archive</h3>
+              <p className="text-sm text-white/70">Manage quizzes</p>
             </div>
           </div>
         </Link>
@@ -98,91 +98,91 @@ export function Dashboard() {
         averageScore={averageScore}
       />
 
-      {/* Charts and Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Overview</h3>
-          <PerformanceChart results={results} />
-        </div>
+             {/* Charts and Analytics */}
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+         <div className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
+           <h3 className="text-lg font-semibold text-white mb-4">Performance Overview</h3>
+           <PerformanceChart results={results} />
+         </div>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          <RecentHistory 
-            recentQuizzes={recentQuizzes}
-            recentResults={recentResults}
-          />
-        </div>
-      </div>
+         <div className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
+           <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+           <RecentHistory 
+             recentQuizzes={recentQuizzes}
+             recentResults={recentResults}
+           />
+         </div>
+       </div>
 
-      {/* Recent Quizzes */}
-      {recentQuizzes.length > 0 && (
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Quizzes</h3>
-            <Link
-              href="/archive"
-              className="text-[#20C997] hover:text-[#1BA085] text-sm font-medium"
-            >
-              View All
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recentQuizzes.map((quiz) => (
-              <div key={quiz.id} className="border border-gray-200 rounded-lg p-4 hover:border-[#20C997] transition-colors">
-                <h4 className="font-medium text-gray-900 mb-2">{quiz.title}</h4>
-                <p className="text-sm text-gray-600 mb-3">{quiz.description}</p>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>{quiz.questions.length} questions</span>
-                  <span>{quiz.timeLimit} min</span>
-                </div>
-                <div className="mt-3 flex gap-2">
-                  <Link
-                    href={`/quiz/${quiz.id}`}
-                    className="flex-1 bg-[#20C997] text-white text-center py-2 px-3 rounded-lg text-sm hover:bg-[#1BA085] transition-colors"
-                  >
-                    Take Quiz
-                  </Link>
-                  <Link
-                    href={`/results?quiz=${quiz.id}`}
-                    className="flex-1 border border-[#20C997] text-[#20C997] text-center py-2 px-3 rounded-lg text-sm hover:bg-[#20C997] hover:text-white transition-colors"
-                  >
-                    Results
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+             {/* Recent Quizzes */}
+       {recentQuizzes.length > 0 && (
+         <div className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
+           <div className="flex items-center justify-between mb-4">
+             <h3 className="text-lg font-semibold text-white">Recent Quizzes</h3>
+             <Link
+               href="/archive"
+               className="text-white/80 hover:text-white text-sm font-medium"
+             >
+               View All
+             </Link>
+           </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+             {recentQuizzes.map((quiz) => (
+               <div key={quiz.id} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+                 <h4 className="font-medium text-white mb-2">{quiz.title}</h4>
+                 <p className="text-sm text-white/70 mb-3">{quiz.description}</p>
+                 <div className="flex items-center justify-between text-sm text-white/60">
+                   <span>{quiz.questions.length} questions</span>
+                   <span>{quiz.timeLimit} min</span>
+                 </div>
+                 <div className="mt-3 flex gap-2">
+                   <Link
+                     href={`/quiz/${quiz.id}`}
+                     className="flex-1 bg-white text-black text-center py-2 px-3 rounded-full text-sm hover:bg-white/90 transition-all duration-300 font-medium"
+                   >
+                     Take Quiz
+                   </Link>
+                   <Link
+                     href={`/results?quiz=${quiz.id}`}
+                     className="flex-1 border border-white/30 text-white text-center py-2 px-3 rounded-full text-sm hover:bg-white/10 transition-all duration-300"
+                   >
+                     Results
+                   </Link>
+                 </div>
+               </div>
+             ))}
+           </div>
+         </div>
+       )}
 
-      {/* Empty State */}
-      {quizzes.length === 0 && (
-        <div className="bg-white p-12 rounded-lg border border-gray-200 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 bg-[#20C997]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Plus className="h-8 w-8 text-[#20C997]" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Get Started with Your First Quiz</h3>
-            <p className="text-gray-600 mb-6">
-              Create your first quiz to start testing knowledge and tracking performance.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <Link
-                href="/create"
-                className="bg-[#20C997] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#1BA085] transition-colors"
-              >
-                Create Quiz
-              </Link>
-              <Link
-                href="/upload"
-                className="border border-[#20C997] text-[#20C997] px-6 py-3 rounded-lg font-medium hover:bg-[#20C997] hover:text-white transition-colors"
-              >
-                Upload Document
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+             {/* Empty State */}
+       {quizzes.length === 0 && (
+         <div className="bg-white/5 backdrop-blur-xl p-12 rounded-3xl border border-white/10 shadow-2xl text-center">
+           <div className="max-w-md mx-auto">
+             <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
+               <Plus className="h-8 w-8 text-white" />
+             </div>
+             <h3 className="text-lg font-semibold text-white mb-2">Get Started with Your First Quiz</h3>
+             <p className="text-white/70 mb-6">
+               Create your first quiz to start testing knowledge and tracking performance.
+             </p>
+             <div className="flex gap-3 justify-center">
+               <Link
+                 href="/create"
+                 className="bg-white text-black px-6 py-3 rounded-full font-medium hover:bg-white/90 transition-all duration-300 shadow-2xl"
+               >
+                 Create Quiz
+               </Link>
+               <Link
+                 href="/upload"
+                 className="border border-white/30 text-white px-6 py-3 rounded-full font-medium hover:bg-white/10 transition-all duration-300"
+               >
+                 Upload Document
+               </Link>
+             </div>
+           </div>
+         </div>
+       )}
     </div>
   );
 }

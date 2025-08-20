@@ -39,24 +39,24 @@ export function Sidebar() {
   ];
 
   return (
-    <div className={`lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:z-50 lg:bg-neutral-light lg:border-r lg:border-gray-200 lg:shadow-lg transition-all duration-300 ${
+    <div className={`lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:z-50 lg:bg-black/90 lg:backdrop-blur-2xl lg:border-r lg:border-white/10 lg:shadow-2xl transition-all duration-300 ${
       sidebarOpen ? 'lg:w-72' : 'lg:w-20'
     }`}>
       {/* Logo Section */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-neutral-light">
+      <div className="flex items-center justify-between h-16 px-4 border-b border-white/10 bg-black/50">
         <Link
           href="/dashboard"
-          className={`flex items-center gap-3 text-xl font-bold text-neutral-dark hover:text-primary-1 transition-colors ${
+          className={`flex items-center gap-3 text-xl font-bold text-white hover:text-white/80 transition-colors ${
             !sidebarOpen && 'justify-center w-full'
           }`}
         >
-          <div className="h-8 w-8 bg-gradient-to-br from-primary-1 to-primary-2 rounded-lg flex items-center justify-center shadow-md">
-            <Target className="h-5 w-5 text-white" />
+          <div className="h-8 w-8 bg-white rounded-2xl flex items-center justify-center shadow-2xl">
+            <Target className="h-5 w-5 text-black" />
           </div>
           {sidebarOpen && (
             <div className="flex items-center">
-              <span className="text-primary-1">Quest</span>
-              <span className="text-neutral-dark">AI</span>
+              <span className="text-white">Quest</span>
+              <span className="text-white/80">AI</span>
             </div>
           )}
         </Link>
@@ -64,12 +64,12 @@ export function Sidebar() {
         {/* Toggle Button */}
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-full hover:bg-white/10 transition-colors"
         >
           {sidebarOpen ? (
-            <ChevronLeft className="h-5 w-5 text-gray-600" />
+            <ChevronLeft className="h-5 w-5 text-white" />
           ) : (
-            <ChevronRight className="h-5 w-5 text-gray-600" />
+            <ChevronRight className="h-5 w-5 text-white" />
           )}
         </button>
       </div>
@@ -82,19 +82,19 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
+              className={`flex items-center gap-3 px-3 py-3 rounded-2xl text-sm font-medium transition-all duration-300 group ${
                 isActive
-                  ? 'bg-gradient-to-r from-primary-1 to-primary-2 text-white shadow-lg'
-                  : 'text-neutral-dark hover:bg-gray-100 hover:text-primary-2'
+                  ? 'bg-white text-black shadow-2xl'
+                  : 'text-white/80 hover:bg-white/10 hover:text-white'
               }`}
             >
-              <div className={`p-2 rounded-lg transition-colors ${
+              <div className={`p-2 rounded-xl transition-colors ${
                 isActive 
-                  ? 'bg-white/20' 
-                  : 'bg-gray-100 group-hover:bg-gray-200'
+                  ? 'bg-black/20' 
+                  : 'bg-white/10 group-hover:bg-white/20'
               }`}>
                 <item.icon className={`h-5 w-5 ${
-                  isActive ? 'text-white' : 'text-gray-600'
+                  isActive ? 'text-black' : 'text-white'
                 }`} />
               </div>
               {sidebarOpen && (
@@ -108,19 +108,19 @@ export function Sidebar() {
       </nav>
 
       {/* User Info */}
-      <div className="p-4 border-t border-gray-200 bg-white">
+      <div className="p-4 border-t border-white/10 bg-black/50">
         <div className={`flex items-center gap-3 ${!sidebarOpen && 'justify-center'}`}>
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#20C997] to-[#1BA085] flex items-center justify-center shadow-md">
-            <span className="text-white text-sm font-bold">
+          <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-2xl">
+            <span className="text-black text-sm font-bold">
               {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
             </span>
           </div>
           {sidebarOpen && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
+              <p className="text-sm font-semibold text-white truncate">
                 {user.name || 'User'}
               </p>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-white/60 truncate">
                 {user.email}
               </p>
             </div>

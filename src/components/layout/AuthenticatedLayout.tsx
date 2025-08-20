@@ -40,7 +40,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
   // If authenticated and not on landing page, render with sidebar and header
   return (
-    <div className="min-h-screen bg-neutral-light">
+    <div className="min-h-screen bg-black">
       <Sidebar />
       <div className={`transition-all duration-300 ${
         sidebarOpen ? 'lg:pl-72' : 'lg:pl-20'
