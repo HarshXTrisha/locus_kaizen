@@ -7,33 +7,16 @@ export default function LoginPage() {
   return (
     <PublicOnlyRoute>
       <main className="flex min-h-screen w-full relative overflow-hidden">
-        {/* Left Side - Nano Banana Image (Fully Covered) */}
-        <div className="hidden lg:flex lg:w-1/2 relative">
-          <Image
-            src="/nano-banana_I_need_you_change_co.png"
-            alt="QuestAI Data Analysis"
-            fill
-            className="object-cover"
-            priority
-          />
-          {/* Overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/20"></div>
-          
-          {/* Branding Text Overlay */}
-          <div className="relative z-10 flex items-center justify-center w-full h-full p-8">
-            <div className="max-w-md text-center text-white">
-              <h1 className="text-4xl font-bold tracking-tight mb-4">
-                QuestAI
-              </h1>
-              <p className="text-xl font-medium leading-relaxed mb-3">
-                Smart Learning, Smarter Results
-              </p>
-              <p className="text-base font-normal leading-relaxed opacity-90">
-                Transform your learning experience with AI-powered quizzes and analytics
-              </p>
-            </div>
-          </div>
-        </div>
+                 {/* Left Side - Nano Banana Image (Fully Covered) */}
+         <div className="hidden lg:flex lg:w-1/2 relative">
+           <Image
+             src="/nano-banana_I_need_you_change_co.png"
+             alt="QuestAI Data Analysis"
+             fill
+             className="object-cover"
+             priority
+           />
+         </div>
 
         {/* Right Side - Login Form with Floating Bubbles */}
         <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-8 relative z-10">
