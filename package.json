@@ -23,6 +23,8 @@
     "artillery:test": "artillery run artillery-config.yml",
     "performance:monitor": "node performance-monitor.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:analyze": "node test-analyze.js",
+    "test:pdf-conversion": "node test-pdf-conversion.js",
     "load-test": "k6 run load-test-80-users-60-questions.js",
     "load-test-local": "k6 run --env BASE_URL=http://localhost:3000 load-test-80-users-60-questions.js",
     "load-test-prod": "k6 run --env BASE_URL=https://your-production-domain.com load-test-80-users-60-questions.js"
@@ -33,6 +35,7 @@
     "@types/mongoose": "^5.11.96",
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
+    "express-rate-limit": "^8.0.1",
     "firebase": "^10.7.1",
     "firebase-admin": "^13.4.0",
     "lucide-react": "^0.303.0",
