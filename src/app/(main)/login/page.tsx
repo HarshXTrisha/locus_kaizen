@@ -32,9 +32,9 @@ export default function LoginPage() {
               className="object-cover w-full h-full"
               priority
               sizes="50vw"
-              style={{
-                objectPosition: 'center 120%'
-              }}
+                             style={{
+                 objectPosition: 'center 80%'
+               }}
             />
           </div>
 
