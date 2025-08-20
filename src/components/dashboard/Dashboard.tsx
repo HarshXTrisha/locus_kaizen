@@ -32,11 +32,11 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
           href="/create"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary-1/10 rounded-lg group-hover:bg-primary-1/20 transition-colors">
-              <Plus className="h-6 w-6 text-primary-1" />
+            <div className="p-3 bg-black/10 rounded-lg group-hover:bg-black/20 transition-colors">
+              <Plus className="h-6 w-6 text-black" />
             </div>
             <div>
               <h3 className="font-semibold text-neutral-dark">Create Quiz</h3>
@@ -47,11 +47,11 @@ export function Dashboard() {
 
         <Link
           href="/upload"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
-              <BookOpen className="h-6 w-6 text-accent" />
+            <div className="p-3 bg-gray-600/10 rounded-lg group-hover:bg-gray-600/20 transition-colors">
+              <BookOpen className="h-6 w-6 text-gray-600" />
             </div>
             <div>
               <h3 className="font-semibold text-neutral-dark">Upload JSON</h3>
@@ -62,11 +62,11 @@ export function Dashboard() {
 
         <Link
           href="/results"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary-2/10 rounded-lg group-hover:bg-primary-2/20 transition-colors">
-              <TrendingUp className="h-6 w-6 text-primary-2" />
+            <div className="p-3 bg-gray-800/10 rounded-lg group-hover:bg-gray-800/20 transition-colors">
+              <TrendingUp className="h-6 w-6 text-gray-800" />
             </div>
             <div>
               <h3 className="font-semibold text-neutral-dark">View Results</h3>
@@ -77,11 +77,11 @@ export function Dashboard() {
 
         <Link
           href="/archive"
-          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary-1 hover:shadow-md transition-all group"
+          className="bg-white p-6 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
-              <Target className="h-6 w-6 text-accent" />
+            <div className="p-3 bg-gray-600/10 rounded-lg group-hover:bg-gray-600/20 transition-colors">
+              <Target className="h-6 w-6 text-gray-600" />
             </div>
             <div>
               <h3 className="font-semibold text-neutral-dark">Quiz Archive</h3>

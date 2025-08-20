@@ -9,20 +9,20 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          1: '#2EC4B6', // Teal
-          2: '#21356B', // Navy
+          1: '#000000', // Black
+          2: '#333333', // Dark Gray
         },
-        accent: '#4A90E2', // Bright Blue
+        accent: '#666666', // Medium Gray
         neutral: {
-          light: '#F4F7F9', // Light grey-blue background
-          dark: '#2F3542', // Soft black/dark grey text
+          light: '#F8F8F8', // Light gray background
+          dark: '#1A1A1A', // Dark gray text
         },
         // Legacy color mappings for smooth transition
-        'brand-teal': '#2EC4B6',
-        'brand-navy': '#21356B',
-        'brand-blue': '#4A90E2',
-        'brand-bg': '#F4F7F9',
-        'brand-text': '#2F3542',
+        'brand-teal': '#000000',
+        'brand-navy': '#333333',
+        'brand-blue': '#666666',
+        'brand-bg': '#F8F8F8',
+        'brand-text': '#1A1A1A',
       },
     },
   },

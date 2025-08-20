@@ -11,15 +11,15 @@ interface KpiCardsProps {
 
 export function KpiCards({ totalQuizzes, totalResults, averageScore }: KpiCardsProps) {
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-primary-1';
-    if (score >= 60) return 'text-accent';
-    return 'text-red-500';
+    if (score >= 80) return 'text-black';
+    if (score >= 60) return 'text-gray-600';
+    return 'text-gray-400';
   };
 
   const getScoreIcon = (score: number) => {
-    if (score >= 80) return <TrendingUp className="h-5 w-5 text-primary-1" />;
-    if (score >= 60) return <Target className="h-5 w-5 text-accent" />;
-    return <TrendingDown className="h-5 w-5 text-red-500" />;
+    if (score >= 80) return <TrendingUp className="h-5 w-5 text-black" />;
+    if (score >= 60) return <Target className="h-5 w-5 text-gray-600" />;
+    return <TrendingDown className="h-5 w-5 text-gray-400" />;
   };
 
   return (
@@ -31,8 +31,8 @@ export function KpiCards({ totalQuizzes, totalResults, averageScore }: KpiCardsP
             <p className="text-sm font-medium text-neutral-dark/70">Total Quizzes</p>
             <p className="text-2xl font-bold text-neutral-dark">{totalQuizzes}</p>
           </div>
-          <div className="p-3 bg-primary-1/10 rounded-lg">
-            <BookOpen className="h-6 w-6 text-primary-1" />
+          <div className="p-3 bg-black/10 rounded-lg">
+            <BookOpen className="h-6 w-6 text-black" />
           </div>
         </div>
         <div className="mt-4">
@@ -49,8 +49,8 @@ export function KpiCards({ totalQuizzes, totalResults, averageScore }: KpiCardsP
             <p className="text-sm font-medium text-neutral-dark/70">Total Results</p>
             <p className="text-2xl font-bold text-neutral-dark">{totalResults}</p>
           </div>
-          <div className="p-3 bg-accent/10 rounded-lg">
-            <Award className="h-6 w-6 text-accent" />
+          <div className="p-3 bg-gray-600/10 rounded-lg">
+            <Award className="h-6 w-6 text-gray-600" />
           </div>
         </div>
         <div className="mt-4">
@@ -69,7 +69,7 @@ export function KpiCards({ totalQuizzes, totalResults, averageScore }: KpiCardsP
               {averageScore}%
             </p>
           </div>
-          <div className="p-3 bg-primary-2/10 rounded-lg">
+          <div className="p-3 bg-gray-800/10 rounded-lg">
             {getScoreIcon(averageScore)}
           </div>
         </div>
