@@ -23,17 +23,20 @@ export default function LoginPage() {
           ))}
         </div>
 
-                 {/* Left Side - Nano Banana Image (Fully Covered) */}
-         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden z-10">
-           <Image
-             src="/nano-banana_I_need_you_change_co.png"
-             alt="QuestAI Data Analysis"
-             fill
-             className="object-cover w-full h-full"
-             priority
-             sizes="50vw"
-           />
-         </div>
+                                  {/* Left Side - Nano Banana Image (Fully Covered) */}
+          <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden z-10">
+            <Image
+              src="/nano-banana_I_need_you_change_co.png"
+              alt="QuestAI Data Analysis"
+              fill
+              className="object-cover w-full h-full"
+              priority
+              sizes="50vw"
+              style={{
+                objectPosition: 'center 120%'
+              }}
+            />
+          </div>
 
         {/* Right Side - Login Form */}
         <div className="w-full lg:w-1/2 bg-white/95 backdrop-blur-sm flex items-center justify-center p-8 relative z-10">
