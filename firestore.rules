@@ -73,13 +73,10 @@ service cloud.firestore {
     // Quiz rules with enhanced permissions
     match /quizzes/{quizId} {
       // Allow read if:
-      // - User is authenticated AND
-      // - Quiz is published OR user is creator OR user is admin
-      allow read: if isAuthenticated() && (
-        isPublished(resource.data) || 
-        isCreator(resource.data) || 
-        isAdmin()
-      );
+      // - Quiz is published (for public access) OR
+      // - User is authenticated AND (user is creator OR user is admin)
+      allow read: if isPublished(resource.data) || 
+        (isAuthenticated() && (isCreator(resource.data) || isAdmin()));
       
       // Allow create if user is authenticated
       allow create: if isAuthenticated() && 
@@ -102,7 +99,7 @@ service cloud.firestore {
         isAdmin()
       );
       
-      // Allow list if user is authenticated
+      // Allow list if user is authenticated (for private quizzes) or for public access
       allow list: if isAuthenticated();
     }
     
