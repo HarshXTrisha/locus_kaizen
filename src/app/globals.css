@@ -18,8 +18,21 @@
   }
 }
 
+@keyframes gentleFloat {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-10px) rotate(1deg); 
+  }
+}
+
 .animate-float {
   animation: float linear infinite;
+}
+
+.animate-gentle-float {
+  animation: gentleFloat 7s ease-in-out infinite;
 }
 
 /* Critical CSS optimizations */

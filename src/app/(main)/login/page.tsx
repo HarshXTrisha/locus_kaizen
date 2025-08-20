@@ -25,16 +25,16 @@ export default function LoginPage() {
 
                                   {/* Left Side - Nano Banana Image (Fully Covered) */}
           <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden z-10">
-            <Image
+                        <Image
               src="/nano-banana_I_need_you_change_co.png"
               alt="QuestAI Data Analysis"
               fill
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-full animate-gentle-float"
               priority
               sizes="50vw"
-                                                                                                                       style={{
-                 objectPosition: 'center center'
-               }}
+              style={{
+                objectPosition: 'center center'
+              }}
             />
           </div>
 
