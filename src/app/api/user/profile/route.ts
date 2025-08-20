@@ -4,6 +4,9 @@ import { db } from '@/lib/firebase';
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { setUserRole } from '@/lib/firebase-quiz';
 
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+
 export async function PUT(request: NextRequest) {
   try {
     console.log('PUT /api/user/profile - Starting request');

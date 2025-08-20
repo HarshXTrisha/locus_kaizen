@@ -112,69 +112,6 @@ export default function MobileQuizTaker() {
     loadQuiz();
   }, [quizId, isAuthenticated, user, router]);
 
-  // Timer effect
-  useEffect(() => {
-    if (timeRemaining <= 0 || isSubmitted) return;
-
-    const timer = setInterval(() => {
-      setTimeRemaining(prev => {
-        if (prev <= 1) {
-          // Auto-submit when time runs out
-          handleSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeRemaining, isSubmitted]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const handleAnswerSelect = useCallback((questionId: string, option: string) => {
-    setAnswers(prev => 
-      prev.map(answer => 
-        answer.questionId === questionId 
-          ? { ...answer, selectedOption: option }
-          : answer
-      )
-    );
-  }, []);
-
-  const handleFlagQuestion = useCallback((questionId: string) => {
-    setAnswers(prev => 
-      prev.map(answer => 
-        answer.questionId === questionId 
-          ? { ...answer, isFlagged: !answer.isFlagged }
-          : answer
-      )
-    );
-  }, []);
-
-  const handleQuestionNavigation = useCallback((index: number) => {
-    if (index >= 0 && index < (quizData?.questions?.length || 0)) {
-      setCurrentQuestion(index);
-      setShowMobileNav(false); // Close mobile nav when navigating
-    }
-  }, [quizData?.questions?.length]);
-
-  const handleNextQuestion = useCallback(() => {
-    if (quizData && currentQuestion < quizData.questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
-    }
-  }, [currentQuestion, quizData]);
-
-  const handlePrevQuestion = useCallback(() => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1);
-    }
-  }, [currentQuestion]);
-
   const handleSubmit = useCallback(async () => {
     if (submitting || isSubmitted) return;
 
@@ -227,6 +164,69 @@ export default function MobileQuizTaker() {
       setShowConfirmSubmit(false);
     }
   }, [submitting, isSubmitted, quizData, answers, timeRemaining, router]);
+
+  // Timer effect
+  useEffect(() => {
+    if (timeRemaining <= 0 || isSubmitted) return;
+
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          // Auto-submit when time runs out
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeRemaining, isSubmitted, handleSubmit]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleAnswerSelect = useCallback((questionId: string, option: string) => {
+    setAnswers(prev => 
+      prev.map(answer => 
+        answer.questionId === questionId 
+          ? { ...answer, selectedOption: option }
+          : answer
+      )
+    );
+  }, []);
+
+  const handleFlagQuestion = useCallback((questionId: string) => {
+    setAnswers(prev => 
+      prev.map(answer => 
+        answer.questionId === questionId 
+          ? { ...answer, isFlagged: !answer.isFlagged }
+          : answer
+      )
+    );
+  }, []);
+
+  const handleQuestionNavigation = useCallback((index: number) => {
+    if (index >= 0 && index < (quizData?.questions?.length || 0)) {
+      setCurrentQuestion(index);
+      setShowMobileNav(false); // Close mobile nav when navigating
+    }
+  }, [quizData?.questions?.length]);
+
+  const handleNextQuestion = useCallback(() => {
+    if (quizData && currentQuestion < quizData.questions.length - 1) {
+      setCurrentQuestion(prev => prev + 1);
+    }
+  }, [currentQuestion, quizData]);
+
+  const handlePrevQuestion = useCallback(() => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(prev => prev - 1);
+    }
+  }, [currentQuestion]);
 
   // Question Navigation Component
   const QuestionNavigation = () => {

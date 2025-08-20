@@ -5,6 +5,9 @@ import User from '@/models/User';
 import Quiz from '@/models/Quiz';
 import Result from '@/models/Result';
 
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+
 // GET /api/analytics/dashboard - Get dashboard analytics
 export async function GET(request: NextRequest) {
   try {

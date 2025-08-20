@@ -96,7 +96,6 @@ const UserSchema = new Schema<IUser>({
 });
 
 // Indexes for better performance
-UserSchema.index({ email: 1 });
 UserSchema.index({ createdAt: -1 });
 
 // Virtual for full name

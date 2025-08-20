@@ -4,6 +4,11 @@ export async function GET() {
   try {
     console.log('🧪 Testing Firebase Admin SDK...');
     
+    // Check if adminAuth is properly initialized
+    if (!adminAuth) {
+      throw new Error('Firebase Admin SDK not initialized - check environment variables');
+    }
+    
     // This will throw an error if the service account is invalid
     const listUsersResult = await adminAuth.listUsers(1);
     
@@ -21,7 +26,8 @@ export async function GET() {
     return Response.json({ 
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      details: 'Check FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL, and FIREBASE_PROJECT_ID environment variables'
     }, { status: 500 });
   }
 }
