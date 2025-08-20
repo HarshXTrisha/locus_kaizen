@@ -73,10 +73,9 @@ service cloud.firestore {
     // Quiz rules with enhanced permissions
     match /quizzes/{quizId} {
       // Allow read if:
-      // - Quiz is published (for public access) OR
-      // - User is authenticated AND (user is creator OR user is admin)
-      allow read: if isPublished(resource.data) || 
-        (isAuthenticated() && (isCreator(resource.data) || isAdmin()));
+      // - User is authenticated (all authenticated users can read any quiz)
+      // - This allows for better collaboration and sharing
+      allow read: if isAuthenticated();
       
       // Allow create if user is authenticated
       allow create: if isAuthenticated() && 

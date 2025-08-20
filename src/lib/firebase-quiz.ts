@@ -157,7 +157,7 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
       createdBy: quizData.createdBy,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      isPublished: false,
+      isPublished: true, // Set to true by default so other users can access quizzes
       isTemporary: quizData.isTemporary || false
     };
 
