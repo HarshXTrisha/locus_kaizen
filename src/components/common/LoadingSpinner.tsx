@@ -21,7 +21,7 @@ export function LoadingSpinner({
   };
 
   const colorClasses = {
-    primary: 'text-[#20C997]',
+    primary: 'text-white',
     white: 'text-white',
     gray: 'text-gray-400',
   };
@@ -33,7 +33,7 @@ export function LoadingSpinner({
           className={`${sizeClasses[size]} ${colorClasses[color]} animate-spin rounded-full border-2 border-current border-t-transparent`}
         />
         {text && (
-          <p className="text-sm text-gray-600 animate-pulse">{text}</p>
+          <p className="text-sm text-white/70 animate-pulse">{text}</p>
         )}
       </div>
     </div>
@@ -43,7 +43,7 @@ export function LoadingSpinner({
 // Full page loading component
 export function FullPageLoader({ text = 'Loading...' }: { text?: string }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       <LoadingSpinner size="xl" text={text} />
     </div>
   );

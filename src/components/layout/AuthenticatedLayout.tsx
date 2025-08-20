@@ -42,8 +42,8 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <div className="min-h-screen bg-black">
       <Sidebar />
-      <div className={`transition-all duration-300 ${
-        sidebarOpen ? 'lg:pl-72' : 'lg:pl-20'
+      <div className={`transition-all duration-500 ${
+        sidebarOpen ? 'lg:pl-80' : 'lg:pl-24'
       }`}>
         <Header />
         <main className="min-h-screen">
