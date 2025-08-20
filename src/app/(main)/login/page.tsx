@@ -7,34 +7,36 @@ export default function LoginPage() {
   return (
     <PublicOnlyRoute>
       <main className="flex min-h-screen w-full relative overflow-hidden">
+        {/* Floating Bubbles Background Animation (Full Page) */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          {Array.from({ length: 40 }).map((_, index) => (
+            <div
+              key={index}
+              className="absolute w-4 h-4 bg-gradient-to-br from-[#20C997]/24 to-[#1BA085]/24 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 10}s`,
+                animationDuration: `${9 + Math.random() * 6}s`,
+              }}
+            />
+          ))}
+        </div>
+
                  {/* Left Side - Nano Banana Image (Fully Covered) */}
-         <div className="hidden lg:flex lg:w-1/2 relative">
+         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden z-10">
            <Image
              src="/nano-banana_I_need_you_change_co.png"
              alt="QuestAI Data Analysis"
              fill
-             className="object-cover"
+             className="object-cover w-full h-full"
              priority
+             sizes="50vw"
            />
          </div>
 
-        {/* Right Side - Login Form with Floating Bubbles */}
-        <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-8 relative z-10">
-          {/* Floating Bubbles Background Animation (Right Side Only) */}
-          <div className="absolute inset-0 pointer-events-none">
-            {Array.from({ length: 40 }).map((_, index) => (
-              <div
-                key={index}
-                className="absolute w-4 h-4 bg-gradient-to-br from-[#20C997]/20 to-[#1BA085]/20 rounded-full animate-float"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 10}s`,
-                  animationDuration: `${9 + Math.random() * 6}s`,
-                }}
-              />
-            ))}
-          </div>
+        {/* Right Side - Login Form */}
+        <div className="w-full lg:w-1/2 bg-white/95 backdrop-blur-sm flex items-center justify-center p-8 relative z-10">
 
           <div className="w-full max-w-md relative z-10">
             {/* Logo for mobile */}
