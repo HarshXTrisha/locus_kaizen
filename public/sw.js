@@ -6,9 +6,6 @@ const DYNAMIC_CACHE = 'locus-dynamic-v1.0.0';
 const STATIC_FILES = [
   '/',
   '/manifest.json',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
-  '/apple-touch-icon.png',
   '/offline.html'
 ];
 
@@ -168,9 +165,7 @@ self.addEventListener('push', (event) => {
   console.log('Service Worker: Push notification received');
   
   const options = {
-    body: event.data ? event.data.text() : 'New notification from Locus',
-    icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
+    body: event.data ? event.data.text() : 'New notification from QuestAI',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -179,19 +174,17 @@ self.addEventListener('push', (event) => {
     actions: [
       {
         action: 'explore',
-        title: 'View',
-        icon: '/icon-192x192.png'
+        title: 'View'
       },
       {
         action: 'close',
-        title: 'Close',
-        icon: '/icon-192x192.png'
+        title: 'Close'
       }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification('Locus', options)
+    self.registration.showNotification('QuestAI', options)
   );
 });
 
