@@ -146,18 +146,18 @@ export function LoginForm() {
 
   return (
     <div className="w-full">
-      <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-neutral-dark mb-4 leading-tight tracking-tight">Welcome Back!</h2>
-        <p className="text-neutral-dark/70 text-center">Sign in to continue your learning journey with QuestAI.</p>
+      <div className="text-center mb-12">
+        <h2 className="text-5xl font-bold text-white mb-4 leading-tight tracking-tight">Welcome Back!</h2>
+        <p className="text-white/70 text-center text-lg">Sign in to continue your learning journey with QuestAI.</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Google Sign In Button */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-neutral-dark border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-black hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
+          className="flex w-full items-center justify-center rounded-full bg-white px-10 py-6 text-xl font-semibold text-black shadow-2xl transition-all duration-300 hover:bg-white/90 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
         >
           {isLoading && authProvider === 'google' ? (
             <ButtonLoader text="Signing In..." />
@@ -176,10 +176,10 @@ export function LoginForm() {
         {/* Divider */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-white/20"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500 font-medium">or</span>
+            <span className="px-6 bg-black/50 backdrop-blur-sm text-white/60 font-medium rounded-full">or</span>
           </div>
         </div>
 
@@ -188,7 +188,7 @@ export function LoginForm() {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-neutral-dark border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-black hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
+          className="flex w-full items-center justify-center rounded-full bg-white px-10 py-6 text-xl font-semibold text-black shadow-2xl transition-all duration-300 hover:bg-white/90 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
         >
           {isLoading && authProvider === 'microsoft' ? (
             <ButtonLoader text="Signing In..." />
@@ -205,17 +205,17 @@ export function LoginForm() {
         </button>
 
         {/* Benefits */}
-        <div className="mt-10 space-y-5">
-          <div className="flex items-center text-base text-neutral-dark/70 font-medium">
-            <div className="w-2 h-2 bg-black rounded-full mr-4"></div>
+        <div className="mt-12 space-y-6">
+          <div className="flex items-center text-base text-white/70 font-medium">
+            <div className="w-3 h-3 bg-white rounded-full mr-4 shadow-lg"></div>
             <span>Secure authentication with Google or Microsoft</span>
           </div>
-          <div className="flex items-center text-base text-neutral-dark/70 font-medium">
-            <div className="w-2 h-2 bg-black rounded-full mr-4"></div>
+          <div className="flex items-center text-base text-white/70 font-medium">
+            <div className="w-3 h-3 bg-white rounded-full mr-4 shadow-lg"></div>
             <span>Access to all quiz features</span>
           </div>
-          <div className="flex items-center text-base text-neutral-dark/70 font-medium">
-            <div className="w-2 h-2 bg-black rounded-full mr-4"></div>
+          <div className="flex items-center text-base text-white/70 font-medium">
+            <div className="w-3 h-3 bg-white rounded-full mr-4 shadow-lg"></div>
             <span>Personalized learning dashboard</span>
           </div>
         </div>
