@@ -43,7 +43,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
       <div className={`transition-all duration-300 ${
-        sidebarOpen ? 'lg:pl-64' : 'lg:pl-16'
+        sidebarOpen ? 'lg:pl-72' : 'lg:pl-20'
       }`}>
         <Header />
         <main className="min-h-screen">
