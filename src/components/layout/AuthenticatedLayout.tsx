@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
@@ -13,6 +14,7 @@ interface AuthenticatedLayoutProps {
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const { user, isAuthenticated, sidebarOpen } = useAppStore();
+  const pathname = usePathname();
 
   // Show loading while checking authentication
   if (isAuthenticated === null) {
@@ -28,12 +30,20 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     return <PageTransition>{children}</PageTransition>;
   }
 
-  // If authenticated, render with sidebar and header
+  // Check if we're on the landing page (root path)
+  const isLandingPage = pathname === '/';
+
+  // If on landing page, render without sidebar and header
+  if (isLandingPage) {
+    return <PageTransition>{children}</PageTransition>;
+  }
+
+  // If authenticated and not on landing page, render with sidebar and header
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
       <div className={`transition-all duration-300 ${
-        sidebarOpen ? 'lg:pl-72' : 'lg:pl-20'
+        sidebarOpen ? 'lg:pl-64' : 'lg:pl-16'
       }`}>
         <Header />
         <main className="min-h-screen">
