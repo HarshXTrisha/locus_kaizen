@@ -7,10 +7,11 @@ import {
   signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
+  OAuthProvider,
   UserCredential
 } from 'firebase/auth';
 import { auth } from './firebase';
-import { googleConfig } from './config';
+import { googleConfig, microsoftConfig } from './config';
 
 // Check if popup is likely to be blocked
 const isPopupBlocked = () => {
@@ -101,8 +102,82 @@ export const signInWithGoogleRedirect = async (): Promise<UserCredential> => {
   }
 };
 
-// Get redirect result (call this after page load)
-export const getGoogleSignInResult = async (): Promise<UserCredential | null> => {
+// Sign in with Microsoft using popup or redirect
+export const signInWithMicrosoft = async (): Promise<UserCredential> => {
+  if (!auth) {
+    throw new Error('Firebase Auth is not initialized');
+  }
+  
+  const provider = new OAuthProvider('microsoft.com');
+  
+  // Add custom parameters for better OAuth flow
+  provider.setCustomParameters({
+    prompt: microsoftConfig.prompt
+  });
+  
+  // Add scopes from config
+  microsoftConfig.scopes.forEach(scope => {
+    provider.addScope(scope);
+  });
+  
+  // Check if popup is likely to be blocked
+  if (isPopupBlocked()) {
+    console.log('🔄 Popup likely blocked, using redirect method...');
+    return signInWithMicrosoftRedirect();
+  }
+  
+  try {
+    console.log('📡 Attempting Microsoft popup sign-in...');
+    const userCredential = await signInWithPopup(auth, provider);
+    return userCredential;
+  } catch (error: any) {
+    console.error("Error during Microsoft popup sign-in:", error);
+    
+    // If popup fails due to COOP policy or other blocking, try redirect
+    if (error.code === 'auth/popup-closed-by-user' || 
+        error.code === 'auth/popup-blocked' ||
+        error.message?.includes('Cross-Origin-Opener-Policy') ||
+        error.message?.includes('message port closed')) {
+      console.log('🔄 Popup failed, trying redirect method...');
+      return signInWithMicrosoftRedirect();
+    }
+    
+    // For other errors, throw them
+    throw error;
+  }
+};
+
+// Sign in with Microsoft using redirect (fallback method)
+export const signInWithMicrosoftRedirect = async (): Promise<UserCredential> => {
+  if (!auth) {
+    throw new Error('Firebase Auth is not initialized');
+  }
+  
+  const provider = new OAuthProvider('microsoft.com');
+  
+  // Add custom parameters for better OAuth flow
+  provider.setCustomParameters({
+    prompt: microsoftConfig.prompt
+  });
+  
+  // Add scopes from config
+  microsoftConfig.scopes.forEach(scope => {
+    provider.addScope(scope);
+  });
+  
+  try {
+    console.log('🔄 Initiating Microsoft redirect sign-in...');
+    await signInWithRedirect(auth, provider);
+    // This will redirect the user, so we won't reach the return statement
+    throw new Error('Redirect initiated');
+  } catch (error: any) {
+    console.error("Error during Microsoft redirect sign-in:", error);
+    throw error;
+  }
+};
+
+// Get redirect result (call this after page load) - updated to handle both providers
+export const getSignInResult = async (): Promise<UserCredential | null> => {
   if (!auth) {
     return null;
   }

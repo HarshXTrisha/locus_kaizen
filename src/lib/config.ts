@@ -16,6 +16,13 @@ export const googleConfig = {
   prompt: 'select_account'
 };
 
+// Microsoft OAuth Configuration
+export const microsoftConfig = {
+  clientId: process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID || "",
+  scopes: ['email', 'profile', 'openid'],
+  prompt: 'select_account'
+};
+
 // App Configuration
 export const appConfig = {
   name: 'QuestAI',

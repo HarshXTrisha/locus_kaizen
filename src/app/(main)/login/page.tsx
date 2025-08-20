@@ -30,7 +30,7 @@ export default function LoginPage() {
               </div>
               <h1 className="text-5xl font-bold text-[#212529] tracking-tight">QuestAI</h1>
             </div>
-            <p className="text-xl text-[#6C757D] mb-3 font-medium leading-relaxed">Sign in with your Google account</p>
+            <p className="text-xl text-[#6C757D] mb-3 font-medium leading-relaxed">Sign in with your preferred account</p>
             <p className="text-base text-[#6C757D] font-normal leading-relaxed">Access your personalized learning dashboard powered by Kaizen</p>
           </div>
           
@@ -62,7 +62,7 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="mt-10 text-center">
             <p className="text-sm text-[#6C757D] mb-3 font-medium leading-relaxed">
-              New users will be automatically created when signing in with Google
+              New users will be automatically created when signing in with Google or Microsoft
             </p>
             <div className="flex items-center justify-center text-xs text-[#6C757D] font-medium">
               <span className="mr-2">Powered by</span>
