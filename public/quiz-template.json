@@ -1,0 +1,84 @@
+{
+  "title": "Sample Quiz Template",
+  "description": "This is a sample quiz template showing the required JSON format for uploading structured quiz data to Locus.",
+  "questions": [
+    {
+      "id": "q1",
+      "text": "What is the capital of France?",
+      "type": "multiple-choice",
+      "options": ["London", "Berlin", "Paris", "Madrid"],
+      "correctAnswer": "Paris",
+      "points": 1
+    },
+    {
+      "id": "q2",
+      "text": "Which planet is known as the Red Planet?",
+      "type": "multiple-choice",
+      "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+      "correctAnswer": "Mars",
+      "points": 1
+    },
+    {
+      "id": "q3",
+      "text": "What is the chemical symbol for gold?",
+      "type": "multiple-choice",
+      "options": ["Ag", "Au", "Fe", "Cu"],
+      "correctAnswer": "Au",
+      "points": 1
+    },
+    {
+      "id": "q4",
+      "text": "The Earth is round.",
+      "type": "true-false",
+      "options": ["True", "False"],
+      "correctAnswer": "True",
+      "points": 1
+    },
+    {
+      "id": "q5",
+      "text": "Explain the process of photosynthesis in your own words.",
+      "type": "short-answer",
+      "correctAnswer": "Photosynthesis is the process by which plants convert sunlight, water, and carbon dioxide into glucose and oxygen.",
+      "points": 2
+    },
+    {
+      "id": "q6",
+      "text": "What is the largest ocean on Earth?",
+      "type": "multiple-choice",
+      "options": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+      "correctAnswer": "Pacific Ocean",
+      "points": 1
+    },
+    {
+      "id": "q7",
+      "text": "Who wrote 'Romeo and Juliet'?",
+      "type": "multiple-choice",
+      "options": ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+      "correctAnswer": "William Shakespeare",
+      "points": 1
+    },
+    {
+      "id": "q8",
+      "text": "The speed of light is approximately 300,000 km/s.",
+      "type": "true-false",
+      "options": ["True", "False"],
+      "correctAnswer": "True",
+      "points": 1
+    },
+    {
+      "id": "q9",
+      "text": "What is the main function of the heart?",
+      "type": "short-answer",
+      "correctAnswer": "The heart pumps blood throughout the body to deliver oxygen and nutrients to cells.",
+      "points": 2
+    },
+    {
+      "id": "q10",
+      "text": "Which programming language is known as the 'language of the web'?",
+      "type": "multiple-choice",
+      "options": ["Python", "Java", "JavaScript", "C++"],
+      "correctAnswer": "JavaScript",
+      "points": 1
+    }
+  ]
+}
