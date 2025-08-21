@@ -8,7 +8,9 @@ import { db } from '@/lib/firebase';
 interface User {
   id: string;
   email: string;
-  displayName: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
   createdAt: any;
   lastLoginAt: any;
 }
@@ -177,7 +179,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center py-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-sm text-gray-500">Welcome back, {user?.displayName || user?.email}</p>
+                             <p className="text-sm text-gray-500">Welcome back, {user?.name || user?.email}</p>
             </div>
             <div className="flex space-x-4">
               <button
@@ -331,13 +333,13 @@ export default function AdminDashboard() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-700">
-                              {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
-                            </span>
+                                                         <span className="text-sm font-medium text-gray-700">
+                               {user.name?.charAt(0) || user.email?.charAt(0) || 'U'}
+                             </span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{user.displayName || 'No Name'}</div>
+                                                     <div className="text-sm font-medium text-gray-900">{user.name || 'No Name'}</div>
                           <div className="text-sm text-gray-500">{user.email}</div>
                         </div>
                       </div>
