@@ -29,9 +29,10 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
     // Set canvas size
     const resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
     };
 
     resizeCanvas();
@@ -39,7 +40,6 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
 
     // Animation state
     let animationTime = 0;
-    let currentPhase = 0; // 0: origin, 1: growth, 2: connection, 3: network, 4: loop
     let pulsePhase = 0;
 
     // Neural network nodes with phases
@@ -81,8 +81,9 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
 
     // Draw functions
     const drawNode = (node: Node, progress: number, isActive: boolean) => {
-      const x = node.x * canvas.width;
-      const y = node.y * canvas.height;
+      const rect = canvas.getBoundingClientRect();
+      const x = node.x * rect.width;
+      const y = node.y * rect.height;
       const size = node.type === 'root' ? 6 : node.type === 'subject' ? 8 : 2;
       
       if (node.type === 'root') {
@@ -148,10 +149,11 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
     };
 
     const drawConnection = (from: Node, to: Node, progress: number, isActive: boolean) => {
-      const x1 = from.x * canvas.width;
-      const y1 = from.y * canvas.height;
-      const x2 = to.x * canvas.width;
-      const y2 = to.y * canvas.height;
+      const rect = canvas.getBoundingClientRect();
+      const x1 = from.x * rect.width;
+      const y1 = from.y * rect.height;
+      const x2 = to.x * rect.width;
+      const y2 = to.y * rect.height;
       
       ctx.save();
       ctx.globalAlpha = progress * (isActive ? 0.8 : 0.1);
@@ -159,10 +161,6 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
       // Glow effect
       ctx.shadowColor = colors.glow;
       ctx.shadowBlur = 15;
-      
-      // Line with varying brightness for depth
-      const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-      const brightness = 0.6 + 0.4 * Math.sin(distance * 0.01 + pulsePhase);
       
       ctx.strokeStyle = colors.primary;
       ctx.lineWidth = 2;
@@ -176,9 +174,11 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
     };
 
     const animate = () => {
+      const rect = canvas.getBoundingClientRect();
+      
       // Clear canvas with black background
       ctx.fillStyle = colors.background;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, rect.width, rect.height);
       
       animationTime += 0.016; // 60fps
       pulsePhase += 0.03;
@@ -262,18 +262,18 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
             ctx.save();
             ctx.globalAlpha = pulseIntensity * 0.2;
             const gradient = ctx.createRadialGradient(
-              node.x * canvas.width, 
-              node.y * canvas.height, 
+              node.x * rect.width, 
+              node.y * rect.height, 
               0, 
-              node.x * canvas.width, 
-              node.y * canvas.height, 
+              node.x * rect.width, 
+              node.y * rect.height, 
               100
             );
             gradient.addColorStop(0, colors.pulse);
             gradient.addColorStop(1, 'transparent');
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(node.x * canvas.width, node.y * canvas.height, 100, 0, Math.PI * 2);
+            ctx.arc(node.x * rect.width, node.y * rect.height, 100, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
           }
