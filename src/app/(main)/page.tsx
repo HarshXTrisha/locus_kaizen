@@ -136,20 +136,12 @@ export default function Home() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight">
-                  {/* Logo Mockup - Replace with your actual logo */}
                   <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center border-2 border-white/20 shadow-lg">
-                    {/* Logo Placeholder - Upload your logo here */}
-                    <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">LOGO</span>
-                    </div>
-                    {/* 
-                    To use your actual logo, replace the above div with:
                     <img 
-                      src="/your-logo.png" 
+                      src="/logo.png" 
                       alt="QuestAI Logo" 
                       className="w-8 h-8 object-contain"
                     />
-                    */}
                   </div>
                   QuestAI
                 </h1>
@@ -412,20 +404,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h3 className="text-3xl font-bold mb-6 flex items-center justify-center tracking-tight">
-              {/* Logo Mockup - Replace with your actual logo */}
               <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center border-2 border-white/20 shadow-lg">
-                {/* Logo Placeholder - Upload your logo here */}
-                <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">LOGO</span>
-                </div>
-                {/* 
-                To use your actual logo, replace the above div with:
                 <img 
-                  src="/your-logo.png" 
+                  src="/logo.png" 
                   alt="QuestAI Logo" 
                   className="w-8 h-8 object-contain"
                 />
-                */}
               </div>
               QuestAI
             </h3>
