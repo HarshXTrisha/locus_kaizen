@@ -135,14 +135,14 @@ export default function Home() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight">
-                  <img 
-                    src="/logo.png" 
-                    alt="QuestAI Logo" 
-                    className="w-12 h-12 mr-3 object-contain"
-                  />
-                  QuestAI
-                </h1>
+                                 <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight">
+                   <img 
+                     src="/logo.png" 
+                     alt="QuestAI Logo" 
+                     className="w-12 h-12 mr-3 object-contain"
+                   />
+                   QuestAI
+                 </h1>
               </div>
               <div className="ml-4 flex items-center text-xs text-[#6C757D] font-medium">
                 <span className="mr-1">Powered by</span>
@@ -401,14 +401,14 @@ export default function Home() {
       <footer className="bg-[#212529] text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h3 className="text-3xl font-bold mb-6 flex items-center justify-center tracking-tight">
-              <img 
-                src="/logo.png" 
-                alt="QuestAI Logo" 
-                className="w-12 h-12 mr-3 object-contain"
-              />
-              QuestAI
-            </h3>
+                         <h3 className="text-3xl font-bold mb-6 flex items-center justify-center tracking-tight">
+               <img 
+                 src="/logo.png" 
+                 alt="QuestAI Logo" 
+                 className="w-12 h-12 mr-3 object-contain"
+               />
+               QuestAI
+             </h3>
             <p className="text-xl text-gray-400 mb-6 leading-relaxed font-normal">
               The ultimate quiz management platform for modern learning and assessment.
             </p>

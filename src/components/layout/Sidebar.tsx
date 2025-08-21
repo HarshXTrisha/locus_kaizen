@@ -50,7 +50,7 @@ export function Sidebar() {
             !sidebarOpen && 'justify-center w-full'
           }`}
         >
-                                 <img 
+                                                         <img 
               src="/logo.png" 
               alt="QuestAI Logo" 
               className="h-8 w-8 object-contain"
