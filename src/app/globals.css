@@ -400,3 +400,17 @@
   background-size: 200px 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Blinking cursor animation for typewriter effect */
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}

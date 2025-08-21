@@ -65,7 +65,7 @@ const TypewriterText = ({ texts, speed = 100, deleteSpeed = 50, pauseTime = 2000
   return (
     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#20C997] to-[#1BA085]">
       {displayText}
-      <span className="inline-block w-0.5 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] ml-1 animate-pulse"></span>
+      <span className="inline-block w-0.5 h-8 bg-gradient-to-r from-[#20C997] to-[#1BA085] ml-1 animate-blink"></span>
     </span>
   );
 };
@@ -121,9 +121,9 @@ export default function Home() {
 
   // Typewriter texts for non-authenticated users
   const typewriterTexts = [
-    "Create",
-    "Analyze", 
-    "Share"
+    "QuestAI",
+    "Learning Platform", 
+    "Quiz Management"
   ];
 
   return (
@@ -201,7 +201,7 @@ export default function Home() {
               </>
             ) : (
               <>
-                Master Your Knowledge with
+                Welcome to
                 <span className="block">
                   <TypewriterText 
                     texts={typewriterTexts}
