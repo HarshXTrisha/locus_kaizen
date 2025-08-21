@@ -105,16 +105,30 @@ export default function AdminDashboard() {
       setQuizzes(quizzesData);
       console.log(`✅ Loaded ${quizzesData.length} quizzes`);
 
-      // Load results
+      // Load results (try multiple collection names)
       console.log('📈 Loading results...');
-      const resultsQuery = query(collection(db, 'results'), orderBy('completedAt', 'desc'), limit(50));
-      const resultsSnapshot = await getDocs(resultsQuery);
-      const resultsData = resultsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Result[];
+      let resultsData: Result[] = [];
+      
+      // Try different collection names based on your Firebase rules
+      const resultsCollections = ['quizResults', 'liveQuizResults', 'results'];
+      
+      for (const collectionName of resultsCollections) {
+        try {
+          const resultsQuery = query(collection(db, collectionName), orderBy('completedAt', 'desc'), limit(50));
+          const resultsSnapshot = await getDocs(resultsQuery);
+          resultsData = resultsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Result[];
+          console.log(`✅ Loaded ${resultsData.length} results from ${collectionName}`);
+          break; // Use the first successful collection
+        } catch (error) {
+          console.log(`❌ Could not load from ${collectionName}: ${error}`);
+        }
+      }
+      
       setResults(resultsData);
-      console.log(`✅ Loaded ${resultsData.length} results`);
+      console.log(`✅ Final results count: ${resultsData.length}`);
 
       // Calculate stats
       const totalUsers = usersData.length;
