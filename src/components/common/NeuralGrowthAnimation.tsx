@@ -82,13 +82,13 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
       { x: 0.55, y: 0.55, connections: [0, 8], type: 'connection', phase: 1 },
     ];
 
-    // Colors - vibrant green on black
+    // Colors - vibrant green on white background
     const colors = {
       primary: '#20C997',
       secondary: '#1BA085',
-      glow: 'rgba(32, 201, 151, 0.8)',
-      pulse: 'rgba(32, 201, 151, 0.3)',
-      background: '#000000',
+      glow: 'rgba(32, 201, 151, 0.6)',
+      pulse: 'rgba(32, 201, 151, 0.2)',
+      background: '#ffffff',
     };
 
     // Easing functions for smooth animation
