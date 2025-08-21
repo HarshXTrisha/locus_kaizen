@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Node {
   x: number;
@@ -18,18 +18,29 @@ interface NeuralGrowthAnimationProps {
 const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Detect mobile device
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768 || 
+                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(mobile);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
+    // Set canvas size with mobile optimization
     const resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = isMobile ? 1 : (window.devicePixelRatio || 1); // Reduce DPR on mobile for performance
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
@@ -42,24 +53,29 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
     let animationTime = 0;
     let pulsePhase = 0;
 
-    // Neural network nodes with phases
-    const nodes: Node[] = [
-      // Root node (center)
+    // Neural network nodes with mobile optimization
+    const nodes: Node[] = isMobile ? [
+      // Simplified nodes for mobile performance
       { x: 0.5, y: 0.5, connections: [], type: 'root', phase: 0 },
-      
-      // Subject nodes
+      { x: 0.2, y: 0.3, connections: [0], type: 'subject', icon: '📚', phase: 2 },
+      { x: 0.8, y: 0.3, connections: [0], type: 'subject', icon: '🧪', phase: 2 },
+      { x: 0.3, y: 0.7, connections: [0], type: 'subject', icon: '⚙️', phase: 2 },
+      { x: 0.7, y: 0.7, connections: [0], type: 'subject', icon: '💡', phase: 2 },
+      { x: 0.35, y: 0.45, connections: [0, 1], type: 'connection', phase: 1 },
+      { x: 0.65, y: 0.45, connections: [0, 2], type: 'connection', phase: 1 },
+      { x: 0.45, y: 0.55, connections: [0, 3], type: 'connection', phase: 1 },
+      { x: 0.55, y: 0.55, connections: [0, 4], type: 'connection', phase: 1 },
+    ] : [
+      // Full nodes for desktop
+      { x: 0.5, y: 0.5, connections: [], type: 'root', phase: 0 },
       { x: 0.2, y: 0.25, connections: [0], type: 'subject', icon: '📚', phase: 2 },
       { x: 0.8, y: 0.25, connections: [0], type: 'subject', icon: '🧪', phase: 2 },
       { x: 0.25, y: 0.75, connections: [0], type: 'subject', icon: '⚙️', phase: 2 },
       { x: 0.75, y: 0.75, connections: [0], type: 'subject', icon: '💡', phase: 2 },
-      
-      // Connection nodes for organic branching
       { x: 0.35, y: 0.35, connections: [0, 1], type: 'connection', phase: 1 },
       { x: 0.65, y: 0.35, connections: [0, 2], type: 'connection', phase: 1 },
       { x: 0.35, y: 0.65, connections: [0, 3], type: 'connection', phase: 1 },
       { x: 0.65, y: 0.65, connections: [0, 4], type: 'connection', phase: 1 },
-      
-      // Additional branching nodes for organic feel
       { x: 0.45, y: 0.45, connections: [0, 5], type: 'connection', phase: 1 },
       { x: 0.55, y: 0.45, connections: [0, 6], type: 'connection', phase: 1 },
       { x: 0.45, y: 0.55, connections: [0, 7], type: 'connection', phase: 1 },
@@ -79,12 +95,14 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
     const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
     const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-    // Draw functions
+    // Draw functions with mobile optimization
     const drawNode = (node: Node, progress: number, isActive: boolean) => {
       const rect = canvas.getBoundingClientRect();
       const x = node.x * rect.width;
       const y = node.y * rect.height;
-      const size = node.type === 'root' ? 6 : node.type === 'subject' ? 8 : 2;
+      const size = isMobile ? 
+        (node.type === 'root' ? 4 : node.type === 'subject' ? 6 : 1.5) :
+        (node.type === 'root' ? 6 : node.type === 'subject' ? 8 : 2);
       
       if (node.type === 'root') {
         // Root node with pulsing glow
@@ -92,14 +110,15 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
         const pulseIntensity = 0.5 + 0.5 * Math.sin(pulsePhase * 2);
         ctx.globalAlpha = progress * pulseIntensity;
         
-        // Outer glow
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 6);
+        // Outer glow (reduced on mobile)
+        const glowSize = isMobile ? size * 4 : size * 6;
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowSize);
         gradient.addColorStop(0, colors.glow);
         gradient.addColorStop(0.5, colors.pulse);
         gradient.addColorStop(1, 'transparent');
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(x, y, size * 6, 0, Math.PI * 2);
+        ctx.arc(x, y, glowSize, 0, Math.PI * 2);
         ctx.fill();
         
         // Core
@@ -114,13 +133,14 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
         ctx.save();
         ctx.globalAlpha = progress * (isActive ? 1 : 0.3);
         
-        // Background glow
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 3);
+        // Background glow (reduced on mobile)
+        const glowSize = isMobile ? size * 2 : size * 3;
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowSize);
         gradient.addColorStop(0, colors.glow);
         gradient.addColorStop(1, 'transparent');
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(x, y, size * 3, 0, Math.PI * 2);
+        ctx.arc(x, y, glowSize, 0, Math.PI * 2);
         ctx.fill();
         
         // Icon background
@@ -158,12 +178,12 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
       ctx.save();
       ctx.globalAlpha = progress * (isActive ? 0.8 : 0.1);
       
-      // Glow effect
+      // Glow effect (reduced on mobile for performance)
       ctx.shadowColor = colors.glow;
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = isMobile ? 8 : 15;
       
       ctx.strokeStyle = colors.primary;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = isMobile ? 1.5 : 2;
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(x1, y1);
@@ -180,8 +200,10 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
       ctx.fillStyle = colors.background;
       ctx.fillRect(0, 0, rect.width, rect.height);
       
-      animationTime += 0.016; // 60fps
-      pulsePhase += 0.03;
+      // Adjust animation speed for mobile
+      const frameRate = isMobile ? 0.02 : 0.016;
+      animationTime += frameRate;
+      pulsePhase += isMobile ? 0.02 : 0.03;
       
       // Phase 0: Origin (0-0.5 seconds)
       if (animationTime < 0.5) {
@@ -257,23 +279,24 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
           const pulseIntensity = 0.7 + 0.3 * Math.sin(pulsePhase + networkProgress * Math.PI);
           drawNode(node, 1, true);
           
-          // Add network-wide pulse effect
+          // Add network-wide pulse effect (reduced on mobile)
           if (node.type === 'root') {
             ctx.save();
             ctx.globalAlpha = pulseIntensity * 0.2;
+            const pulseSize = isMobile ? 60 : 100;
             const gradient = ctx.createRadialGradient(
               node.x * rect.width, 
               node.y * rect.height, 
               0, 
               node.x * rect.width, 
               node.y * rect.height, 
-              100
+              pulseSize
             );
             gradient.addColorStop(0, colors.pulse);
             gradient.addColorStop(1, 'transparent');
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(node.x * rect.width, node.y * rect.height, 100, 0, Math.PI * 2);
+            ctx.arc(node.x * rect.width, node.y * rect.height, pulseSize, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
           }
@@ -312,18 +335,19 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
     animate();
 
     return () => {
+      window.removeEventListener('resize', checkMobile);
       window.removeEventListener('resize', resizeCanvas);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <canvas
       ref={canvasRef}
       className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
-      style={{ opacity: 0.8 }}
+      style={{ opacity: isMobile ? 0.9 : 0.8 }}
     />
   );
 };
