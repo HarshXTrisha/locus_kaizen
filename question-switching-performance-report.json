@@ -1,0 +1,1106 @@
+{
+  "testDate": "2025-08-18T16:59:01.864Z",
+  "testType": "Question Switching Performance Test",
+  "duration": "7.23 seconds",
+  "totalTests": 120,
+  "successfulTests": 120,
+  "optimized": {
+    "averageResponseTime": "30.73ms",
+    "minResponseTime": "10.30ms",
+    "maxResponseTime": "62.65ms",
+    "totalTests": 60
+  },
+  "old": {
+    "averageResponseTime": "35.19ms",
+    "minResponseTime": "19.35ms",
+    "maxResponseTime": "52.80ms",
+    "totalTests": 60
+  },
+  "improvement": {
+    "percentage": "12.7%",
+    "timeSaved": "4.46ms per question switch"
+  },
+  "userExperience": "Poor - Too Slow",
+  "detailedResults": [
+    {
+      "questionNumber": 1,
+      "success": true,
+      "responseTime": 26.114599999999996,
+      "stateUpdateTime": 0.042983508895654166,
+      "renderTime": 0.760179372205075,
+      "domUpdateTime": 0.0926755509032906,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 2,
+      "success": true,
+      "responseTime": 41.4904,
+      "stateUpdateTime": 0.04680018073436587,
+      "renderTime": 0.9842077380590902,
+      "domUpdateTime": 0.2528687942288672,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 3,
+      "success": true,
+      "responseTime": 40.882099999999994,
+      "stateUpdateTime": 0.21231181038279345,
+      "renderTime": 0.8469795799857092,
+      "domUpdateTime": 0.16669801070606816,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 4,
+      "success": true,
+      "responseTime": 37.30120000000002,
+      "stateUpdateTime": 0.29683109815637154,
+      "renderTime": 0.6209624408055826,
+      "domUpdateTime": 0.31293606995090084,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 5,
+      "success": true,
+      "responseTime": 33.751599999999996,
+      "stateUpdateTime": 0.035098466134294126,
+      "renderTime": 0.7947016449490989,
+      "domUpdateTime": 0.41356786076007634,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 6,
+      "success": true,
+      "responseTime": 43.76880000000003,
+      "stateUpdateTime": 0.29496412406446326,
+      "renderTime": 0.523459689859386,
+      "domUpdateTime": 0.4935595634642399,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 7,
+      "success": true,
+      "responseTime": 31.886300000000006,
+      "stateUpdateTime": 0.24473670450916218,
+      "renderTime": 0.5097857427309272,
+      "domUpdateTime": 0.2479463831390739,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 8,
+      "success": true,
+      "responseTime": 31.89050000000003,
+      "stateUpdateTime": 0.08505507197342954,
+      "renderTime": 0.5172582486781985,
+      "domUpdateTime": 0.10198104926943186,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 9,
+      "success": true,
+      "responseTime": 40.811000000000035,
+      "stateUpdateTime": 0.022047115410780194,
+      "renderTime": 0.9730958224450759,
+      "domUpdateTime": 0.3761387602183994,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 10,
+      "success": true,
+      "responseTime": 30.14530000000002,
+      "stateUpdateTime": 0.0005068897578116571,
+      "renderTime": 0.8627268358541419,
+      "domUpdateTime": 0.30557973066019184,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 11,
+      "success": true,
+      "responseTime": 31.990400000000022,
+      "stateUpdateTime": 0.3078782987736767,
+      "renderTime": 0.5451008730467416,
+      "domUpdateTime": 0.38231148036299545,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 12,
+      "success": true,
+      "responseTime": 21.65640000000002,
+      "stateUpdateTime": 0.09091830117324362,
+      "renderTime": 0.5771204108156325,
+      "domUpdateTime": 0.482407331247115,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 13,
+      "success": true,
+      "responseTime": 32.66650000000004,
+      "stateUpdateTime": 0.3279131330546877,
+      "renderTime": 0.7094854848361782,
+      "domUpdateTime": 0.2923931686832346,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 14,
+      "success": true,
+      "responseTime": 41.606199999999944,
+      "stateUpdateTime": 0.0700874247332881,
+      "renderTime": 0.5244632798283865,
+      "domUpdateTime": 0.4016815355982172,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 15,
+      "success": true,
+      "responseTime": 14.3202,
+      "stateUpdateTime": 0.3080936289782793,
+      "renderTime": 0.9152968238837514,
+      "domUpdateTime": 0.2259051340427386,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 16,
+      "success": true,
+      "responseTime": 21.4452,
+      "stateUpdateTime": 0.36114425210659407,
+      "renderTime": 0.9669435704976747,
+      "domUpdateTime": 0.17826628980520687,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 17,
+      "success": true,
+      "responseTime": 23.74560000000008,
+      "stateUpdateTime": 0.30664313801985166,
+      "renderTime": 0.5741411977654512,
+      "domUpdateTime": 0.2648451475943915,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 18,
+      "success": true,
+      "responseTime": 39.74920000000009,
+      "stateUpdateTime": 0.1044736260245056,
+      "renderTime": 0.6545920962841543,
+      "domUpdateTime": 0.38695423218246305,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 19,
+      "success": true,
+      "responseTime": 31.22569999999996,
+      "stateUpdateTime": 0.11318616215033217,
+      "renderTime": 0.6435891218513082,
+      "domUpdateTime": 0.06730945827558976,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 20,
+      "success": true,
+      "responseTime": 21.7281999999999,
+      "stateUpdateTime": 0.2483171869114147,
+      "renderTime": 0.977879861829512,
+      "domUpdateTime": 0.4146387203982379,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 1,
+      "success": true,
+      "responseTime": 34.06230000000005,
+      "stateUpdateTime": 2.8329287268946532,
+      "renderTime": 3.869114741199113,
+      "domUpdateTime": 1.7847617312962103,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 2,
+      "success": true,
+      "responseTime": 21.758699999999976,
+      "stateUpdateTime": 2.1814480362251647,
+      "renderTime": 3.213476331260205,
+      "domUpdateTime": 1.511910846774223,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 3,
+      "success": true,
+      "responseTime": 33.87540000000001,
+      "stateUpdateTime": 2.1420386448708943,
+      "renderTime": 5.527040189198797,
+      "domUpdateTime": 1.0981018031184377,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 4,
+      "success": true,
+      "responseTime": 33.7795000000001,
+      "stateUpdateTime": 3.271933192286411,
+      "renderTime": 4.395875876812067,
+      "domUpdateTime": 1.568875697453827,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 5,
+      "success": true,
+      "responseTime": 24.340000000000032,
+      "stateUpdateTime": 2.153424065963195,
+      "renderTime": 4.412526419357546,
+      "domUpdateTime": 1.4894247851888056,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 6,
+      "success": true,
+      "responseTime": 28.30989999999997,
+      "stateUpdateTime": 2.5745198872376975,
+      "renderTime": 4.258221427605428,
+      "domUpdateTime": 1.849963022498255,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 7,
+      "success": true,
+      "responseTime": 39.44709999999998,
+      "stateUpdateTime": 2.1651375468024314,
+      "renderTime": 5.159331949899378,
+      "domUpdateTime": 1.5183319889203641,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 8,
+      "success": true,
+      "responseTime": 39.075199999999995,
+      "stateUpdateTime": 3.989336495029552,
+      "renderTime": 3.9835645916111195,
+      "domUpdateTime": 2.247555064864784,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 9,
+      "success": true,
+      "responseTime": 41.558300000000145,
+      "stateUpdateTime": 2.108887375979211,
+      "renderTime": 4.329860289315044,
+      "domUpdateTime": 2.3249969082625297,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 10,
+      "success": true,
+      "responseTime": 21.285699999999906,
+      "stateUpdateTime": 3.0553711354306263,
+      "renderTime": 4.716679479386834,
+      "domUpdateTime": 1.8312782040314013,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 11,
+      "success": true,
+      "responseTime": 28.231199999999944,
+      "stateUpdateTime": 2.5529479373826534,
+      "renderTime": 5.271605704159358,
+      "domUpdateTime": 1.499061756709216,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 12,
+      "success": true,
+      "responseTime": 33.085799999999836,
+      "stateUpdateTime": 3.992271901297524,
+      "renderTime": 3.756715715549835,
+      "domUpdateTime": 1.1698493158244436,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 13,
+      "success": true,
+      "responseTime": 32.92500000000018,
+      "stateUpdateTime": 3.62708700207946,
+      "renderTime": 3.9984235402124786,
+      "domUpdateTime": 1.044040799919081,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 14,
+      "success": true,
+      "responseTime": 19.35069999999996,
+      "stateUpdateTime": 2.700273045525598,
+      "renderTime": 3.8972436421086014,
+      "domUpdateTime": 2.322497543375132,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 15,
+      "success": true,
+      "responseTime": 20.013500000000022,
+      "stateUpdateTime": 3.5657487341560703,
+      "renderTime": 3.1280341461598336,
+      "domUpdateTime": 2.80206063779422,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 16,
+      "success": true,
+      "responseTime": 31.875400000000127,
+      "stateUpdateTime": 3.188821901036937,
+      "renderTime": 4.85713215309346,
+      "domUpdateTime": 1.7944971061112494,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 17,
+      "success": true,
+      "responseTime": 27.249300000000176,
+      "stateUpdateTime": 3.865226050331228,
+      "renderTime": 4.779538433311972,
+      "domUpdateTime": 2.2781343115384116,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 18,
+      "success": true,
+      "responseTime": 28.090900000000147,
+      "stateUpdateTime": 2.0128543878903415,
+      "renderTime": 5.349883467039861,
+      "domUpdateTime": 1.865440048183065,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 19,
+      "success": true,
+      "responseTime": 24.236499999999978,
+      "stateUpdateTime": 3.133224777231828,
+      "renderTime": 4.332586368299672,
+      "domUpdateTime": 1.2770299350906766,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 20,
+      "success": true,
+      "responseTime": 31.75279999999998,
+      "stateUpdateTime": 2.418948508229039,
+      "renderTime": 5.123539795928737,
+      "domUpdateTime": 1.9018065817483607,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 1,
+      "success": true,
+      "responseTime": 22.776100000000042,
+      "stateUpdateTime": 0.3975207837908724,
+      "renderTime": 0.7153593801580913,
+      "domUpdateTime": 0.23441111244087032,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 2,
+      "success": true,
+      "responseTime": 30.792199999999866,
+      "stateUpdateTime": 0.06521345468768391,
+      "renderTime": 0.7218911743225619,
+      "domUpdateTime": 0.12137469250311916,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 3,
+      "success": true,
+      "responseTime": 29.395800000000236,
+      "stateUpdateTime": 0.31147711369579045,
+      "renderTime": 0.5420009318880069,
+      "domUpdateTime": 0.12605384063512415,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 4,
+      "success": true,
+      "responseTime": 33.702999999999975,
+      "stateUpdateTime": 0.23992417144683287,
+      "renderTime": 0.6146386267905707,
+      "domUpdateTime": 0.13646638526592436,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 5,
+      "success": true,
+      "responseTime": 39.3752999999997,
+      "stateUpdateTime": 0.441299415803565,
+      "renderTime": 0.5624966462644864,
+      "domUpdateTime": 0.31136622312389595,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 6,
+      "success": true,
+      "responseTime": 32.159599999999955,
+      "stateUpdateTime": 0.4043775982265716,
+      "renderTime": 0.7700274498500402,
+      "domUpdateTime": 0.42382321453341576,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 7,
+      "success": true,
+      "responseTime": 22.983299999999872,
+      "stateUpdateTime": 0.20645989362256345,
+      "renderTime": 0.654548763860575,
+      "domUpdateTime": 0.4345580322937477,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 8,
+      "success": true,
+      "responseTime": 39.82139999999981,
+      "stateUpdateTime": 0.41388471487844236,
+      "renderTime": 0.555262271749149,
+      "domUpdateTime": 0.392665328145929,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 9,
+      "success": true,
+      "responseTime": 25.129399999999805,
+      "stateUpdateTime": 0.2834299961959281,
+      "renderTime": 0.6152792207604932,
+      "domUpdateTime": 0.32659024307110696,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 10,
+      "success": true,
+      "responseTime": 44.27440000000024,
+      "stateUpdateTime": 0.2961680916051853,
+      "renderTime": 0.5578335032421798,
+      "domUpdateTime": 0.17622916773502673,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 11,
+      "success": true,
+      "responseTime": 36.92669999999998,
+      "stateUpdateTime": 0.30199753428465037,
+      "renderTime": 0.6019734713630793,
+      "domUpdateTime": 0.2835778146072607,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 12,
+      "success": true,
+      "responseTime": 22.08279999999968,
+      "stateUpdateTime": 0.2524290765240432,
+      "renderTime": 0.586404397198082,
+      "domUpdateTime": 0.02391228853706895,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 13,
+      "success": true,
+      "responseTime": 29.265300000000025,
+      "stateUpdateTime": 0.4136727423901364,
+      "renderTime": 0.7175252252907641,
+      "domUpdateTime": 0.16710763636809034,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 14,
+      "success": true,
+      "responseTime": 33.2832999999996,
+      "stateUpdateTime": 0.25685284876316217,
+      "renderTime": 0.7012731845027065,
+      "domUpdateTime": 0.13503263184792413,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 15,
+      "success": true,
+      "responseTime": 31.47530000000006,
+      "stateUpdateTime": 0.1439416659096151,
+      "renderTime": 0.9334052096737949,
+      "domUpdateTime": 0.23894363222954484,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 16,
+      "success": true,
+      "responseTime": 36.70049999999992,
+      "stateUpdateTime": 0.04970447690274238,
+      "renderTime": 0.8417022111458815,
+      "domUpdateTime": 0.4349335676948195,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 17,
+      "success": true,
+      "responseTime": 37.23219999999992,
+      "stateUpdateTime": 0.3238464495107144,
+      "renderTime": 0.8356152066747429,
+      "domUpdateTime": 0.4524180241220427,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 18,
+      "success": true,
+      "responseTime": 25.2216999999996,
+      "stateUpdateTime": 0.44501851119254765,
+      "renderTime": 0.946434311780796,
+      "domUpdateTime": 0.24042084727448543,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 19,
+      "success": true,
+      "responseTime": 15.517599999999675,
+      "stateUpdateTime": 0.49491801181177,
+      "renderTime": 0.5699175385979502,
+      "domUpdateTime": 0.23798743808656864,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 20,
+      "success": true,
+      "responseTime": 27.60010000000011,
+      "stateUpdateTime": 0.42876532710423754,
+      "renderTime": 0.6781634076962413,
+      "domUpdateTime": 0.07988403186921966,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 1,
+      "success": true,
+      "responseTime": 32.96459999999979,
+      "stateUpdateTime": 2.7667901683330935,
+      "renderTime": 4.8099842602852405,
+      "domUpdateTime": 2.7280617108509624,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 2,
+      "success": true,
+      "responseTime": 48.66350000000011,
+      "stateUpdateTime": 3.9789575878996435,
+      "renderTime": 4.99397297158588,
+      "domUpdateTime": 2.952988787157105,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 3,
+      "success": true,
+      "responseTime": 40.23309999999992,
+      "stateUpdateTime": 2.9467664164950205,
+      "renderTime": 4.0774204216120635,
+      "domUpdateTime": 1.1180849501480274,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 4,
+      "success": true,
+      "responseTime": 44.401900000000296,
+      "stateUpdateTime": 2.032337502396263,
+      "renderTime": 5.64723011877858,
+      "domUpdateTime": 2.7960963250378037,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 5,
+      "success": true,
+      "responseTime": 28.428100000000086,
+      "stateUpdateTime": 2.3573867391749683,
+      "renderTime": 4.994463676542437,
+      "domUpdateTime": 1.3199943746246947,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 6,
+      "success": true,
+      "responseTime": 32.04750000000013,
+      "stateUpdateTime": 3.7490688237779715,
+      "renderTime": 4.676481295529101,
+      "domUpdateTime": 2.1482002158523925,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 7,
+      "success": true,
+      "responseTime": 50.24359999999979,
+      "stateUpdateTime": 3.3324863235232662,
+      "renderTime": 3.3747304038378307,
+      "domUpdateTime": 1.118448192595237,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 8,
+      "success": true,
+      "responseTime": 27.94329999999991,
+      "stateUpdateTime": 2.700831243213738,
+      "renderTime": 3.530201011765775,
+      "domUpdateTime": 1.9687066222107061,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 9,
+      "success": true,
+      "responseTime": 41.43640000000005,
+      "stateUpdateTime": 2.043759423632724,
+      "renderTime": 5.6314521863879605,
+      "domUpdateTime": 2.492376411404075,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 10,
+      "success": true,
+      "responseTime": 37.73080000000027,
+      "stateUpdateTime": 3.1946138808415285,
+      "renderTime": 5.184439521564681,
+      "domUpdateTime": 2.284219152234283,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 11,
+      "success": true,
+      "responseTime": 31.607800000000225,
+      "stateUpdateTime": 2.391765158753845,
+      "renderTime": 5.287705540823982,
+      "domUpdateTime": 1.877885223643251,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 12,
+      "success": true,
+      "responseTime": 41.69599999999991,
+      "stateUpdateTime": 3.657928563066474,
+      "renderTime": 3.623586976957176,
+      "domUpdateTime": 1.0856053642495835,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 13,
+      "success": true,
+      "responseTime": 31.36259999999993,
+      "stateUpdateTime": 3.11861126211378,
+      "renderTime": 5.0575436944359815,
+      "domUpdateTime": 1.1035988759239088,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 14,
+      "success": true,
+      "responseTime": 33.820500000000266,
+      "stateUpdateTime": 3.472501068069439,
+      "renderTime": 5.805469883189611,
+      "domUpdateTime": 1.173498218099208,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 15,
+      "success": true,
+      "responseTime": 37.74369999999999,
+      "stateUpdateTime": 2.072688564770878,
+      "renderTime": 3.385004728521835,
+      "domUpdateTime": 1.1646526423431727,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 16,
+      "success": true,
+      "responseTime": 47.914800000000014,
+      "stateUpdateTime": 2.2182746364039576,
+      "renderTime": 5.791184977817705,
+      "domUpdateTime": 2.387614790594281,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 17,
+      "success": true,
+      "responseTime": 39.40970000000016,
+      "stateUpdateTime": 3.983905466519729,
+      "renderTime": 5.530077197884713,
+      "domUpdateTime": 2.4470981538048933,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 18,
+      "success": true,
+      "responseTime": 39.385099999999966,
+      "stateUpdateTime": 3.168723817232271,
+      "renderTime": 3.9788741457486267,
+      "domUpdateTime": 2.0807991738280767,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 19,
+      "success": true,
+      "responseTime": 38.05719999999974,
+      "stateUpdateTime": 2.804361521402055,
+      "renderTime": 3.801436421584021,
+      "domUpdateTime": 2.8737916474292846,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 20,
+      "success": true,
+      "responseTime": 41.956999999999425,
+      "stateUpdateTime": 3.817098680116596,
+      "renderTime": 5.588025519049051,
+      "domUpdateTime": 2.435191277395292,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 1,
+      "success": true,
+      "responseTime": 30.743900000000394,
+      "stateUpdateTime": 0.2551960297324988,
+      "renderTime": 0.9773226830865765,
+      "domUpdateTime": 0.2165100630527278,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 2,
+      "success": true,
+      "responseTime": 37.467900000000554,
+      "stateUpdateTime": 0.35658759907085147,
+      "renderTime": 0.7328296712347012,
+      "domUpdateTime": 0.4025676287082469,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 3,
+      "success": true,
+      "responseTime": 26.689900000000307,
+      "stateUpdateTime": 0.23784522733938607,
+      "renderTime": 0.7027347572357164,
+      "domUpdateTime": 0.21691676625571377,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 4,
+      "success": true,
+      "responseTime": 38.97470000000067,
+      "stateUpdateTime": 0.4875615205117002,
+      "renderTime": 0.7795124113782362,
+      "domUpdateTime": 0.4727642249090054,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 5,
+      "success": true,
+      "responseTime": 29.191799999999603,
+      "stateUpdateTime": 0.3755159222798985,
+      "renderTime": 0.7491491022209188,
+      "domUpdateTime": 0.17997115197666536,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 6,
+      "success": true,
+      "responseTime": 22.0007999999998,
+      "stateUpdateTime": 0.312006278903986,
+      "renderTime": 0.5343705753860379,
+      "domUpdateTime": 0.40268457602906305,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 7,
+      "success": true,
+      "responseTime": 62.64629999999943,
+      "stateUpdateTime": 0.07916366850067325,
+      "renderTime": 0.7658118863441896,
+      "domUpdateTime": 0.20036278805309427,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 8,
+      "success": true,
+      "responseTime": 35.92529999999988,
+      "stateUpdateTime": 0.17094407813420343,
+      "renderTime": 0.5567000014924312,
+      "domUpdateTime": 0.4148515832834907,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 9,
+      "success": true,
+      "responseTime": 26.423399999999674,
+      "stateUpdateTime": 0.14903804780484686,
+      "renderTime": 0.5717869244770927,
+      "domUpdateTime": 0.05385222731026873,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 10,
+      "success": true,
+      "responseTime": 10.303499999999985,
+      "stateUpdateTime": 0.3680312343033634,
+      "renderTime": 0.5442816431899093,
+      "domUpdateTime": 0.15053218040007288,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 11,
+      "success": true,
+      "responseTime": 23.422099999999773,
+      "stateUpdateTime": 0.4262290898514265,
+      "renderTime": 0.7604132933743745,
+      "domUpdateTime": 0.44261072528357126,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 12,
+      "success": true,
+      "responseTime": 32.13010000000031,
+      "stateUpdateTime": 0.48059001978884064,
+      "renderTime": 0.9914154370862815,
+      "domUpdateTime": 0.37518422621091774,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 13,
+      "success": true,
+      "responseTime": 24.5662999999995,
+      "stateUpdateTime": 0.013463332643708914,
+      "renderTime": 0.8813727511439089,
+      "domUpdateTime": 0.41774720332382986,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 14,
+      "success": true,
+      "responseTime": 40.30360000000019,
+      "stateUpdateTime": 0.021382576861581404,
+      "renderTime": 0.5754750952370187,
+      "domUpdateTime": 0.37845611143249225,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 15,
+      "success": true,
+      "responseTime": 16.58889999999974,
+      "stateUpdateTime": 0.44299608601456564,
+      "renderTime": 0.8370682931278973,
+      "domUpdateTime": 0.4722370355279941,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 16,
+      "success": true,
+      "responseTime": 21.179000000000087,
+      "stateUpdateTime": 0.3130154006927094,
+      "renderTime": 0.7561599506714664,
+      "domUpdateTime": 0.13935431191707082,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 17,
+      "success": true,
+      "responseTime": 26.091699999999946,
+      "stateUpdateTime": 0.16572419196720167,
+      "renderTime": 0.9512668821378363,
+      "domUpdateTime": 0.3590989718342892,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 18,
+      "success": true,
+      "responseTime": 28.575000000000728,
+      "stateUpdateTime": 0.07452520518530747,
+      "renderTime": 0.8418590573088182,
+      "domUpdateTime": 0.04591140864247856,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 19,
+      "success": true,
+      "responseTime": 24.77089999999953,
+      "stateUpdateTime": 0.25578935316216955,
+      "renderTime": 0.6097442315142932,
+      "domUpdateTime": 0.15907394413515008,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 20,
+      "success": true,
+      "responseTime": 31.871099999999387,
+      "stateUpdateTime": 0.41817854329660964,
+      "renderTime": 0.7961081901906973,
+      "domUpdateTime": 0.026047128447477252,
+      "optimization": "Optimized"
+    },
+    {
+      "questionNumber": 1,
+      "success": true,
+      "responseTime": 47.381899999999405,
+      "stateUpdateTime": 2.1940084715333064,
+      "renderTime": 3.9910316184222943,
+      "domUpdateTime": 2.2087359046120425,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 2,
+      "success": true,
+      "responseTime": 38.103799999999865,
+      "stateUpdateTime": 3.712045689122621,
+      "renderTime": 5.893303054565878,
+      "domUpdateTime": 1.9386187399714627,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 3,
+      "success": true,
+      "responseTime": 35.17689999999948,
+      "stateUpdateTime": 3.392447766827882,
+      "renderTime": 3.893716165371777,
+      "domUpdateTime": 2.9048740991080457,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 4,
+      "success": true,
+      "responseTime": 34.48199999999997,
+      "stateUpdateTime": 2.511919019830161,
+      "renderTime": 3.52638517145098,
+      "domUpdateTime": 1.5709464889712335,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 5,
+      "success": true,
+      "responseTime": 39.73859999999968,
+      "stateUpdateTime": 2.2654197849578432,
+      "renderTime": 3.0710332750570553,
+      "domUpdateTime": 1.5277253133041793,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 6,
+      "success": true,
+      "responseTime": 39.46060000000034,
+      "stateUpdateTime": 2.2712589271668553,
+      "renderTime": 5.511174458297503,
+      "domUpdateTime": 1.6719931689523357,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 7,
+      "success": true,
+      "responseTime": 47.759500000000116,
+      "stateUpdateTime": 3.3565223644560582,
+      "renderTime": 3.388821191922687,
+      "domUpdateTime": 2.931141306748199,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 8,
+      "success": true,
+      "responseTime": 40.1255000000001,
+      "stateUpdateTime": 3.6937253631243405,
+      "renderTime": 4.480008716253042,
+      "domUpdateTime": 2.1818671690108675,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 9,
+      "success": true,
+      "responseTime": 48.768200000000434,
+      "stateUpdateTime": 3.3954828638361336,
+      "renderTime": 5.87268584358349,
+      "domUpdateTime": 1.6889655883926022,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 10,
+      "success": true,
+      "responseTime": 47.88200000000052,
+      "stateUpdateTime": 3.5374160798696126,
+      "renderTime": 4.815546878741742,
+      "domUpdateTime": 2.765430629132319,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 11,
+      "success": true,
+      "responseTime": 23.636199999999917,
+      "stateUpdateTime": 2.3056760693025704,
+      "renderTime": 5.855642870257017,
+      "domUpdateTime": 1.9115618766535634,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 12,
+      "success": true,
+      "responseTime": 43.83190000000013,
+      "stateUpdateTime": 2.5899276253859846,
+      "renderTime": 5.131341413060617,
+      "domUpdateTime": 2.4419475261115764,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 13,
+      "success": true,
+      "responseTime": 34.68489999999929,
+      "stateUpdateTime": 3.5419930891889706,
+      "renderTime": 4.932744329487584,
+      "domUpdateTime": 2.6277789341630986,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 14,
+      "success": true,
+      "responseTime": 35.21680000000015,
+      "stateUpdateTime": 3.859228992185131,
+      "renderTime": 3.8663443759598333,
+      "domUpdateTime": 2.032331735090388,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 15,
+      "success": true,
+      "responseTime": 20.829600000000028,
+      "stateUpdateTime": 3.760300201011037,
+      "renderTime": 5.188617780377991,
+      "domUpdateTime": 2.488885377539074,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 16,
+      "success": true,
+      "responseTime": 23.784700000000157,
+      "stateUpdateTime": 3.269939339594248,
+      "renderTime": 5.346848069267517,
+      "domUpdateTime": 1.9827168202297911,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 17,
+      "success": true,
+      "responseTime": 22.112600000000384,
+      "stateUpdateTime": 2.869877542203439,
+      "renderTime": 4.522185293199838,
+      "domUpdateTime": 1.7535861868289677,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 18,
+      "success": true,
+      "responseTime": 36.91739999999936,
+      "stateUpdateTime": 2.650315689551882,
+      "renderTime": 5.620867940962841,
+      "domUpdateTime": 1.9302225071367216,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 19,
+      "success": true,
+      "responseTime": 37.4395999999997,
+      "stateUpdateTime": 2.6606171096043676,
+      "renderTime": 4.947983451621472,
+      "domUpdateTime": 1.0016925209285485,
+      "optimization": "Old (Slow)"
+    },
+    {
+      "questionNumber": 20,
+      "success": true,
+      "responseTime": 52.80240000000049,
+      "stateUpdateTime": 2.612844683683963,
+      "renderTime": 4.093315270335775,
+      "domUpdateTime": 1.643354476790122,
+      "optimization": "Old (Slow)"
+    }
+  ]
+}
