@@ -97,3 +97,7 @@ jspm_packages/
 
 # TernJS port file
 .tern-port
+
+# External repositories
+kaizen/
+locus/
