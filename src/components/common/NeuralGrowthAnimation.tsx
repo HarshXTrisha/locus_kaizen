@@ -255,8 +255,8 @@ const NeuralGrowthAnimation: React.FC<NeuralGrowthAnimationProps> = ({ className
             drawNode(node, iconProgress, true);
             
             node.connections.forEach(connectionIndex => {
-              const connectionProgress = Math.max(0, (connectionProgress - (index - 1) * 0.2) * 2);
-              drawConnection(nodes[connectionIndex], node, connectionProgress, true);
+              const nodeConnectionProgress = Math.max(0, (connectionProgress - (index - 1) * 0.2) * 2);
+              drawConnection(nodes[connectionIndex], node, nodeConnectionProgress, true);
             });
           }
         });
