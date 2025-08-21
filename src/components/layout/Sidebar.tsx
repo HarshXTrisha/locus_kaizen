@@ -50,11 +50,11 @@ export function Sidebar() {
             !sidebarOpen && 'justify-center w-full'
           }`}
         >
-                                                         <img 
-              src="/logo.png" 
-              alt="QuestAI Logo" 
-              className="h-8 w-8 object-contain"
-            />
+                                                                                           <img 
+               src="/logo - Copy.png" 
+               alt="QuestAI Logo" 
+               className="h-8 w-8 object-contain"
+             />
           {sidebarOpen && (
             <div className="flex items-center">
               <span className="text-[#212529]">Quest</span>

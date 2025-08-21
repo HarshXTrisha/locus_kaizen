@@ -137,7 +137,7 @@ export default function Home() {
               <div className="flex-shrink-0">
                                  <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight">
                    <img 
-                     src="/logo.png" 
+                     src="/logo - Copy.png" 
                      alt="QuestAI Logo" 
                      className="w-12 h-12 mr-3 object-contain"
                    />
@@ -403,7 +403,7 @@ export default function Home() {
           <div className="text-center">
                          <h3 className="text-3xl font-bold mb-6 flex items-center justify-center tracking-tight">
                <img 
-                 src="/logo.png" 
+                 src="/logo - Copy.png" 
                  alt="QuestAI Logo" 
                  className="w-12 h-12 mr-3 object-contain"
                />
