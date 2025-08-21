@@ -251,7 +251,7 @@ export default function Home() {
             ) : (
               <Link 
                 href="/login"
-                className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-10 py-5 rounded-xl text-xl font-semibold flex items-center justify-center backdrop-blur-sm"
+                className="bg-gradient-to-r from-[#20C997] to-[#1BA085] text-white px-10 py-5 rounded-xl text-xl font-semibold flex items-center justify-center backdrop-blur-sm hover:from-[#1BA085] hover:to-[#20C997] transition-all duration-300 shadow-lg"
               >
                 <span>Sign In with Google</span>
                 <ArrowRight className="ml-3 h-6 w-6" />
@@ -398,7 +398,7 @@ export default function Home() {
             ) : (
               <Link 
                 href="/login"
-                className="bg-white/10 backdrop-blur-xl text-[#20C997] px-12 py-6 rounded-2xl text-2xl font-bold border border-white/20"
+                className="bg-white text-[#20C997] px-12 py-6 rounded-2xl text-2xl font-bold border border-white/20 shadow-lg hover:bg-gray-50 transition-colors"
               >
                 <span>Sign In with Google</span>
               </Link>
