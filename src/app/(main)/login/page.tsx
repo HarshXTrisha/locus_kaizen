@@ -45,10 +45,12 @@ export default function LoginPage() {
             {/* Logo for mobile */}
             <div className="lg:hidden text-center mb-8">
               <div className="flex items-center justify-center mb-4">
-                <img 
+                <Image 
                   src="/logo - Copy.png" 
                   alt="QuestAI Logo" 
-                  className="w-[calc(3rem*1.4)] h-[calc(3rem*1.4)] mr-3 object-contain"
+                  width={67}
+                  height={67}
+                  className="mr-3 object-contain"
                 />
                 <h1 className="text-3xl font-bold text-[#212529] tracking-tight">QuestAI</h1>
               </div>

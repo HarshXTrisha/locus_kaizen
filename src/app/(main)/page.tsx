@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAppStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -136,10 +137,12 @@ export default function Home() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                                  <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight">
-                   <img 
+                   <Image 
                      src="/logo - Copy.png" 
                      alt="QuestAI Logo" 
-                     className="w-[calc(3rem*1.4)] h-[calc(3rem*1.4)] mr-3 object-contain"
+                     width={67}
+                     height={67}
+                     className="mr-3 object-contain"
                    />
                    QuestAI
                  </h1>
@@ -402,10 +405,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
                          <h3 className="text-3xl font-bold mb-6 flex items-center justify-center tracking-tight">
-               <img 
+               <Image 
                  src="/logo - Copy.png" 
                  alt="QuestAI Logo" 
-                 className="w-[calc(3rem*1.4)] h-[calc(3rem*1.4)] mr-3 object-contain"
+                 width={67}
+                 height={67}
+                 className="mr-3 object-contain"
                />
                QuestAI
              </h3>

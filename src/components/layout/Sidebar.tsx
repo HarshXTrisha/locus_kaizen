@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { 
@@ -50,10 +51,12 @@ export function Sidebar() {
             !sidebarOpen && 'justify-center w-full'
           }`}
         >
-                                                                                           <img 
+                                                                                           <Image 
                src="/logo - Copy.png" 
                alt="QuestAI Logo" 
-               className="h-[calc(2rem*1.4)] w-[calc(2rem*1.4)] object-contain"
+               width={45}
+               height={45}
+               className="object-contain"
              />
           {sidebarOpen && (
             <div className="flex items-center">

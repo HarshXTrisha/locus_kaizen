@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/firebase-auth';
+import { useAppStore } from '@/lib/store';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
@@ -33,7 +33,7 @@ interface Result {
 }
 
 export default function AdminDashboard() {
-  const { user, loading } = useAuth();
+  const { user, isLoading: loading } = useAppStore();
   const [users, setUsers] = useState<User[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [results, setResults] = useState<Result[]>([]);
@@ -316,12 +316,12 @@ export default function AdminDashboard() {
             </div>
             {users.length === 0 ? (
               <div className="px-4 py-8 text-center text-gray-500">
-                No users found. This might be because:
-                <ul className="mt-2 text-sm">
-                  <li>• No users have registered yet</li>
-                  <li>• Users collection doesn't exist</li>
-                  <li>• Firebase permissions issue</li>
-                </ul>
+                                 No users found. This might be because:
+                 <ul className="mt-2 text-sm">
+                   <li>• No users have registered yet</li>
+                   <li>• Users collection doesn&apos;t exist</li>
+                   <li>• Firebase permissions issue</li>
+                 </ul>
               </div>
             ) : (
               <ul className="divide-y divide-gray-200">
@@ -359,12 +359,12 @@ export default function AdminDashboard() {
             </div>
             {quizzes.length === 0 ? (
               <div className="px-4 py-8 text-center text-gray-500">
-                No quizzes found. This might be because:
-                <ul className="mt-2 text-sm">
-                  <li>• No quizzes have been created yet</li>
-                  <li>• Quizzes collection doesn't exist</li>
-                  <li>• Firebase permissions issue</li>
-                </ul>
+                                 No quizzes found. This might be because:
+                 <ul className="mt-2 text-sm">
+                   <li>• No quizzes have been created yet</li>
+                   <li>• Quizzes collection doesn&apos;t exist</li>
+                   <li>• Firebase permissions issue</li>
+                 </ul>
               </div>
             ) : (
               <ul className="divide-y divide-gray-200">
@@ -394,12 +394,12 @@ export default function AdminDashboard() {
             </div>
             {results.length === 0 ? (
               <div className="px-4 py-8 text-center text-gray-500">
-                No results found. This might be because:
-                <ul className="mt-2 text-sm">
-                  <li>• No quizzes have been taken yet</li>
-                  <li>• Results collection doesn't exist</li>
-                  <li>• Firebase permissions issue</li>
-                </ul>
+                                 No results found. This might be because:
+                 <ul className="mt-2 text-sm">
+                   <li>• No quizzes have been taken yet</li>
+                   <li>• Results collection doesn&apos;t exist</li>
+                   <li>• Firebase permissions issue</li>
+                 </ul>
               </div>
             ) : (
               <ul className="divide-y divide-gray-200">
