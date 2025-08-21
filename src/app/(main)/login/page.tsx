@@ -45,11 +45,11 @@ export default function LoginPage() {
             {/* Logo for mobile */}
             <div className="lg:hidden text-center mb-8">
               <div className="flex items-center justify-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-xl shadow-lg flex items-center justify-center mr-3">
-                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
+                <img 
+                  src="/logo - Copy.png" 
+                  alt="QuestAI Logo" 
+                  className="w-[calc(3rem*1.4)] h-[calc(3rem*1.4)] mr-3 object-contain"
+                />
                 <h1 className="text-3xl font-bold text-[#212529] tracking-tight">QuestAI</h1>
               </div>
             </div>

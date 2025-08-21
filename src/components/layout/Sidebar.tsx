@@ -53,7 +53,7 @@ export function Sidebar() {
                                                                                            <img 
                src="/logo - Copy.png" 
                alt="QuestAI Logo" 
-               className="h-8 w-8 object-contain"
+               className="h-[calc(2rem*1.4)] w-[calc(2rem*1.4)] object-contain"
              />
           {sidebarOpen && (
             <div className="flex items-center">

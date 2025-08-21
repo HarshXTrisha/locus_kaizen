@@ -139,7 +139,7 @@ export default function Home() {
                    <img 
                      src="/logo - Copy.png" 
                      alt="QuestAI Logo" 
-                     className="w-12 h-12 mr-3 object-contain"
+                     className="w-[calc(3rem*1.4)] h-[calc(3rem*1.4)] mr-3 object-contain"
                    />
                    QuestAI
                  </h1>
@@ -405,7 +405,7 @@ export default function Home() {
                <img 
                  src="/logo - Copy.png" 
                  alt="QuestAI Logo" 
-                 className="w-12 h-12 mr-3 object-contain"
+                 className="w-[calc(3rem*1.4)] h-[calc(3rem*1.4)] mr-3 object-contain"
                />
                QuestAI
              </h3>
