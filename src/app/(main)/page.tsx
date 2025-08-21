@@ -438,7 +438,7 @@ export default function Home() {
               <span className="ml-2">- Continuous Improvement</span>
             </div>
             <div className="border-t border-gray-700 pt-8 text-center text-gray-400">
-              <p className="font-medium">&copy; 2024 QuestAI. All rights reserved. Built with ❤️ using Next.js and Firebase.</p>
+              <p className="font-medium">&copy; 2025 QuestAI. All rights reserved. Powered by modern web technologies.</p>
             </div>
           </div>
         </div>
