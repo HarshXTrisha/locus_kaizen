@@ -136,13 +136,11 @@ export default function Home() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <h1 className="text-2xl font-bold text-[#212529] flex items-center tracking-tight">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center border-2 border-white/20 shadow-lg">
-                    <img 
-                      src="/logo.png" 
-                      alt="QuestAI Logo" 
-                      className="w-8 h-8 object-contain"
-                    />
-                  </div>
+                  <img 
+                    src="/logo.png" 
+                    alt="QuestAI Logo" 
+                    className="w-12 h-12 mr-3 object-contain"
+                  />
                   QuestAI
                 </h1>
               </div>
@@ -404,13 +402,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h3 className="text-3xl font-bold mb-6 flex items-center justify-center tracking-tight">
-              <div className="w-12 h-12 bg-gradient-to-r from-[#20C997] to-[#1BA085] rounded-lg mr-3 flex items-center justify-center border-2 border-white/20 shadow-lg">
-                <img 
-                  src="/logo.png" 
-                  alt="QuestAI Logo" 
-                  className="w-8 h-8 object-contain"
-                />
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="QuestAI Logo" 
+                className="w-12 h-12 mr-3 object-contain"
+              />
               QuestAI
             </h3>
             <p className="text-xl text-gray-400 mb-6 leading-relaxed font-normal">
