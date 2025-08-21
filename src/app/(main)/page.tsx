@@ -17,7 +17,12 @@ import {
 } from '@/lib/icons';
 
 // Typewriter Animation Component
-const TypewriterText = ({ texts, speed = 100, deleteSpeed = 50, pauseTime = 2000 }) => {
+const TypewriterText = ({ texts, speed = 100, deleteSpeed = 50, pauseTime = 2000 }: {
+  texts: string[];
+  speed?: number;
+  deleteSpeed?: number;
+  pauseTime?: number;
+}) => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
