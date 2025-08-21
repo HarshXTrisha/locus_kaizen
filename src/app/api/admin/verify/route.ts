@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
     // Check if user is admin (you can modify this logic)
     const isAdmin = decodedToken.email === 'admin@locus.com' || 
                    decodedToken.email === 'spycook.jjn007@gmail.com' ||
-                   decodedToken.email?.includes('admin');
+                   decodedToken.email?.includes('admin') ||
+                   decodedToken.role === 'admin';
 
     if (!isAdmin) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });

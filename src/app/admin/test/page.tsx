@@ -26,7 +26,8 @@ export default function AdminTest() {
     addResult(`🔐 User exists: ${!!user}`);
     
     // Test 2: Admin check
-    const isAdmin = user?.email === 'admin@locus.com' || 
+    const isAdmin = user?.role === 'admin' || 
+                   user?.email === 'admin@locus.com' || 
                    user?.email === 'spycook.jjn007@gmail.com' || 
                    user?.email?.includes('admin');
     addResult(`👑 Admin access: ${isAdmin}`);

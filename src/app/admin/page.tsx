@@ -49,8 +49,9 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [debugInfo, setDebugInfo] = useState<string>('');
 
-  // Check if user is admin (you can modify this logic)
-  const isAdmin = user?.email === 'admin@locus.com' || 
+  // Check if user is admin (supports both role-based and email-based admin)
+  const isAdmin = user?.role === 'admin' || 
+                 user?.email === 'admin@locus.com' || 
                  user?.email === 'spycook.jjn007@gmail.com' || 
                  user?.email?.includes('admin');
 
