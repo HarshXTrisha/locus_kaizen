@@ -15,6 +15,7 @@ import {
   Upload,
   TrendingUp
 } from '@/lib/icons';
+import NeuralGrowthAnimation from '@/components/common/NeuralGrowthAnimation';
 
 // Typewriter Animation Component
 const TypewriterText = ({ texts, speed = 100, deleteSpeed = 50, pauseTime = 2000 }: {
@@ -192,8 +193,11 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center relative z-10">
+      <section className="relative min-h-screen flex items-center justify-center px-4 py-20 overflow-hidden">
+        {/* Neural Growth Animation Background */}
+        {!isAuthenticated && <NeuralGrowthAnimation />}
+        
+        <div className="relative z-10 max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-[#212529] mb-8 leading-tight tracking-tight">
             {isAuthenticated ? (
               <>
