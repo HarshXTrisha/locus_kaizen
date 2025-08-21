@@ -1,70 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/database';
-import mongoose from 'mongoose';
 
 export async function GET(request: NextRequest) {
   try {
-    // Short-circuit: skip MongoDB test if not explicitly enabled
-    if (process.env.ENABLE_MONGODB_TEST !== 'true') {
+    console.log('🔗 Testing Database Connection...');
+    
+    // Check if MongoDB is configured
+    const hasMongoConfig = process.env.MONGODB_URI || process.env.ENABLE_MONGODB_TEST === 'true';
+    
+    if (!hasMongoConfig) {
+      console.log('ℹ️ MongoDB not configured - skipping test');
       return NextResponse.json({
         success: true,
-        message: 'MongoDB test disabled',
-      });
-    }
-    console.log('🔗 Testing MongoDB connection...');
-    
-    // Test the connection
-    await connectDB();
-    
-    // Check if we're connected
-    const isConnected = mongoose.connection.readyState === 1;
-    
-    if (isConnected) {
-      console.log('✅ MongoDB connection successful!');
-      
-      // Test basic operations
-      const db = mongoose.connection.db;
-      if (!db) {
-        throw new Error('Database connection not available');
-      }
-      
-      const collections = await db.listCollections().toArray();
-      
-      return NextResponse.json({
-        success: true,
-        message: 'MongoDB connection successful!',
+        message: 'Database test skipped - MongoDB not configured',
         details: {
-          connectionState: mongoose.connection.readyState,
-          databaseName: db.databaseName,
-          collections: collections.map(col => col.name),
-          host: mongoose.connection.host,
-          port: mongoose.connection.port,
+          status: 'skipped',
+          reason: 'MongoDB not configured'
         },
         timestamp: new Date().toISOString()
       });
-    } else {
-      console.log('❌ MongoDB connection failed!');
+    }
+
+    // If MongoDB is configured, test the connection
+    try {
+      const { connectDB } = await import('@/lib/database');
+      const mongoose = await import('mongoose');
+      
+      await connectDB();
+      
+      const isConnected = mongoose.default.connection.readyState === 1;
+      
+      if (isConnected) {
+        console.log('✅ Database connection successful!');
+        return NextResponse.json({
+          success: true,
+          message: 'Database connection successful!',
+          details: {
+            connectionState: mongoose.default.connection.readyState,
+            databaseName: mongoose.default.connection.db?.databaseName,
+            host: mongoose.default.connection.host,
+            port: mongoose.default.connection.port,
+          },
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        throw new Error('Database connection not established');
+      }
+    } catch (dbError) {
+      console.log('❌ Database connection failed:', dbError);
       return NextResponse.json({
         success: false,
-        message: 'MongoDB connection failed',
+        message: 'Database connection failed',
+        error: dbError instanceof Error ? dbError.message : 'Unknown error',
         details: {
-          connectionState: mongoose.connection.readyState,
-          error: 'Connection not established'
+          status: 'failed',
+          reason: 'Connection error'
         }
       }, { status: 500 });
     }
 
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
+    console.error('❌ Database test error:', error);
     
     return NextResponse.json({
       success: false,
-      message: 'MongoDB connection error',
+      message: 'Database test error',
       error: error instanceof Error ? error.message : 'Unknown error',
       details: {
-        connectionState: mongoose.connection.readyState,
-        host: mongoose.connection.host,
-        port: mongoose.connection.port,
+        status: 'error',
+        reason: 'Test execution error'
       }
     }, { status: 500 });
   }
