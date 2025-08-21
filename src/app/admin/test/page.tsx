@@ -44,7 +44,7 @@ export default function AdminTest() {
     }
     
     // Test 4: Collections test
-    const collections = ['users', 'quizzes', 'results'];
+    const collections = ['users', 'quizzes', 'results', 'quizResults', 'liveQuizResults'];
     for (const collectionName of collections) {
       try {
         addResult(`📁 Testing ${collectionName} collection...`);
