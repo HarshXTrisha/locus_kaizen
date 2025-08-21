@@ -47,8 +47,8 @@ export default function AdminTest() {
     for (const collectionName of collections) {
       try {
         addResult(`📁 Testing ${collectionName} collection...`);
-        const query = query(collection(db, collectionName), limit(5));
-        const snapshot = await getDocs(query);
+        const collectionQuery = query(collection(db, collectionName), limit(5));
+        const snapshot = await getDocs(collectionQuery);
         addResult(`✅ ${collectionName}: ${snapshot.size} documents found`);
       } catch (error) {
         addResult(`❌ ${collectionName} error: ${error instanceof Error ? error.message : 'Unknown error'}`);
