@@ -50,13 +50,25 @@ export function Sidebar() {
             !sidebarOpen && 'justify-center w-full'
           }`}
         >
-          <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center shadow-md">
-            <Target className="h-5 w-5 text-white" />
+          {/* Logo Placeholder - Replace with your actual logo */}
+          <div className="h-8 w-8 bg-gradient-to-br from-[#20C997] to-[#1BA085] rounded-lg flex items-center justify-center shadow-md border border-white/20">
+            {/* Logo Placeholder - Upload your logo here */}
+            <div className="h-5 w-5 bg-white/20 rounded flex items-center justify-center">
+              <span className="text-white font-bold text-xs">L</span>
+            </div>
+            {/* 
+            To use your actual logo, replace the above div with:
+            <img 
+              src="/your-logo.png" 
+              alt="QuestAI Logo" 
+              className="h-5 w-5 object-contain"
+            />
+            */}
           </div>
           {sidebarOpen && (
             <div className="flex items-center">
-              <span className="text-[#20C997]">Quest</span>
-              <span className="text-[#212529]">AI</span>
+              <span className="text-[#212529]">Quest</span>
+              <span className="text-[#20C997]">AI</span>
             </div>
           )}
         </Link>
