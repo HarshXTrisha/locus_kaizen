@@ -23,6 +23,23 @@ export const microsoftConfig = {
   prompt: 'select_account'
 };
 
+// AI Model Configuration
+export const aiConfig = {
+  // Hugging Face Configuration (legacy)
+  hfToken: process.env.HF_TOKEN,
+  hfApiUrl: 'https://api-inference.huggingface.co/models/facebook/bart-base',
+  
+  // OSS GPT 20B Configuration (OpenRouter)
+  ossGptApiKey: process.env.OPENROUTER_API_KEY,
+  ossGptApiUrl: process.env.OSS_GPT_API_URL || 'https://openrouter.ai/api/v1',
+  ossGptModel: process.env.OSS_GPT_MODEL || 'openai/gpt-oss-20b:free',
+  siteUrl: process.env.SITE_URL || 'http://localhost:3000',
+  siteName: process.env.SITE_NAME || 'QuestAI',
+  
+  // Default to OSS GPT if available, otherwise fallback to Hugging Face
+  preferredModel: process.env.PREFERRED_AI_MODEL || 'oss-gpt'
+};
+
 // App Configuration
 export const appConfig = {
   name: 'QuestAI',
@@ -49,5 +66,23 @@ export const validateConfig = () => {
   }
 
   console.log('✅ Firebase configuration validated');
+  return true;
+};
+
+// Validate AI configuration
+export const validateAIConfig = () => {
+  if (aiConfig.preferredModel === 'oss-gpt') {
+    if (!aiConfig.ossGptApiKey) {
+      console.error('❌ OSS GPT API key not configured');
+      return false;
+    }
+    console.log('✅ OSS GPT configuration validated');
+  } else if (aiConfig.preferredModel === 'huggingface') {
+    if (!aiConfig.hfToken) {
+      console.error('❌ Hugging Face token not configured');
+      return false;
+    }
+    console.log('✅ Hugging Face configuration validated');
+  }
   return true;
 };

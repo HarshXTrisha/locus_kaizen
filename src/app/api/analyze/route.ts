@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeQuiz, validateQuizAnswers, formatQuizAnswers } from '@/lib/huggingface-service';
+import { analyzeQuizWithOSSGPT, validateQuizAnswers as validateOSSGPT, formatQuizAnswers as formatOSSGPT } from '@/lib/oss-gpt-service';
+import { aiConfig, validateAIConfig } from '@/lib/config';
 import { useAppStore } from '@/lib/store';
 
 // Rate limiting storage (in production, use Redis or database)
@@ -70,7 +72,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate answers format
-    if (!validateQuizAnswers(answers)) {
+    const isValidFormat = validateQuizAnswers(answers) || validateOSSGPT(answers);
+    if (!isValidFormat) {
       return NextResponse.json(
         { 
           error: 'Invalid format', 
@@ -81,12 +84,30 @@ export async function POST(request: NextRequest) {
     }
 
     // Format answers for better AI analysis
-    const formattedAnswers = formatQuizAnswers(answers);
+    const formattedAnswers = formatQuizAnswers(answers) || formatOSSGPT(answers);
 
     console.log('📊 Analyzing quiz answers:', formattedAnswers);
 
-    // Call Hugging Face API for analysis
-    const analysis = await analyzeQuiz(formattedAnswers);
+    // Validate AI configuration
+    if (!validateAIConfig()) {
+      return NextResponse.json(
+        { 
+          error: 'Configuration error', 
+          message: 'AI model configuration is invalid. Please check your API keys.' 
+        },
+        { status: 500 }
+      );
+    }
+
+    // Call appropriate AI API based on configuration
+    let analysis;
+    if (aiConfig.preferredModel === 'oss-gpt') {
+      console.log('🤖 Using OSS GPT 20B model for analysis...');
+      analysis = await analyzeQuizWithOSSGPT(formattedAnswers);
+    } else {
+      console.log('🤖 Using Hugging Face model for analysis...');
+      analysis = await analyzeQuiz(formattedAnswers);
+    }
 
     console.log('✅ Analysis completed:', analysis);
 
@@ -133,10 +154,14 @@ export async function POST(request: NextRequest) {
  * Health check endpoint
  */
 export async function GET() {
+  const { aiConfig } = await import('@/lib/config');
+  
   return NextResponse.json({
     status: 'healthy',
     service: 'Quiz Analysis API',
-    model: 'facebook/bart-base',
+    preferredModel: aiConfig.preferredModel,
+    currentModel: aiConfig.preferredModel === 'oss-gpt' ? aiConfig.ossGptModel : 'facebook/bart-base',
+    fallbackModel: aiConfig.preferredModel === 'oss-gpt' ? 'facebook/bart-base' : aiConfig.ossGptModel,
     rateLimit: 'disabled',
     timestamp: new Date().toISOString()
   });
