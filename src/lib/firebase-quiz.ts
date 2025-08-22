@@ -336,20 +336,30 @@ export async function saveQuizResult(result: Omit<QuizResult, 'id'>, userName?: 
     console.log('Quiz ID:', result.quizId);
     console.log('User ID:', result.userId);
     console.log('Score:', result.score);
+    console.log('Source comparison:', result.source === 'iimb-bba-dbe');
     
     if (result.source === 'iimb-bba-dbe') {
       console.log('✅ This is an IIMB-BBA-DBE quiz, updating leaderboard...');
       try {
         const displayName = userName || result.userName || 'Anonymous User';
         console.log('Display name:', displayName);
+        console.log('About to call updateLeaderboard with:', {
+          quizId: result.quizId,
+          userId: result.userId,
+          userName: displayName,
+          score: result.score
+        });
         await updateLeaderboard(result.quizId, result.userId, displayName, result.score);
         console.log('✅ Leaderboard updated for iimb-bba-dbe quiz');
       } catch (leaderboardError) {
         console.error('❌ Error updating leaderboard:', leaderboardError);
+        console.error('❌ Error details:', leaderboardError.message);
+        console.error('❌ Error stack:', leaderboardError.stack);
         // Don't throw error here, as the result is already saved
       }
     } else {
       console.log('❌ Not an IIMB-BBA-DBE quiz, skipping leaderboard update');
+      console.log('❌ Expected source: "iimb-bba-dbe", got:', result.source);
     }
     
     return docRef.id;

@@ -62,13 +62,18 @@ export async function updateLeaderboard(
     console.log('👤 User:', userId, userName, 'Score:', score);
     
     const leaderboardRef = doc(db, 'quiz-leaderboards', quizId);
+    console.log('📄 Getting existing leaderboard document...');
     const leaderboardDoc = await getDoc(leaderboardRef);
 
     let currentScores: DatabaseLeaderboardEntry[] = [];
     
     if (leaderboardDoc.exists()) {
+      console.log('✅ Existing leaderboard found, loading current scores...');
       const data = leaderboardDoc.data() as DatabaseQuizLeaderboard;
       currentScores = data.scores || [];
+      console.log('📊 Current scores count:', currentScores.length);
+    } else {
+      console.log('📝 No existing leaderboard found, creating new one...');
     }
 
     // Add new score
@@ -110,9 +115,11 @@ export async function updateLeaderboard(
       lastUpdated: serverTimestamp()
     };
 
-    console.log('💾 updateLeaderboard: Saving leaderboard data:', leaderboardData);
+    console.log('💾 updateLeaderboard: About to save leaderboard data...');
+    console.log('📊 Final scores to save:', top20Scores.length);
+    console.log('🏆 Top 3 scores:', top20Scores.slice(0, 3).map(s => `${s.userName}: ${s.score}%`));
     await setDoc(leaderboardRef, leaderboardData);
-    console.log('✅ Leaderboard updated for quiz:', quizId);
+    console.log('✅ Leaderboard successfully saved to database for quiz:', quizId);
   } catch (error) {
     console.error('❌ Error updating leaderboard:', error);
     throw new Error('Failed to update leaderboard');
