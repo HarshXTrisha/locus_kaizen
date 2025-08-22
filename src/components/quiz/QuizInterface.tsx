@@ -102,7 +102,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
         correctAnswers++;
       }
     });
-    return Math.round((correctAnswers / quiz.questions.length) * 100);
+    return quiz.questions.length > 0 ? Math.round((correctAnswers / quiz.questions.length) * 100) : 0;
   }, [quiz, answers]);
 
   // Optimized handlers - moved before early returns
@@ -165,6 +165,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
         correctAnswers,
         timeTaken: timeSpent,
         completedAt: new Date(),
+        source: quiz.source || 'main',
         answers: answers.map(answer => ({
           questionId: answer.questionId,
           userAnswer: answer.selectedOption,
@@ -173,7 +174,7 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
         }))
       };
 
-      const resultId = await saveQuizResult(result);
+      const resultId = await saveQuizResult(result, user.name);
       showSuccess('Quiz Submitted!', `Your score: ${score}%`);
       router.push(`/results/${resultId}`);
     } catch (error) {

@@ -8,6 +8,7 @@ import { ScoreSummaryCard } from './ScoreSummaryCard';
 import { KeyInsights } from './KeyInsights';
 import { AnalyticsCharts } from './AnalyticsCharts';
 import { QuestionTypeAnalysis } from './TopicPerformanceCard';
+import { LeaderboardDisplay } from '@/components/common/LeaderboardDisplay';
 
 interface ResultsDisplayProps {
   resultId: string;
@@ -168,6 +169,15 @@ export function ResultsDisplay({ resultId }: ResultsDisplayProps) {
         <AnalyticsCharts result={result} quiz={quiz} />
         
         <QuestionTypeAnalysis result={result} quiz={quiz} />
+
+        {/* Leaderboard for IIMB-BBA-DBE quizzes */}
+        {result.source === 'iimb-bba-dbe' && (
+          <LeaderboardDisplay 
+            quizId={result.quizId} 
+            userScore={result.score}
+            className="mt-8"
+          />
+        )}
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">

@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     } else if (lowerMessage.includes('pdf') || lowerMessage.includes('convert')) {
       response = "I can help you convert PDFs to quizzes! Use the PDF upload tool on this page to convert your documents into interactive quizzes. The tool supports multiple AI models for the best results.";
     } else if (files && files.length > 0) {
-      const fileNames = files.map(f => f.name).join(', ');
+      const fileNames = files.map((f: any) => f.name).join(', ');
       response = `I see you've uploaded: ${fileNames}. I can help analyze these files. For PDF conversion to quizzes, please use the dedicated PDF upload tool on this page for the best results.`;
     } else {
       // For other messages, provide a helpful response

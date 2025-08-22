@@ -180,7 +180,8 @@ export default function IIMBBADBEPage() {
         questions: extractedQuestions,
         timeLimit: quizData.timeLimit,
         passingScore: quizData.passingScore,
-        createdBy: user.id
+        createdBy: user.id,
+        source: 'iimb-bba-dbe' as const
       };
 
       const quizId = await createQuiz(quizToSave);

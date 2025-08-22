@@ -27,6 +27,7 @@ interface QuizData {
   description: string;
   timeLimit: number;
   questions: Question[];
+  source?: 'main' | 'iimb-bba-dbe' | 'personal';
 }
 
 interface Answer {
@@ -82,6 +83,7 @@ export default function MobileQuizTaker() {
           title: quiz.title,
           description: quiz.description,
           timeLimit: quiz.timeLimit,
+          source: quiz.source,
           questions: quiz.questions.map((q, index) => ({
             id: q.id || `q${index}`,
             text: q.text,
@@ -138,7 +140,7 @@ export default function MobileQuizTaker() {
 
       // Calculate score
       const correctAnswers = formattedAnswers.filter(a => a.isCorrect).length;
-      const score = Math.round((correctAnswers / quizData.questions.length) * 100);
+      const score = quizData.questions.length > 0 ? Math.round((correctAnswers / quizData.questions.length) * 100) : 0;
 
       const resultId = await saveQuizResult({
         quizId: quizData.id,
@@ -148,8 +150,9 @@ export default function MobileQuizTaker() {
         correctAnswers,
         timeTaken: (quizData.timeLimit * 60) - timeRemaining,
         completedAt: new Date(),
+        source: quizData.source || 'main',
         answers: formattedAnswers
-      });
+      }, auth.currentUser.displayName || 'Anonymous User');
 
       setIsSubmitted(true);
       showSuccess('Success', 'Quiz submitted successfully!');

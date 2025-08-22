@@ -15,6 +15,7 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { ExtractedQuestion } from './pdf-processor';
+import { updateLeaderboard } from './leaderboard';
 
 // Allowed subjects for quizzes
 export const ALLOWED_SUBJECTS = [
@@ -43,6 +44,7 @@ export interface Quiz {
   updatedAt: Date;
   isPublished: boolean;
   isTemporary?: boolean;
+  source?: 'main' | 'iimb-bba-dbe' | 'personal'; // Source of the quiz
 }
 
 // Database Quiz interface (for Firestore operations)
@@ -58,6 +60,7 @@ interface DatabaseQuiz {
   updatedAt: FieldValue;
   isPublished: boolean;
   isTemporary?: boolean;
+  source?: 'main' | 'iimb-bba-dbe' | 'personal'; // Source of the quiz
 }
 
 // Question interface
@@ -76,24 +79,28 @@ export interface QuizResult {
   id: string;
   quizId: string;
   userId: string;
+  userName?: string; // User's display name
   score: number;
   totalQuestions: number;
   correctAnswers: number;
   timeTaken: number; // in seconds
   completedAt: Date;
   answers: Answer[];
+  source?: 'main' | 'iimb-bba-dbe' | 'personal'; // Source of the result
 }
 
 // Database Result interface (for Firestore operations)
 interface DatabaseQuizResult {
   quizId: string;
   userId: string;
+  userName?: string; // User's display name
   score: number;
   totalQuestions: number;
   correctAnswers: number;
   timeTaken: number;
   completedAt: FieldValue;
   answers: Answer[];
+  source?: 'main' | 'iimb-bba-dbe' | 'personal'; // Source of the result
 }
 
 // Answer interface
@@ -114,6 +121,7 @@ export interface CreateQuizData {
   passingScore: number;
   createdBy: string;
   isTemporary?: boolean;
+  source?: 'main' | 'iimb-bba-dbe' | 'personal'; // Source of the quiz
 }
 
 // Admin controls interface
@@ -158,7 +166,8 @@ export async function createQuiz(quizData: CreateQuizData): Promise<string> {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       isPublished: true, // Set to true by default so other users can access quizzes
-      isTemporary: quizData.isTemporary || false
+      isTemporary: quizData.isTemporary || false,
+      source: quizData.source || 'main' // Default to 'main' if not specified
     };
 
     // Log custom subjects for debugging (no validation blocking)
@@ -301,21 +310,36 @@ export async function deleteQuiz(quizId: string): Promise<void> {
 /**
  * Save quiz result
  */
-export async function saveQuizResult(result: Omit<QuizResult, 'id'>): Promise<string> {
+export async function saveQuizResult(result: Omit<QuizResult, 'id'>, userName?: string): Promise<string> {
   try {
     const resultDoc: DatabaseQuizResult = {
       quizId: result.quizId,
       userId: result.userId,
+      userName: userName || result.userName || 'Anonymous User',
       score: result.score,
       totalQuestions: result.totalQuestions,
       correctAnswers: result.correctAnswers,
       timeTaken: result.timeTaken,
       completedAt: serverTimestamp(),
-      answers: result.answers
+      answers: result.answers,
+      source: result.source || 'main' // Default to 'main' if not specified
     };
 
     const docRef = await addDoc(collection(db, 'quizResults'), resultDoc);
     console.log('✅ Quiz result saved with ID:', docRef.id);
+    
+    // Update leaderboard if this is an iimb-bba-dbe quiz
+    if (result.source === 'iimb-bba-dbe') {
+      try {
+        const displayName = userName || result.userName || 'Anonymous User';
+        await updateLeaderboard(result.quizId, result.userId, displayName, result.score);
+        console.log('✅ Leaderboard updated for iimb-bba-dbe quiz');
+      } catch (leaderboardError) {
+        console.error('❌ Error updating leaderboard:', leaderboardError);
+        // Don't throw error here, as the result is already saved
+      }
+    }
+    
     return docRef.id;
   } catch (error) {
     console.error('❌ Error saving quiz result:', error);
@@ -343,11 +367,13 @@ export async function getUserQuizResults(userId: string): Promise<QuizResult[]> 
         id: doc.id,
         quizId: data.quizId,
         userId: data.userId,
+        userName: data.userName,
         score: data.score,
         totalQuestions: data.totalQuestions,
         correctAnswers: data.correctAnswers,
         timeTaken: data.timeTaken,
         completedAt: data.completedAt?.toDate() || new Date(),
+        source: data.source || 'main',
         answers: data.answers
       });
     });
@@ -408,11 +434,13 @@ export async function getQuizResult(resultId: string): Promise<QuizResult | null
         id: resultDoc.id,
         quizId: data.quizId,
         userId: data.userId,
+        userName: data.userName,
         score: data.score,
         totalQuestions: data.totalQuestions,
         correctAnswers: data.correctAnswers,
         timeTaken: data.timeTaken,
         completedAt: data.completedAt?.toDate() || new Date(),
+        source: data.source || 'main',
         answers: data.answers
       };
     }
@@ -548,6 +576,7 @@ export const getUserQuizzesWithControls = async (userId: string): Promise<QuizWi
         updatedAt: quizData.updatedAt?.toDate() || new Date(),
         isPublished: quizData.isPublished || false,
         isTemporary: quizData.isTemporary || false,
+        source: quizData.source || 'main',
         adminControls
       });
     }
