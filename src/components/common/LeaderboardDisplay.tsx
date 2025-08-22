@@ -20,16 +20,19 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
   useEffect(() => {
     if (!quizId) return;
 
+    console.log('🔍 LeaderboardDisplay: Subscribing to leaderboard for quiz:', quizId);
     setIsLoading(true);
     
     // Subscribe to real-time leaderboard updates
     const unsubscribe = subscribeToLeaderboard(quizId, (data) => {
+      console.log('📊 LeaderboardDisplay: Received leaderboard data:', data);
       setLeaderboard(data);
       setIsLoading(false);
       
       // Calculate user's rank if user is logged in
       if (user?.id && data) {
         const rank = getUserRank(data, user.id);
+        console.log('👤 LeaderboardDisplay: User rank:', rank);
         setUserRank(rank);
       }
     });

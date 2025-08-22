@@ -58,6 +58,9 @@ export async function updateLeaderboard(
   score: number
 ): Promise<void> {
   try {
+    console.log('🔍 updateLeaderboard: Starting update for quiz:', quizId);
+    console.log('👤 User:', userId, userName, 'Score:', score);
+    
     const leaderboardRef = doc(db, 'quiz-leaderboards', quizId);
     const leaderboardDoc = await getDoc(leaderboardRef);
 
@@ -107,6 +110,7 @@ export async function updateLeaderboard(
       lastUpdated: serverTimestamp()
     };
 
+    console.log('💾 updateLeaderboard: Saving leaderboard data:', leaderboardData);
     await setDoc(leaderboardRef, leaderboardData);
     console.log('✅ Leaderboard updated for quiz:', quizId);
   } catch (error) {

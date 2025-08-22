@@ -329,15 +329,25 @@ export async function saveQuizResult(result: Omit<QuizResult, 'id'>, userName?: 
     console.log('✅ Quiz result saved with ID:', docRef.id);
     
     // Update leaderboard if this is an iimb-bba-dbe quiz
+    console.log('🔍 Checking if leaderboard should be updated...');
+    console.log('Result source:', result.source);
+    console.log('Quiz ID:', result.quizId);
+    console.log('User ID:', result.userId);
+    console.log('Score:', result.score);
+    
     if (result.source === 'iimb-bba-dbe') {
+      console.log('✅ This is an IIMB-BBA-DBE quiz, updating leaderboard...');
       try {
         const displayName = userName || result.userName || 'Anonymous User';
+        console.log('Display name:', displayName);
         await updateLeaderboard(result.quizId, result.userId, displayName, result.score);
         console.log('✅ Leaderboard updated for iimb-bba-dbe quiz');
       } catch (leaderboardError) {
         console.error('❌ Error updating leaderboard:', leaderboardError);
         // Don't throw error here, as the result is already saved
       }
+    } else {
+      console.log('❌ Not an IIMB-BBA-DBE quiz, skipping leaderboard update');
     }
     
     return docRef.id;
