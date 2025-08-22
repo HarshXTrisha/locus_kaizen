@@ -21,6 +21,7 @@ interface EnhancedPDFUploadProps {
   onQuizGenerated: (quiz: any) => void;
   onUploadStart?: () => void;
   onUploadComplete?: () => void;
+  selectedModel?: string;
 }
 
 interface ConversionSettings {
@@ -34,7 +35,8 @@ interface ConversionSettings {
 export function EnhancedPDFUpload({ 
   onQuizGenerated, 
   onUploadStart, 
-  onUploadComplete 
+  onUploadComplete,
+  selectedModel = 'auto'
 }: EnhancedPDFUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -109,7 +111,8 @@ export function EnhancedPDFUpload({
           fileName: file.name,
           questionCount: settings.questionCount,
           subject: settings.subject || undefined,
-          includeExplanations: settings.includeExplanations
+          includeExplanations: settings.includeExplanations,
+          aiModel: selectedModel
         })
       });
 
