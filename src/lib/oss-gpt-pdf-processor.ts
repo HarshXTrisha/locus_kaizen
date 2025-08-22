@@ -22,7 +22,7 @@ export interface QuestAIQuiz {
 // Enhanced metadata for processing
 export interface ProcessingMetadata {
   sourceType: 'pdf';
-  processingMethod: 'oss-gpt-20b';
+  processingMethod: 'oss-gpt-20b' | 'fallback-pattern-matching';
   confidence: number; // 0-100
   warnings: string[];
   originalFileName: string;
