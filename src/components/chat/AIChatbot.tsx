@@ -220,10 +220,14 @@ export const AIChatbot: React.FC<ChatbotProps> = ({ className = '' }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">AI Assistant</h3>
-              <p className="text-sm text-gray-600">Powered by {getModelDisplayName(selectedModel)}</p>
-            </div>
+                             <div>
+                   <h3 className="text-lg font-semibold text-gray-900">AI Assistant</h3>
+                   <p className="text-sm text-gray-600">Powered by {getModelDisplayName(selectedModel)}</p>
+                   <div className="flex items-center space-x-2 mt-1">
+                     <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                     <span className="text-xs text-yellow-600">Fallback Mode</span>
+                   </div>
+                 </div>
           </div>
           
           <div className="flex items-center space-x-2">
