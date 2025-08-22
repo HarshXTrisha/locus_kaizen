@@ -179,7 +179,7 @@ export default function PDFConversionPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">About This Tool</h3>
             <p className="text-sm text-gray-600 mb-4">
               This PDF to Quiz converter uses the powerful OSS GPT 20B model to intelligently analyze your PDF content 
-              and generate high-quality multiple-choice questions in QuestAI's JSON format. Perfect for educators, 
+              and generate high-quality multiple-choice questions in QuestAI&apos;s JSON format. Perfect for educators, 
               trainers, and content creators.
             </p>
             <div className="flex justify-center space-x-6 text-xs text-gray-500">
