@@ -5,6 +5,18 @@ import { Upload, FileText, Zap, Settings, CheckCircle, AlertCircle, Download, Sp
 import { PDFProcessor } from '@/lib/pdf-processor';
 import { showSuccess, showError, showInfo } from '@/components/common/NotificationSystem';
 
+// PDF.js import for raw text extraction
+let pdfjsLib: any = null;
+
+if (typeof window !== 'undefined') {
+  import('pdfjs-dist').then((module) => {
+    pdfjsLib = module;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+  }).catch((error) => {
+    console.error('Failed to load PDF.js:', error);
+  });
+}
+
 interface EnhancedPDFUploadProps {
   onQuizGenerated: (quiz: any) => void;
   onUploadStart?: () => void;
@@ -77,11 +89,12 @@ export function EnhancedPDFUpload({
     try {
       setProcessingStatus('Extracting text from PDF...');
       
-      // First extract text using existing PDF processor
-      const extractedQuiz = await PDFProcessor.processPDF(file);
-      const pdfText = extractedQuiz.questions.map(q => 
-        `${q.text} ${q.options ? q.options.join(' ') : ''}`
-      ).join(' ');
+      // Extract raw text from PDF for OSS GPT processing
+      const pdfText = await extractRawTextFromPDF(file);
+
+      if (!pdfText || pdfText.trim().length === 0) {
+        throw new Error('No text could be extracted from the PDF');
+      }
 
       setProcessingStatus('Analyzing content with OSS GPT 20B...');
       
@@ -179,8 +192,57 @@ ${metadata.warnings.length > 0 ? `⚠️ Warnings: ${metadata.warnings.length}` 
     }
   };
 
-  const downloadSamplePDF = () => {
-          showInfo('Coming Soon', 'Sample PDF download feature coming soon!');
+    const downloadSamplePDF = () => {
+    showInfo('Coming Soon', 'Sample PDF download feature coming soon!');
+  };
+
+  // Function to extract raw text from PDF
+  const extractRawTextFromPDF = async (file: File): Promise<string> => {
+    if (typeof window === 'undefined') {
+      throw new Error('PDF processing is only available on the client side');
+    }
+
+    if (!pdfjsLib) {
+      // Wait for pdf.js to load
+      await new Promise(resolve => {
+        const checkPdfJs = () => {
+          if (pdfjsLib) {
+            resolve(true);
+          } else {
+            setTimeout(checkPdfJs, 100);
+          }
+        };
+        checkPdfJs();
+      });
+    }
+
+    try {
+      console.log('Extracting text from PDF:', file.name);
+      
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      
+      let allText = '';
+      
+      // Extract text from all pages
+      for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 10); pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        
+        allText += pageText + '\n';
+      }
+      
+      console.log('Text extraction completed. Length:', allText.length);
+      return allText.trim();
+      
+    } catch (error) {
+      console.error('PDF text extraction failed:', error);
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   return (
