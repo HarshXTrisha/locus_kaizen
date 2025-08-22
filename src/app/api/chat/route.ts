@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error('Model processing failed:', error);
       // Provide a helpful fallback response
-      response = `I apologize, but I'm currently experiencing technical difficulties. Please try again in a moment or switch to a different AI model. Error: ${error.message}`;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      response = `I apologize, but I'm currently experiencing technical difficulties. Please try again in a moment or switch to a different AI model. Error: ${errorMessage}`;
     }
 
     return NextResponse.json({
