@@ -57,9 +57,9 @@ export function EnhancedPDFUpload({
     
     if (pdfFile) {
       setUploadedFile(pdfFile);
-      showInfo(`PDF "${pdfFile.name}" ready for conversion. Click "Generate Quiz" to start.`);
+      showInfo('PDF Ready', `PDF "${pdfFile.name}" ready for conversion. Click "Generate Quiz" to start.`);
     } else {
-      showError('Please upload a PDF file');
+      showError('Invalid File', 'Please upload a PDF file');
     }
   }, []);
 
@@ -67,9 +67,9 @@ export function EnhancedPDFUpload({
     const file = e.target.files?.[0];
     if (file && file.type === 'application/pdf') {
       setUploadedFile(file);
-      showInfo(`PDF "${file.name}" ready for conversion. Click "Generate Quiz" to start.`);
+      showInfo('PDF Ready', `PDF "${file.name}" ready for conversion. Click "Generate Quiz" to start.`);
     } else {
-      showError('Please select a PDF file');
+      showError('Invalid File', 'Please select a PDF file');
     }
   }, []);
 
@@ -121,7 +121,7 @@ export function EnhancedPDFUpload({
 
   const handleGenerateQuiz = async () => {
     if (!uploadedFile) {
-      showError('Please select a PDF file first');
+      showError('No File Selected', 'Please select a PDF file first');
       return;
     }
 
@@ -132,7 +132,7 @@ export function EnhancedPDFUpload({
       const result = await processWithOSSGPT(uploadedFile);
       const { quiz, metadata } = result;
       
-      showSuccess(`✨ Quiz generated successfully! ${quiz.questions.length} questions created with ${metadata.confidence}% confidence.`);
+      showSuccess('Quiz Generated Successfully', `✨ ${quiz.questions.length} questions created with ${metadata.confidence}% confidence.`);
       
       // Show summary
       const summary = `
@@ -153,7 +153,7 @@ ${metadata.warnings.length > 0 ? `⚠️ Warnings: ${metadata.warnings.length}` 
       
     } catch (error) {
       console.error('Quiz generation failed:', error);
-      showError(`Failed to generate quiz: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showError('Conversion Failed', `Failed to generate quiz: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
       setProcessingStatus('');
@@ -173,14 +173,14 @@ ${metadata.warnings.length > 0 ? `⚠️ Warnings: ${metadata.warnings.length}` 
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showSuccess('JSON file downloaded successfully!');
+      showSuccess('Download Complete', 'JSON file downloaded successfully!');
     } catch (error) {
-      showError('Failed to download JSON file');
+      showError('Download Failed', 'Failed to download JSON file');
     }
   };
 
   const downloadSamplePDF = () => {
-    showInfo('Sample PDF download feature coming soon!');
+          showInfo('Coming Soon', 'Sample PDF download feature coming soon!');
   };
 
   return (
