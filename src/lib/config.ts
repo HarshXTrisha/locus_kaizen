@@ -104,28 +104,28 @@ export const validateConfig = () => {
 
 // Validate AI configuration
 export const validateAIConfig = () => {
-  const errors: string[] = [];
+  const availableModels = [];
   
   // Check OSS GPT configuration
-  if (!aiConfig.ossGptApiKey) {
-    errors.push('OSS GPT API key not configured');
+  if (aiConfig.ossGptApiKey) {
+    availableModels.push('OSS GPT');
   }
   
   // Check Gemini configuration
-  if (!aiConfig.geminiApiKey) {
-    errors.push('Gemini API key not configured');
+  if (aiConfig.geminiApiKey) {
+    availableModels.push('Gemini');
   }
   
   // Check Hugging Face configuration
-  if (!aiConfig.hfToken) {
-    errors.push('Hugging Face token not configured');
+  if (aiConfig.hfToken) {
+    availableModels.push('Hugging Face');
   }
   
-  if (errors.length > 0) {
-    console.error('❌ AI configuration errors:', errors);
+  if (availableModels.length === 0) {
+    console.error('❌ No AI models configured. Please configure at least one AI service.');
     return false;
   }
   
-  console.log('✅ All AI configurations validated');
+  console.log(`✅ AI configuration validated. Available models: ${availableModels.join(', ')}`);
   return true;
 };

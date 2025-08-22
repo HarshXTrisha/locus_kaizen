@@ -38,29 +38,67 @@ export async function POST(request: NextRequest) {
     try {
       switch (selectedModel) {
         case 'oss-gpt':
+          if (!aiConfig.ossGptApiKey) {
+            throw new Error('OSS GPT API key not configured in production environment');
+          }
           response = await processWithOSSGPT(message, files);
           break;
         
         case 'gemini':
+          if (!aiConfig.geminiApiKey) {
+            throw new Error('Gemini API key not configured in production environment');
+          }
           response = await processWithGemini(message, files);
           break;
         
         case 'huggingface':
+          if (!aiConfig.hfToken) {
+            throw new Error('Hugging Face token not configured in production environment');
+          }
           response = await processWithHuggingFace(message, files);
           break;
         
         default:
-          // Try OSS GPT first, fallback to others
-          try {
-            response = await processWithOSSGPT(message, files);
-          } catch (error) {
-            console.log('OSS GPT failed, trying Gemini...');
+          // Try available models in order of preference
+          let lastError = null;
+          
+          // Try Gemini first (most reliable)
+          if (aiConfig.geminiApiKey) {
             try {
               response = await processWithGemini(message, files);
-            } catch (geminiError) {
-              console.log('Gemini failed, using Hugging Face...');
-              response = await processWithHuggingFace(message, files);
+              break;
+            } catch (error) {
+              lastError = error;
+              console.log('Gemini failed, trying OSS GPT...');
             }
+          }
+          
+          // Try OSS GPT
+          if (aiConfig.ossGptApiKey) {
+            try {
+              response = await processWithOSSGPT(message, files);
+              break;
+            } catch (error) {
+              lastError = error;
+              console.log('OSS GPT failed, trying Hugging Face...');
+            }
+          }
+          
+          // Try Hugging Face
+          if (aiConfig.hfToken) {
+            try {
+              response = await processWithHuggingFace(message, files);
+              break;
+            } catch (error) {
+              lastError = error;
+            }
+          }
+          
+          // If all models failed, throw the last error
+          if (lastError) {
+            throw lastError;
+          } else {
+            throw new Error('No AI models are currently available. Please check your API key configuration.');
           }
       }
     } catch (error) {

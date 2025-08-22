@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Configuration error', 
-          message: 'AI model configuration is invalid. Please check your API keys.' 
+          message: 'No AI models are currently available. Please check your API key configuration.' 
         },
         { status: 500 }
       );
