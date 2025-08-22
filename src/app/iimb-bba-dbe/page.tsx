@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
-import { createQuiz, getUserQuizzesWithControls, getUserQuizResults } from '@/lib/firebase-quiz';
+import { createQuiz, getUserQuizzesWithControls, getUserQuizResults, getUserTakenQuizzes } from '@/lib/firebase-quiz';
 import { useAppStore } from '@/lib/store';
 import { FileUploadArea } from '@/components/upload/FileUploadArea';
 import { PDFUploadArea } from '@/components/upload/PDFUploadArea';
@@ -38,6 +38,7 @@ export default function IIMBBBADBEPage() {
 
   // Quiz and results data
   const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [takenQuizzes, setTakenQuizzes] = useState<any[]>([]);
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -68,16 +69,19 @@ export default function IIMBBBADBEPage() {
         setLoading(true);
         
         // Load quizzes and results for IIMB portal
-        const [userQuizzes, userResults] = await Promise.all([
+        const [userQuizzes, userTakenQuizzes, userResults] = await Promise.all([
           getUserQuizzesWithControls(user.id),
+          getUserTakenQuizzes(user.id),
           getUserQuizResults(user.id)
         ]);
 
         // Filter for IIMB portal data
         const iimbQuizzes = userQuizzes.filter(quiz => quiz.source === 'iimb-bba-dbe');
+        const iimbTakenQuizzes = userTakenQuizzes.filter(quiz => quiz.source === 'iimb-bba-dbe');
         const iimbResults = userResults.filter(result => result.source === 'iimb-bba-dbe');
 
         setQuizzes(iimbQuizzes);
+        setTakenQuizzes(iimbTakenQuizzes);
         setResults(iimbResults);
 
         // Calculate stats
@@ -86,7 +90,7 @@ export default function IIMBBBADBEPage() {
           : 0;
 
         setStats({
-          totalQuizzes: iimbQuizzes.length,
+          totalQuizzes: iimbQuizzes.length + iimbTakenQuizzes.length,
           totalResults: iimbResults.length,
           averageScore
         });
@@ -561,40 +565,87 @@ export default function IIMBBBADBEPage() {
               </button>
             </div>
             
-            {quizzes.length === 0 ? (
+            {/* Created Quizzes Section */}
+            {quizzes.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <FileText className="h-5 w-5 mr-2 text-blue-600" />
+                  Quizzes I Created ({quizzes.length})
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {quizzes.map((quiz) => (
+                    <div key={quiz.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <FileText className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Created</span>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2">{quiz.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4">{quiz.subject || 'No subject'}</p>
+                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <span>{quiz.questions?.length || 0} questions</span>
+                        <span>{quiz.timeLimit} min</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Link
+                          href={`/quiz/${quiz.id}`}
+                          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm"
+                        >
+                          Take Quiz
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Taken Quizzes Section */}
+            {takenQuizzes.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <Play className="h-5 w-5 mr-2 text-green-600" />
+                  Quizzes I've Taken ({takenQuizzes.length})
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {takenQuizzes.map((quiz) => (
+                    <div key={quiz.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-2 bg-green-100 rounded-lg">
+                          <Play className="h-6 w-6 text-green-600" />
+                        </div>
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Taken</span>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2">{quiz.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4">{quiz.subject || 'No subject'}</p>
+                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <span>{quiz.questions?.length || 0} questions</span>
+                        <span>{quiz.timeLimit} min</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Link
+                          href={`/quiz/${quiz.id}`}
+                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center text-sm"
+                        >
+                          Retake Quiz
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {quizzes.length === 0 && takenQuizzes.length === 0 && (
               <EmptyState
                 type="quiz"
-                title="No Quizzes Created"
-                description="Start by creating your first IIMB-BBA-DBE quiz"
+                title="No Quizzes Yet"
+                description="Create your first IIMB-BBA-DBE quiz or take a shared quiz to see it here"
                 actionLabel="Create Quiz"
                 onAction={() => setActiveTab('upload')}
               />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {quizzes.map((quiz) => (
-                  <div key={quiz.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <FileText className="h-6 w-6 text-blue-600" />
-                      </div>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">{quiz.title}</h3>
-                    <p className="text-sm text-gray-600 mb-4">{quiz.subject || 'No subject'}</p>
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <span>{quiz.questions?.length || 0} questions</span>
-                      <span>{quiz.timeLimit} min</span>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Link
-                        href={`/quiz/${quiz.id}`}
-                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm"
-                      >
-                        Take Quiz
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
             )}
           </div>
         )}

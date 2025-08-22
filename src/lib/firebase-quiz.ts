@@ -240,7 +240,7 @@ export async function getQuiz(quizId: string): Promise<Quiz | null> {
 }
 
 /**
- * Get all quizzes for a user
+ * Get all quizzes for a user (created by them)
  */
 export async function getUserQuizzes(userId: string): Promise<Quiz[]> {
   try {
@@ -276,6 +276,59 @@ export async function getUserQuizzes(userId: string): Promise<Quiz[]> {
   } catch (error) {
     console.error('❌ Error getting user quizzes:', error);
     throw new Error('Failed to get user quizzes');
+  }
+}
+
+/**
+ * Get all quizzes that a user has taken (based on their results)
+ */
+export async function getUserTakenQuizzes(userId: string): Promise<Quiz[]> {
+  try {
+    // First, get all quiz results for this user
+    const resultsQuery = query(
+      collection(db, 'quizResults'),
+      where('userId', '==', userId),
+      orderBy('completedAt', 'desc')
+    );
+    
+    const resultsSnapshot = await getDocs(resultsQuery);
+    const quizIds = [...new Set(resultsSnapshot.docs.map(doc => doc.data().quizId))];
+    
+    if (quizIds.length === 0) {
+      return [];
+    }
+    
+    // Then, get all the quizzes that the user has taken
+    const quizzes: Quiz[] = [];
+    
+    for (const quizId of quizIds) {
+      try {
+        const quiz = await getQuiz(quizId);
+        if (quiz) {
+          quizzes.push(quiz);
+        }
+      } catch (error) {
+        console.error(`Error fetching quiz ${quizId}:`, error);
+        // Continue with other quizzes even if one fails
+      }
+    }
+    
+    // Sort by most recent result
+    return quizzes.sort((a, b) => {
+      const aResult = resultsSnapshot.docs.find(doc => doc.data().quizId === a.id);
+      const bResult = resultsSnapshot.docs.find(doc => doc.data().quizId === b.id);
+      
+      if (!aResult || !bResult) return 0;
+      
+      const aTime = aResult.data().completedAt?.toDate?.() || new Date(0);
+      const bTime = bResult.data().completedAt?.toDate?.() || new Date(0);
+      
+      return bTime.getTime() - aTime.getTime();
+    });
+    
+  } catch (error) {
+    console.error('❌ Error getting user taken quizzes:', error);
+    throw new Error('Failed to get user taken quizzes');
   }
 }
 
