@@ -13,10 +13,8 @@ export default function PDFLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="antialiased">
-        {children}
-      </body>
-    </html>
+    <div className="pdf-converter-layout">
+      {children}
+    </div>
   );
 }
