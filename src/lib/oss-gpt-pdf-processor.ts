@@ -4,6 +4,7 @@
  */
 
 import { aiConfig } from './config';
+import { GeminiService } from './gemini-service';
 
 // QuestAI Platform JSON Template Interface
 export interface QuestAIQuestion {
@@ -22,7 +23,7 @@ export interface QuestAIQuiz {
 // Enhanced metadata for processing
 export interface ProcessingMetadata {
   sourceType: 'pdf';
-  processingMethod: 'oss-gpt-20b' | 'fallback-pattern-matching';
+  processingMethod: 'oss-gpt-20b' | 'gemini' | 'fallback-pattern-matching';
   confidence: number; // 0-100
   warnings: string[];
   originalFileName: string;
@@ -34,9 +35,9 @@ export interface ProcessingMetadata {
  */
 export class OSSGPTPDFProcessor {
   
-  /**
-   * Convert extracted PDF text to QuestAI JSON template format using OSS GPT 20B
-   */
+    /**
+    * Convert extracted PDF text to QuestAI JSON template format using selected AI model
+    */
   static async convertToQuestAIJSON(
     pdfText: string, 
     fileName: string,
@@ -44,64 +45,172 @@ export class OSSGPTPDFProcessor {
       questionCount?: number;
       includeExplanations?: boolean;
       subject?: string;
+      aiModel?: 'oss-gpt' | 'gemini' | 'auto';
     } = {}
   ): Promise<{ quiz: QuestAIQuiz; metadata: ProcessingMetadata }> {
     
-         const {
-       questionCount = 10,
-       includeExplanations = true,
-       subject
-     } = options;
+    const {
+      questionCount = 10,
+      includeExplanations = true,
+      subject,
+      aiModel = 'auto'
+    } = options;
 
-         console.log('🚀 Starting OSS GPT 20B PDF to QuestAI JSON conversion...');
-     console.log('📝 Text length:', pdfText.length);
-     console.log('🎯 Target questions:', questionCount);
-     console.log('📊 Include explanations:', includeExplanations);
+    console.log('🚀 Starting PDF to QuestAI JSON conversion...');
+    console.log('📝 Text length:', pdfText.length);
+    console.log('🎯 Target questions:', questionCount);
+    console.log('📊 Include explanations:', includeExplanations);
+    console.log('🤖 Selected AI model:', aiModel);
+
+    // Determine which AI model to use
+    const selectedModel = aiModel === 'auto' ? aiConfig.preferredModel : aiModel;
 
     try {
-             // Step 1: Analyze content and extract metadata
-       const contentAnalysis = await this.analyzeContent(pdfText, subject);
-       console.log('📊 Content analysis completed:', contentAnalysis);
-
-       // Step 2: Generate QuestAI format quiz
-       const quiz = await this.generateQuestAIQuiz(
-         pdfText, 
-         fileName, 
-         contentAnalysis,
-         {
-           questionCount,
-           includeExplanations
-         }
-       );
-
-       // Step 3: Validate and enhance the quiz
-       const validatedQuiz = await this.validateQuestAIQuiz(quiz);
-
-       // Step 4: Create metadata
-       const metadata: ProcessingMetadata = {
-         sourceType: 'pdf',
-         processingMethod: 'oss-gpt-20b',
-         confidence: 85,
-         warnings: [],
-         originalFileName: fileName,
-         processingDate: new Date().toISOString()
-       };
-
-       console.log('✅ OSS GPT 20B conversion completed successfully');
-       return { quiz: validatedQuiz, metadata };
-
-         } catch (error) {
-       console.error('❌ OSS GPT 20B conversion failed:', error);
-       
-       // Fallback to basic processing
-       const fallbackResult = await this.fallbackProcessing(pdfText, fileName, options);
-       return fallbackResult;
-     }
+      if (selectedModel === 'gemini') {
+        return await this.processWithGemini(pdfText, fileName, options);
+      } else {
+        return await this.processWithOSSGPT(pdfText, fileName, options);
+      }
+    } catch (error) {
+      console.error(`❌ ${selectedModel.toUpperCase()} conversion failed:`, error);
+      
+      // Try fallback models
+      if (selectedModel === 'gemini') {
+        try {
+          console.log('🔄 Trying OSS GPT as fallback...');
+          return await this.processWithOSSGPT(pdfText, fileName, options);
+        } catch (fallbackError) {
+          console.error('❌ OSS GPT fallback also failed:', fallbackError);
+        }
+      } else if (selectedModel === 'oss-gpt') {
+        try {
+          console.log('🔄 Trying Gemini as fallback...');
+          return await this.processWithGemini(pdfText, fileName, options);
+        } catch (fallbackError) {
+          console.error('❌ Gemini fallback also failed:', fallbackError);
+        }
+      }
+      
+      // Final fallback to pattern matching
+      const fallbackResult = await this.fallbackProcessing(pdfText, fileName, options);
+      return fallbackResult;
+        }
   }
 
   /**
-   * Analyze PDF content to understand structure and topics
-   */
+    * Process PDF with Gemini AI
+    */
+  private static async processWithGemini(
+    pdfText: string,
+    fileName: string,
+    options: any
+  ): Promise<{ quiz: QuestAIQuiz; metadata: ProcessingMetadata }> {
+    console.log('🤖 Processing with Gemini AI...');
+    
+    const { questionCount, includeExplanations } = options;
+    
+    try {
+      // Generate quiz using Gemini
+      const geminiResponse = await GeminiService.generateQuizQuestions(
+        pdfText,
+        questionCount,
+        includeExplanations
+      );
+      
+      if (!geminiResponse.success) {
+        throw new Error(`Gemini processing failed: ${geminiResponse.error}`);
+      }
+      
+      // Extract JSON from response
+      const jsonMatch = geminiResponse.content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Invalid Gemini response format');
+      }
+      
+      const quiz = JSON.parse(jsonMatch[0]);
+      
+      // Ensure all questions have required fields in QuestAI format
+      quiz.questions = quiz.questions.map((q: any, index: number) => ({
+        question: q.question || q.text || `Question ${index + 1}`,
+        options: q.options || ['Option A', 'Option B', 'Option C', 'Option D'],
+        correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+        explanation: q.explanation || undefined
+      }));
+      
+      // Validate the quiz
+      const validatedQuiz = await this.validateQuestAIQuiz(quiz);
+      
+      const metadata: ProcessingMetadata = {
+        sourceType: 'pdf',
+        processingMethod: 'gemini',
+        confidence: 90,
+        warnings: [],
+        originalFileName: fileName,
+        processingDate: new Date().toISOString()
+      };
+      
+      console.log('✅ Gemini AI conversion completed successfully');
+      return { quiz: validatedQuiz, metadata };
+      
+    } catch (error) {
+      console.error('❌ Gemini processing failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+    * Process PDF with OSS GPT 20B
+    */
+  private static async processWithOSSGPT(
+    pdfText: string,
+    fileName: string,
+    options: any
+  ): Promise<{ quiz: QuestAIQuiz; metadata: ProcessingMetadata }> {
+    console.log('🤖 Processing with OSS GPT 20B...');
+    
+    const { questionCount, includeExplanations, subject } = options;
+    
+    try {
+      // Step 1: Analyze content and extract metadata
+      const contentAnalysis = await this.analyzeContent(pdfText, subject);
+      console.log('📊 Content analysis completed:', contentAnalysis);
+
+      // Step 2: Generate QuestAI format quiz
+      const quiz = await this.generateQuestAIQuiz(
+        pdfText, 
+        fileName, 
+        contentAnalysis,
+        {
+          questionCount,
+          includeExplanations
+        }
+      );
+
+      // Step 3: Validate and enhance the quiz
+      const validatedQuiz = await this.validateQuestAIQuiz(quiz);
+
+      // Step 4: Create metadata
+      const metadata: ProcessingMetadata = {
+        sourceType: 'pdf',
+        processingMethod: 'oss-gpt-20b',
+        confidence: 85,
+        warnings: [],
+        originalFileName: fileName,
+        processingDate: new Date().toISOString()
+      };
+
+      console.log('✅ OSS GPT 20B conversion completed successfully');
+      return { quiz: validatedQuiz, metadata };
+      
+    } catch (error) {
+      console.error('❌ OSS GPT processing failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+    * Analyze PDF content to understand structure and topics
+    */
   private static async analyzeContent(text: string, subject?: string): Promise<{
     mainTopics: string[];
     estimatedDifficulty: 'easy' | 'medium' | 'hard';

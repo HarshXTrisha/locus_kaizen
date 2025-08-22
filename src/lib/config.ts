@@ -36,8 +36,41 @@ export const aiConfig = {
   siteUrl: process.env.SITE_URL || 'http://localhost:3000',
   siteName: process.env.SITE_NAME || 'QuestAI',
   
+  // Gemini Configuration
+  geminiApiKey: process.env.GEMINI_API_KEY,
+  geminiApiUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+  geminiModel: process.env.GEMINI_MODEL || 'gemma-3-12b-it',
+  
   // Default to OSS GPT if available, otherwise fallback to Hugging Face
-  preferredModel: process.env.PREFERRED_AI_MODEL || 'oss-gpt'
+  preferredModel: process.env.PREFERRED_AI_MODEL || 'oss-gpt',
+  
+  // Available AI Models
+  availableModels: [
+    {
+      id: 'oss-gpt',
+      name: 'OSS GPT 20B',
+      description: 'Powerful 20B parameter model via OpenRouter',
+      provider: 'OpenRouter',
+      maxTokens: 4000,
+      features: ['High accuracy', 'Fast processing', 'Educational content']
+    },
+    {
+      id: 'gemini',
+      name: 'Gemini (Gemma 3 12B)',
+      description: 'Google\'s advanced language model',
+      provider: 'Google',
+      maxTokens: 8000,
+      features: ['Multimodal', 'High quality', 'Google\'s latest']
+    },
+    {
+      id: 'huggingface',
+      name: 'Hugging Face (Fallback)',
+      description: 'Reliable fallback option',
+      provider: 'Hugging Face',
+      maxTokens: 1000,
+      features: ['Always available', 'Basic processing']
+    }
+  ]
 };
 
 // App Configuration
@@ -71,18 +104,28 @@ export const validateConfig = () => {
 
 // Validate AI configuration
 export const validateAIConfig = () => {
-  if (aiConfig.preferredModel === 'oss-gpt') {
-    if (!aiConfig.ossGptApiKey) {
-      console.error('❌ OSS GPT API key not configured');
-      return false;
-    }
-    console.log('✅ OSS GPT configuration validated');
-  } else if (aiConfig.preferredModel === 'huggingface') {
-    if (!aiConfig.hfToken) {
-      console.error('❌ Hugging Face token not configured');
-      return false;
-    }
-    console.log('✅ Hugging Face configuration validated');
+  const errors: string[] = [];
+  
+  // Check OSS GPT configuration
+  if (!aiConfig.ossGptApiKey) {
+    errors.push('OSS GPT API key not configured');
   }
+  
+  // Check Gemini configuration
+  if (!aiConfig.geminiApiKey) {
+    errors.push('Gemini API key not configured');
+  }
+  
+  // Check Hugging Face configuration
+  if (!aiConfig.hfToken) {
+    errors.push('Hugging Face token not configured');
+  }
+  
+  if (errors.length > 0) {
+    console.error('❌ AI configuration errors:', errors);
+    return false;
+  }
+  
+  console.log('✅ All AI configurations validated');
   return true;
 };

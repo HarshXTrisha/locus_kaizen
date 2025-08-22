@@ -24,7 +24,8 @@ export async function POST(request: NextRequest) {
       fileName, 
       questionCount = 10,
       subject,
-      includeExplanations = true
+      includeExplanations = true,
+      aiModel = 'auto'
     } = body;
 
     // Validate input
@@ -50,23 +51,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🚀 Starting OSS GPT 20B PDF conversion...');
+    console.log('🚀 Starting PDF conversion...');
     console.log('📊 Parameters:', {
       fileName,
       textLength: pdfText.length,
       questionCount,
       subject,
-      includeExplanations
+      includeExplanations,
+      aiModel
     });
 
-    // Convert PDF to QuestAI JSON format using OSS GPT 20B
+    // Convert PDF to QuestAI JSON format using selected AI model
     const result = await OSSGPTPDFProcessor.convertToQuestAIJSON(
       pdfText,
       fileName,
       {
         questionCount,
         subject,
-        includeExplanations
+        includeExplanations,
+        aiModel
       }
     );
 
@@ -112,7 +115,26 @@ export async function GET() {
   return NextResponse.json({
     status: 'healthy',
     service: 'PDF to Quiz Converter',
-    model: 'OSS GPT 20B (OpenRouter)',
+    models: [
+      {
+        id: 'oss-gpt',
+        name: 'OSS GPT 20B',
+        provider: 'OpenRouter',
+        description: 'Powerful 20B parameter model'
+      },
+      {
+        id: 'gemini',
+        name: 'Gemini (Gemma 3 12B)',
+        provider: 'Google',
+        description: 'Google\'s advanced language model'
+      },
+      {
+        id: 'auto',
+        name: 'Auto Select',
+        provider: 'System',
+        description: 'Automatically choose the best available model'
+      }
+    ],
     features: [
       'Intelligent content analysis',
       'Structured quiz generation',
@@ -120,7 +142,8 @@ export async function GET() {
       'Difficulty assessment',
       'Topic identification',
       'Answer explanations',
-      'Fallback processing'
+      'Fallback processing',
+      'Multi-model support'
     ],
     limits: {
       maxQuestions: 50,
