@@ -173,5 +173,20 @@ service cloud.firestore {
       // Allow update/delete if user is admin
       allow update, delete: if isAuthenticated() && isAdmin();
     }
+    
+    // Quiz leaderboards collection for real-time leaderboards
+    match /quiz-leaderboards/{leaderboardId} {
+      // Allow read for all authenticated users (for viewing leaderboards)
+      allow read: if isAuthenticated();
+      
+      // Allow create if user is authenticated (for initial leaderboard creation)
+      allow create: if isAuthenticated();
+      
+      // Allow update if user is authenticated (for updating scores)
+      allow update: if isAuthenticated();
+      
+      // Allow delete if user is admin
+      allow delete: if isAuthenticated() && isAdmin();
+    }
   }
 }
