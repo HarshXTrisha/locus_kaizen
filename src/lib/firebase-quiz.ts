@@ -227,7 +227,8 @@ export async function getQuiz(quizId: string): Promise<Quiz | null> {
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         isPublished: data.isPublished,
-        isTemporary: data.isTemporary || false
+        isTemporary: data.isTemporary || false,
+        source: data.source || 'main' // Add the missing source field
       };
     }
     
@@ -266,7 +267,8 @@ export async function getUserQuizzes(userId: string): Promise<Quiz[]> {
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         isPublished: data.isPublished,
-        isTemporary: data.isTemporary || false
+        isTemporary: data.isTemporary || false,
+        source: data.source || 'main' // Add the missing source field
       });
     });
     
