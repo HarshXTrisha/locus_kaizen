@@ -10,7 +10,7 @@ export default function PDFConversionPage() {
 
   const handleQuizGenerated = (quiz: any) => {
     setGeneratedQuiz(quiz);
-    showSuccess(`Quiz generated successfully! ${quiz.questions.length} questions created.`);
+    showSuccess('Quiz Generated Successfully', `${quiz.questions.length} questions created from your PDF.`);
   };
 
   const handleUploadStart = () => {
