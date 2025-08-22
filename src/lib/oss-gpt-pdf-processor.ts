@@ -358,60 +358,171 @@ JSON:`;
   }
 
      /**
-    * Basic pattern-based question extraction (fallback)
+    * Enhanced pattern-based question extraction (fallback)
     */
-      private static extractBasicQuestions(text: string): QuestAIQuestion[] {
-     const questions: QuestAIQuestion[] = [];
-     const lines = text.split('\n');
-     
-     let currentQuestion: Partial<QuestAIQuestion> | null = null;
-     let questionCounter = 1;
+  private static extractBasicQuestions(text: string): QuestAIQuestion[] {
+    const questions: QuestAIQuestion[] = [];
+    
+    // First try to split by question numbers
+    let questionBlocks = text.split(/\d+\./).filter(block => block.trim().length > 0);
+    
+    // If no question numbers found, try splitting by "Answer:" patterns
+    if (questionBlocks.length <= 1) {
+      questionBlocks = text.split(/Answer:\s*[A-D]\)/i).filter(block => block.trim().length > 0);
+    }
+    
+    for (let i = 0; i < questionBlocks.length; i++) {
+      const block = questionBlocks[i].trim();
+      
+      // Skip if block is too short
+      if (block.length < 20) continue;
+      
+      try {
+        const question = this.parseQuestionBlock(block);
+        if (question) {
+          questions.push(question);
+        }
+      } catch (error) {
+        console.log(`Failed to parse question block ${i + 1}:`, error);
+      }
+    }
+    
+    return questions;
+  }
 
-     for (const line of lines) {
-       const trimmed = line.trim();
-       
-       // Simple question detection
-       const questionMatch = trimmed.match(/^\d+\.?\s*(.+)/);
-       if (questionMatch && trimmed.includes('?')) {
-         if (currentQuestion && currentQuestion.question) {
-           questions.push(this.finalizeBasicQuestion(currentQuestion, questionCounter - 1));
-         }
-         
-         currentQuestion = {
-           question: questionMatch[1],
-           options: [],
-           correctAnswer: 0
-         };
-         questionCounter++;
-       }
-       
-       // Simple option detection
-       const optionMatch = trimmed.match(/^[A-D][\.)]\s*(.+)/);
-       if (optionMatch && currentQuestion) {
-         currentQuestion.options = currentQuestion.options || [];
-         currentQuestion.options.push(optionMatch[1]);
-       }
-     }
-     
-     // Add last question
-     if (currentQuestion && currentQuestion.question) {
-       questions.push(this.finalizeBasicQuestion(currentQuestion, questionCounter - 1));
-     }
-
-     return questions;
-   }
-
-     /**
-    * Finalize basic question structure
+  /**
+    * Parse a single question block into QuestAI format
     */
-   private static finalizeBasicQuestion(
-     question: Partial<QuestAIQuestion>, 
-     index: number
-   ): QuestAIQuestion {
-     return {
-       question: question.question || `Question ${index + 1}`,
-       options: question.options && question.options.length >= 4 ? question.options.slice(0, 4) : ['Option A', 'Option B', 'Option C', 'Option D'],
-       correctAnswer: typeof question.correctAnswer === 'number' ? question.correctAnswer : 0
-     };
-   }
+  private static parseQuestionBlock(block: string): QuestAIQuestion | null {
+    // Look for question text (ends with ?)
+    const questionMatch = block.match(/([^?]+\?)/);
+    if (!questionMatch) return null;
+    
+    const questionText = questionMatch[1].trim();
+    
+    // Extract options and answer using improved parsing
+    const { options, correctAnswer } = this.extractOptionsAndAnswer(block);
+    
+    // Ensure we have exactly 4 valid options
+    const validOptions = this.ensureValidOptions(options);
+    
+    // Validate correct answer index
+    const validCorrectAnswer = correctAnswer < validOptions.length ? correctAnswer : 0;
+    
+    return {
+      question: questionText,
+      options: validOptions,
+      correctAnswer: validCorrectAnswer
+    };
+  }
+
+  /**
+    * Extract options and answer from question block
+    */
+  private static extractOptionsAndAnswer(block: string): { options: string[], correctAnswer: number } {
+    const options: string[] = [];
+    let correctAnswer = 0;
+    
+    // Look for answer pattern first: Answer: [A-D]
+    const answerMatch = block.match(/Answer:\s*([A-D])/i);
+    if (answerMatch) {
+      const answerLetter = answerMatch[1].toUpperCase();
+      correctAnswer = answerLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+    }
+    
+    // Simple approach: split by option letters and extract content
+    const parts = block.split(/(?=[A-D]\))/);
+    
+    for (const part of parts) {
+      const optionMatch = part.match(/^[A-D]\)\s*(.+?)(?=\s+[A-D]\)|Answer:|$)/i);
+      if (optionMatch) {
+        const optionText = optionMatch[1].trim();
+        if (optionText.length > 0) {
+          options.push(optionText);
+        }
+      }
+    }
+    
+    // If simple approach didn't work, try regex extraction
+    if (options.length === 0) {
+      const optionMatches = block.matchAll(/[A-D]\)\s*([^A-D]+?)(?=[A-D]\)|Answer:|$)/g);
+      for (const match of optionMatches) {
+        const optionText = match[1].trim();
+        if (optionText.length > 0) {
+          options.push(optionText);
+        }
+      }
+    }
+    
+    return { options, correctAnswer };
+  }
+
+  /**
+    * Ensure we have exactly 4 valid options
+    */
+  private static ensureValidOptions(options: string[]): string[] {
+    // Remove empty or invalid options
+    const validOptions = options.filter(opt => opt && opt.trim().length > 0 && opt.trim() !== '');
+    
+    // Ensure exactly 4 options
+    while (validOptions.length < 4) {
+      validOptions.push(`Option ${String.fromCharCode(65 + validOptions.length)}`);
+    }
+    
+    // Trim to 4 options if more
+    if (validOptions.length > 4) {
+      validOptions.splice(4);
+    }
+    
+    // Remove duplicates while preserving order
+    const uniqueOptions: string[] = [];
+    for (const option of validOptions) {
+      if (!uniqueOptions.includes(option)) {
+        uniqueOptions.push(option);
+      }
+    }
+    
+    // Fill remaining slots if needed
+    while (uniqueOptions.length < 4) {
+      uniqueOptions.push(`Option ${String.fromCharCode(65 + uniqueOptions.length)}`);
+    }
+    
+    return uniqueOptions.slice(0, 4);
+  }
+
+  /**
+    * Parse inline options when standard format fails
+    */
+  private static parseInlineOptions(block: string): string[] {
+    const options: string[] = [];
+    
+    // Look for patterns like "A) Venus B) Mars C) Jupiter D) Saturn"
+    const inlineMatch = block.match(/A\)\s*([^B]+?)\s*B\)\s*([^C]+?)\s*C\)\s*([^D]+?)\s*D\)\s*([^Answer]+?)/i);
+    
+    if (inlineMatch) {
+      options.push(
+        inlineMatch[1].trim(),
+        inlineMatch[2].trim(),
+        inlineMatch[3].trim(),
+        inlineMatch[4].trim()
+      );
+    } else {
+      // Try alternative pattern for the specific format in your PDF
+      // Pattern: "A) Venus  B) Mars  C) Jupiter  D) Saturn"
+      const altMatch = block.match(/A\)\s*([^B]+?)\s+B\)\s*([^C]+?)\s+C\)\s*([^D]+?)\s+D\)\s*([^Answer]+?)/i);
+      
+      if (altMatch) {
+        options.push(
+          altMatch[1].trim(),
+          altMatch[2].trim(),
+          altMatch[3].trim(),
+          altMatch[4].trim()
+        );
+      }
+    }
+    
+    return options;
+  }
+
+
 }
