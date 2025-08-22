@@ -152,7 +152,7 @@ export default function MobileQuizTaker() {
         completedAt: new Date(),
         source: quizData.source || 'main',
         answers: formattedAnswers
-      }, auth.currentUser.displayName || 'Anonymous User');
+      }, auth.currentUser.displayName || auth.currentUser.email || 'Anonymous User');
 
       setIsSubmitted(true);
       showSuccess('Success', 'Quiz submitted successfully!');

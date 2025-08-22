@@ -342,7 +342,9 @@ export async function saveQuizResult(result: Omit<QuizResult, 'id'>, userName?: 
       console.log('✅ This is an IIMB-BBA-DBE quiz, updating leaderboard...');
       try {
         const displayName = userName || result.userName || 'Anonymous User';
-        console.log('Display name:', displayName);
+        console.log('🔍 saveQuizResult: userName parameter:', userName);
+        console.log('🔍 saveQuizResult: result.userName:', result.userName);
+        console.log('🔍 saveQuizResult: Final display name:', displayName);
         console.log('About to call updateLeaderboard with:', {
           quizId: result.quizId,
           userId: result.userId,

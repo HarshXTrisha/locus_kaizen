@@ -174,6 +174,8 @@ export function QuizInterface({ quizId }: QuizInterfaceProps) {
         }))
       };
 
+      console.log('🔍 QuizInterface: User object:', user);
+      console.log('🔍 QuizInterface: User name being passed:', user.name);
       const resultId = await saveQuizResult(result, user.name);
       showSuccess('Quiz Submitted!', `Your score: ${score}%`);
       router.push(`/results/${resultId}`);
