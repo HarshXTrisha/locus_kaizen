@@ -29,7 +29,7 @@ interface DatabaseLeaderboardEntry {
   userId: string;
   userName: string;
   score: number;
-  timestamp: FieldValue;
+  timestamp: Date; // Changed from FieldValue to Date
   rank: number;
 }
 
@@ -76,7 +76,7 @@ export async function updateLeaderboard(
       userId,
       userName,
       score,
-      timestamp: serverTimestamp(),
+      timestamp: new Date(), // Use regular Date instead of serverTimestamp for array elements
       rank: 0 // Will be calculated after sorting
     };
 
@@ -90,8 +90,8 @@ export async function updateLeaderboard(
       }
       // If scores are equal, sort by timestamp (earlier first)
       // Handle potential null/undefined timestamps safely
-      const aTime = a.timestamp ? (a.timestamp as any).toDate?.()?.getTime() || 0 : 0;
-      const bTime = b.timestamp ? (b.timestamp as any).toDate?.()?.getTime() || 0 : 0;
+      const aTime = a.timestamp ? a.timestamp.getTime() || 0 : 0;
+      const bTime = b.timestamp ? b.timestamp.getTime() || 0 : 0;
       return aTime - bTime;
     });
 
@@ -138,7 +138,7 @@ export async function getLeaderboard(quizId: string): Promise<QuizLeaderboard | 
       userId: entry.userId,
       userName: entry.userName,
       score: entry.score,
-      timestamp: entry.timestamp ? (entry.timestamp as any).toDate() || new Date() : new Date(),
+      timestamp: entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp),
       rank: entry.rank
     }));
 
@@ -175,7 +175,7 @@ export function subscribeToLeaderboard(
       userId: entry.userId,
       userName: entry.userName,
       score: entry.score,
-      timestamp: entry.timestamp ? (entry.timestamp as any).toDate() || new Date() : new Date(),
+      timestamp: entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp),
       rank: entry.rank
     }));
 
