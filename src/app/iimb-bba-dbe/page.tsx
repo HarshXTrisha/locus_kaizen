@@ -658,14 +658,14 @@ export default function IIMBBBADBEPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">IIMB-BBA-DBE Leaderboards</h2>
               
-              {quizzes.length === 0 ? (
-                <EmptyState
-                  type="leaderboard"
-                  title="No Leaderboards Available"
-                  description="Create and take quizzes to see leaderboards"
-                  actionLabel="Create Quiz"
-                  onAction={() => setActiveTab('upload')}
-                />
+                             {quizzes.length === 0 ? (
+                 <EmptyState
+                   type="analytics"
+                   title="No Leaderboards Available"
+                   description="Create and take quizzes to see leaderboards"
+                   actionLabel="Create Quiz"
+                   onAction={() => setActiveTab('upload')}
+                 />
               ) : (
                 <div className="space-y-6">
                   {quizzes.map((quiz) => (
