@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const appUser = {
           id: user.uid,
           email: user.email || '',
+          name: user.displayName || user.email || 'Anonymous User',
           firstName: user.displayName?.split(' ')[0] || '',
           lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
           avatar: user.photoURL || undefined,
