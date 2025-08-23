@@ -342,50 +342,52 @@ export default function IIMBBBADBEPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      {/* Header Stats - Mobile Responsive */}
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">IIMB-BBA-DBE Portal</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6">
+            <div className="mb-4 sm:mb-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">IIMB-BBA-DBE Portal</h1>
               <p className="text-gray-600 mt-1">Quiz Management & Leaderboards</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm text-gray-500">Total Quizzes</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.totalQuizzes}</p>
+            <div className="grid grid-cols-3 gap-4 sm:flex sm:items-center sm:space-x-4">
+              <div className="text-center sm:text-right">
+                <p className="text-xs sm:text-sm text-gray-500">Total Quizzes</p>
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">{stats.totalQuizzes}</p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500">Quiz Results</p>
-                <p className="text-2xl font-bold text-green-600">{stats.totalResults}</p>
+              <div className="text-center sm:text-right">
+                <p className="text-xs sm:text-sm text-gray-500">Quiz Results</p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.totalResults}</p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500">Average Score</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.averageScore}%</p>
+              <div className="text-center sm:text-right">
+                <p className="text-xs sm:text-sm text-gray-500">Average Score</p>
+                <p className="text-xl sm:text-2xl font-bold text-purple-600">{stats.averageScore}%</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Mobile Responsive */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <tab.icon className="h-5 w-5" />
-                <span>{tab.name}</span>
-              </button>
-            ))}
+          <nav className="flex overflow-x-auto scrollbar-hide">
+            <div className="flex space-x-2 sm:space-x-8 min-w-full">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <tab.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span>{tab.name}</span>
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
       </div>
@@ -458,23 +460,23 @@ export default function IIMBBBADBEPage() {
               ) : (
                 <div className="space-y-4">
                   {quizzes.slice(0, 5).map((quiz) => (
-                    <div key={quiz.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <FileText className="h-5 w-5 text-blue-600" />
+                    <div key={quiz.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-gray-200 rounded-lg">
+                      <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-0">
+                        <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                          <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{quiz.title}</h3>
-                          <p className="text-sm text-gray-600">{quiz.subject || 'No subject'}</p>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{quiz.title}</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 truncate">{quiz.subject || 'No subject'}</p>
                           <p className="text-xs text-gray-500">
                             {quiz.questions?.length || 0} questions • {quiz.timeLimit} min
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 self-end sm:self-auto">
                         <Link
                           href={`/quiz/${quiz.id}`}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                          className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-sm whitespace-nowrap"
                         >
                           Take Quiz
                         </Link>
@@ -495,41 +497,43 @@ export default function IIMBBBADBEPage() {
               <p className="text-gray-600">Upload JSON, PDF, or TXT files to create quizzes automatically.</p>
             </div>
 
-            {/* Tab Navigation */}
-            <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
-              <button
-                onClick={() => setActiveUploadTab('json')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeUploadTab === 'json'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <FileText className="h-4 w-4" />
-                <span>JSON Upload</span>
-              </button>
-              <button
-                onClick={() => setActiveUploadTab('pdf')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeUploadTab === 'pdf'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <FileText className="h-4 w-4" />
-                <span>PDF Upload</span>
-              </button>
-              <button
-                onClick={() => setActiveUploadTab('txt')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeUploadTab === 'txt'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <FileText className="h-4 w-4" />
-                <span>TXT Upload</span>
-              </button>
+            {/* Tab Navigation - Mobile Responsive */}
+            <div className="flex overflow-x-auto scrollbar-hide mb-6 bg-gray-100 p-1 rounded-lg">
+              <div className="flex space-x-1 min-w-full">
+                <button
+                  onClick={() => setActiveUploadTab('json')}
+                  className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeUploadTab === 'json'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span>JSON</span>
+                </button>
+                <button
+                  onClick={() => setActiveUploadTab('pdf')}
+                  className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeUploadTab === 'pdf'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span>PDF</span>
+                </button>
+                <button
+                  onClick={() => setActiveUploadTab('txt')}
+                  className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeUploadTab === 'txt'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span>TXT</span>
+                </button>
+              </div>
             </div>
 
             {/* Upload Areas */}
@@ -694,36 +698,36 @@ export default function IIMBBBADBEPage() {
                   <FileText className="h-5 w-5 mr-2 text-blue-600" />
                   Quizzes I Created ({quizzes.length})
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {quizzes.map((quiz) => (
-                    <div key={quiz.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <FileText className="h-6 w-6 text-blue-600" />
+                    <div key={quiz.id} className="border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start justify-between mb-3 sm:mb-4">
+                        <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                          <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                         </div>
                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Created</span>
                       </div>
-                      <h3 className="font-semibold text-gray-900 mb-2">{quiz.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{quiz.subject || 'No subject'}</p>
-                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base truncate">{quiz.title}</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 truncate">{quiz.subject || 'No subject'}</p>
+                      <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
                         <span>{quiz.questions?.length || 0} questions</span>
                         <span>{quiz.timeLimit} min</span>
                       </div>
-                                             <div className="flex space-x-2">
-                         <Link
-                           href={`/quiz/${quiz.id}`}
-                           className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm"
-                         >
-                           Take Quiz
-                         </Link>
-                                                   <button
-                            onClick={() => showDeleteQuizConfirmation(quiz.id, quiz.title)}
-                            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                            title="Delete Quiz"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                       </div>
+                      <div className="flex space-x-2">
+                        <Link
+                          href={`/quiz/${quiz.id}`}
+                          className="flex-1 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-xs sm:text-sm"
+                        >
+                          Take Quiz
+                        </Link>
+                        <button
+                          onClick={() => showDeleteQuizConfirmation(quiz.id, quiz.title)}
+                          className="px-2 sm:px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm"
+                          title="Delete Quiz"
+                        >
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -737,25 +741,25 @@ export default function IIMBBBADBEPage() {
                   <Play className="h-5 w-5 mr-2 text-green-600" />
                   Quizzes I&apos;ve Taken ({takenQuizzes.length})
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {takenQuizzes.map((quiz) => (
-                    <div key={quiz.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                          <Play className="h-6 w-6 text-green-600" />
+                    <div key={quiz.id} className="border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start justify-between mb-3 sm:mb-4">
+                        <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+                          <Play className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
                         </div>
                         <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Taken</span>
                       </div>
-                      <h3 className="font-semibold text-gray-900 mb-2">{quiz.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{quiz.subject || 'No subject'}</p>
-                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base truncate">{quiz.title}</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 truncate">{quiz.subject || 'No subject'}</p>
+                      <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
                         <span>{quiz.questions?.length || 0} questions</span>
                         <span>{quiz.timeLimit} min</span>
                       </div>
                       <div className="flex space-x-2">
                         <Link
                           href={`/quiz/${quiz.id}`}
-                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center text-sm"
+                          className="flex-1 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center text-xs sm:text-sm"
                         >
                           Retake Quiz
                         </Link>
@@ -795,14 +799,14 @@ export default function IIMBBBADBEPage() {
             ) : (
               <div className="space-y-4">
                 {results.map((result) => (
-                  <div key={result.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Trophy className="h-5 w-5 text-green-600" />
+                  <div key={result.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-0">
+                      <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+                        <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Quiz Result</h3>
-                        <p className="text-sm text-gray-600">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Quiz Result</h3>
+                        <p className="text-xs sm:text-sm text-gray-600">
                           Score: {result.score}% • {result.correctAnswers}/{result.totalQuestions} correct
                         </p>
                         <p className="text-xs text-gray-500">
@@ -810,28 +814,28 @@ export default function IIMBBBADBEPage() {
                         </p>
                       </div>
                     </div>
-                                         <div className="flex items-center space-x-2">
-                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                         result.score >= 80 ? 'bg-green-100 text-green-800' :
-                         result.score >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                         'bg-red-100 text-red-800'
-                       }`}>
-                         {result.score}%
-                       </span>
-                       <Link
-                         href={`/results/${result.id}`}
-                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                       >
-                         View Details
-                       </Link>
-                                               <button
-                          onClick={() => showDeleteResultConfirmation(result.id, result.score)}
-                          className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                          title="Delete Result"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                     </div>
+                    <div className="flex items-center space-x-2 self-end sm:self-auto">
+                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                        result.score >= 80 ? 'bg-green-100 text-green-800' :
+                        result.score >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {result.score}%
+                      </span>
+                      <Link
+                        href={`/results/${result.id}`}
+                        className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm whitespace-nowrap"
+                      >
+                        View Details
+                      </Link>
+                      <button
+                        onClick={() => showDeleteResultConfirmation(result.id, result.score)}
+                        className="px-2 sm:px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm"
+                        title="Delete Result"
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -873,8 +877,8 @@ export default function IIMBBBADBEPage() {
                       
                       return (
                         <div key={quiz.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">{quiz.title}</h3>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-0 truncate">{quiz.title}</h3>
                             <div className="flex items-center space-x-2">
                               {isCreated && (
                                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Created</span>
