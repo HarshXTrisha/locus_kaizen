@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Trophy, Medal, Award, Clock, TrendingUp } from 'lucide-react';
+import { Trophy, Medal, Award, Clock, TrendingUp, Crown, Star } from 'lucide-react';
 import { QuizLeaderboard, LeaderboardEntry, subscribeToLeaderboard, getUserRank } from '@/lib/leaderboard';
 import { useAppStore } from '@/lib/store';
 
@@ -43,35 +43,49 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Trophy className="h-5 w-5 text-yellow-500" />;
+        return <Crown className="h-6 w-6 text-yellow-400 drop-shadow-lg" />;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-400" />;
+        return <Medal className="h-5 w-5 text-gray-300 drop-shadow-md" />;
       case 3:
-        return <Award className="h-5 w-5 text-amber-600" />;
+        return <Award className="h-5 w-5 text-amber-500 drop-shadow-md" />;
       default:
-        return <span className="text-sm font-semibold text-gray-500">#{rank}</span>;
+        return <span className="text-sm font-bold text-gray-400 bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center">#{rank}</span>;
     }
   };
 
-  const getRankColor = (rank: number) => {
+  const getRankStyle = (rank: number, isCurrentUser: boolean) => {
+    const baseStyle = "px-6 py-4 transition-all duration-300 hover:shadow-md ";
+    
+    if (isCurrentUser) {
+      return baseStyle + "bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 shadow-sm";
+    }
+
     switch (rank) {
       case 1:
-        return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white';
+        return baseStyle + "bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400 shadow-sm";
       case 2:
-        return 'bg-gradient-to-r from-gray-300 to-gray-500 text-white';
+        return baseStyle + "bg-gradient-to-r from-gray-50 to-slate-50 border-l-4 border-gray-300 shadow-sm";
       case 3:
-        return 'bg-gradient-to-r from-amber-500 to-amber-700 text-white';
+        return baseStyle + "bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-500 shadow-sm";
       default:
-        return 'bg-white hover:bg-gray-50';
+        return baseStyle + "bg-white hover:bg-gray-50";
     }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return "text-emerald-600 font-bold";
+    if (score >= 80) return "text-blue-600 font-bold";
+    if (score >= 70) return "text-amber-600 font-bold";
+    if (score >= 60) return "text-orange-600 font-bold";
+    return "text-red-600 font-bold";
   };
 
   if (isLoading) {
     return (
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600">Loading leaderboard...</span>
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-100 p-6 ${className}`}>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+          <span className="ml-4 text-gray-600 font-medium">Loading leaderboard...</span>
         </div>
       </div>
     );
@@ -79,42 +93,56 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
 
   if (!leaderboard || leaderboard.scores.length === 0) {
     return (
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
-        <div className="text-center py-8">
-          <Trophy className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">No Leaderboard Yet</h3>
-          <p className="text-gray-500">Be the first to take this quiz and claim the top spot!</p>
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-100 p-6 ${className}`}>
+        <div className="text-center py-12">
+          <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <Trophy className="h-10 w-10 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-700 mb-3">No Leaderboard Yet</h3>
+          <p className="text-gray-500 max-w-sm mx-auto">Be the first to take this quiz and claim the top spot! 🏆</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
+    <div className={`bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-6 text-white">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Trophy className="h-6 w-6 text-yellow-500" />
-            <h3 className="text-lg font-semibold text-gray-900">Top 20 Leaderboard</h3>
+          <div className="flex items-center space-x-3">
+            <div className="bg-white/20 rounded-lg p-2">
+              <Trophy className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">Top 20 Leaderboard</h3>
+              <p className="text-blue-100 text-sm">Real-time rankings</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <div className="flex items-center space-x-2 text-blue-100">
             <Clock className="h-4 w-4" />
-            <span>Updated {leaderboard.lastUpdated && !isNaN(leaderboard.lastUpdated.getTime()) ? leaderboard.lastUpdated.toLocaleTimeString() : 'Unknown'}</span>
+            <span className="text-sm">
+              Updated {leaderboard.lastUpdated && !isNaN(leaderboard.lastUpdated.getTime()) ? leaderboard.lastUpdated.toLocaleTimeString() : 'Unknown'}
+            </span>
           </div>
         </div>
         
         {/* User's current position */}
         {userRank && userScore !== undefined && (
-          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="mt-4 p-4 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-blue-700">Your Position:</span>
-                <span className="text-lg font-bold text-blue-800">#{userRank}</span>
+              <div className="flex items-center space-x-3">
+                <div className="bg-white/20 rounded-full p-2">
+                  <Star className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <span className="text-sm text-blue-100">Your Position</span>
+                  <div className="text-2xl font-bold">#{userRank}</div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-blue-600">Score:</span>
-                <span className="text-lg font-bold text-blue-800">{userScore}%</span>
+              <div className="text-right">
+                <span className="text-sm text-blue-100">Your Score</span>
+                <div className={`text-2xl font-bold ${getScoreColor(userScore)}`}>{userScore}%</div>
               </div>
             </div>
           </div>
@@ -123,30 +151,33 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
 
       {/* Leaderboard List */}
       <div className="divide-y divide-gray-100">
-        {leaderboard.scores.map((entry) => (
+        {leaderboard.scores.map((entry, index) => (
           <div
             key={`${entry.userId}-${entry.timestamp && !isNaN(entry.timestamp.getTime()) ? entry.timestamp.getTime() : Date.now()}`}
-            className={`px-6 py-4 transition-colors duration-200 ${getRankColor(entry.rank)} ${
-              entry.userId === user?.id ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
-            }`}
+            className={getRankStyle(entry.rank, entry.userId === user?.id)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="flex items-center justify-center w-8 h-8">
+                <div className="flex items-center justify-center w-10 h-10">
                   {getRankIcon(entry.rank)}
                 </div>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-medium text-gray-900">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3">
+                    <span className="font-semibold text-gray-900 text-lg">
                       {entry.userName}
                     </span>
                     {entry.userId === user?.id && (
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                        You
+                      <span className="px-3 py-1 text-xs font-bold bg-blue-100 text-blue-700 rounded-full border border-blue-200">
+                        YOU
+                      </span>
+                    )}
+                    {entry.rank <= 3 && (
+                      <span className="px-2 py-1 text-xs font-bold bg-yellow-100 text-yellow-700 rounded-full">
+                        TOP {entry.rank}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
                     <span>Completed {entry.timestamp && !isNaN(entry.timestamp.getTime()) ? entry.timestamp.toLocaleDateString() : 'Unknown'}</span>
                     <span>•</span>
                     <span>{entry.timestamp && !isNaN(entry.timestamp.getTime()) ? entry.timestamp.toLocaleTimeString() : 'Unknown'}</span>
@@ -154,9 +185,16 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2">
-                <TrendingUp className="h-4 w-4 text-green-500" />
-                <span className="text-lg font-bold text-gray-900">{entry.score}%</span>
+              <div className="flex items-center space-x-3">
+                <div className="text-right">
+                  <div className={`text-2xl font-bold ${getScoreColor(entry.score)}`}>
+                    {entry.score}%
+                  </div>
+                  <div className="text-xs text-gray-400 font-medium">
+                    Score
+                  </div>
+                </div>
+                <TrendingUp className="h-5 w-5 text-green-500" />
               </div>
             </div>
           </div>
@@ -164,10 +202,13 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-t border-gray-200">
         <div className="flex items-center justify-between text-sm text-gray-600">
-          <span>Showing top {leaderboard.scores.length} scores</span>
-          <span>Real-time updates enabled</span>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="font-medium">Live Updates</span>
+          </div>
+          <span className="font-medium">Showing top {leaderboard.scores.length} scores</span>
         </div>
       </div>
     </div>
