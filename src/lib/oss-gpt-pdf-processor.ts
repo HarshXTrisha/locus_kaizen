@@ -10,7 +10,7 @@ import { GeminiService } from './gemini-service';
 export interface QuestAIQuestion {
   question: string;
   options: string[];
-  correctAnswer: number; // 0-based index (0, 1, 2, 3)
+  correctAnswer: number; // 0-based index (0, 1, 2, 3) for test portal compatibility
   explanation?: string;
 }
 
@@ -133,7 +133,7 @@ export class OSSGPTPDFProcessor {
       quiz.questions = quiz.questions.map((q: any, index: number) => ({
         question: q.question || q.text || `Question ${index + 1}`,
         options: q.options || ['Option A', 'Option B', 'Option C', 'Option D'],
-        correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+        correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0, // Ensure it's 0-based
         explanation: q.explanation || undefined
       }));
       
@@ -393,7 +393,7 @@ JSON:`;
      quiz.questions = quiz.questions.map((q: any, index: number) => ({
        question: q.question || q.text || `Question ${index + 1}`,
        options: q.options || ['Option A', 'Option B', 'Option C', 'Option D'],
-       correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0, // Ensure it's a number
+       correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0, // Ensure it's 0-based
        explanation: q.explanation || undefined
      }));
 
@@ -428,67 +428,161 @@ JSON:`;
 
        if (typeof question.correctAnswer !== 'number' || question.correctAnswer < 0 || question.correctAnswer > 3) {
          warnings.push(`Question ${index + 1}: Invalid correctAnswer index`);
-         question.correctAnswer = 0; // Default to first option
+         question.correctAnswer = 0; // Default to first option (0-based)
        }
      });
 
      return quiz;
   }
 
-     /**
+  /**
     * Fallback processing if OSS GPT fails
     */
-   private static async fallbackProcessing(
-     text: string, 
-     fileName: string, 
-     options: any
-   ): Promise<{ quiz: QuestAIQuiz; metadata: ProcessingMetadata }> {
+  private static async fallbackProcessing(
+    text: string, 
+    fileName: string, 
+    options: any
+  ): Promise<{ quiz: QuestAIQuiz; metadata: ProcessingMetadata }> {
     console.log('🔄 Using fallback processing...');
     
-         // Use basic pattern matching as fallback
-     const basicQuestions = this.extractBasicQuestions(text);
-     
-     const quiz: QuestAIQuiz = {
-       title: fileName.replace('.pdf', '').replace(/[-_]/g, ' '),
-       description: 'Quiz extracted using fallback processing',
-       questions: basicQuestions.slice(0, options.questionCount || 10)
-     };
+    // Use enhanced pattern matching as fallback
+    const basicQuestions = this.extractBasicQuestions(text);
+    
+    // If no questions extracted, create questions from content
+    let questions = basicQuestions;
+    if (questions.length === 0) {
+      questions = this.generateQuestionsFromContent(text, options.questionCount || 10);
+    }
+    
+    const quiz: QuestAIQuiz = {
+      title: fileName.replace('.pdf', '').replace(/[-_]/g, ' '),
+      description: 'Quiz extracted using enhanced fallback processing',
+      questions: questions.slice(0, options.questionCount || 10)
+    };
 
-     const metadata: ProcessingMetadata = {
-       sourceType: 'pdf',
-       processingMethod: 'fallback-pattern-matching',
-       confidence: 60,
-       warnings: ['Used fallback processing due to AI service unavailability'],
-       originalFileName: fileName,
-       processingDate: new Date().toISOString()
-     };
+    const metadata: ProcessingMetadata = {
+      sourceType: 'pdf',
+      processingMethod: 'fallback-pattern-matching',
+      confidence: 60,
+      warnings: ['Used fallback processing due to AI service unavailability'],
+      originalFileName: fileName,
+      processingDate: new Date().toISOString()
+    };
 
-     return { quiz, metadata };
+    return { quiz, metadata };
   }
 
-     /**
+  /**
+    * Generate questions from content when no structured questions are found
+    */
+  private static generateQuestionsFromContent(text: string, questionCount: number): QuestAIQuestion[] {
+    const questions: QuestAIQuestion[] = [];
+    
+    // Extract key terms and concepts from the text
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    const keyTerms = this.extractKeyTerms(text);
+    
+    // Generate questions based on content
+    for (let i = 0; i < Math.min(questionCount, sentences.length); i++) {
+      const sentence = sentences[i].trim();
+      if (sentence.length < 30) continue;
+      
+      // Create a question from the sentence
+      const question = this.createQuestionFromSentence(sentence, keyTerms, i);
+      if (question) {
+        questions.push(question);
+      }
+    }
+    
+    return questions;
+  }
+
+  /**
+    * Extract key terms from text
+    */
+  private static extractKeyTerms(text: string): string[] {
+    const words = text.toLowerCase().match(/\b\w{4,}\b/g) || [];
+    const wordCount: { [key: string]: number } = {};
+    
+    words.forEach(word => {
+      if (word.length > 3) {
+        wordCount[word] = (wordCount[word] || 0) + 1;
+      }
+    });
+    
+    return Object.entries(wordCount)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 20)
+      .map(([word]) => word);
+  }
+
+  /**
+    * Create a question from a sentence
+    */
+  private static createQuestionFromSentence(sentence: string, keyTerms: string[], index: number): QuestAIQuestion | null {
+    // Simple question generation logic
+    const words = sentence.split(' ');
+    if (words.length < 5) return null;
+    
+    // Create a basic question
+    const questionText = `What is the main topic discussed in: "${sentence.substring(0, 100)}..."?`;
+    
+    // Generate options based on key terms
+    const options = [
+      keyTerms[0] || 'Topic A',
+      keyTerms[1] || 'Topic B', 
+      keyTerms[2] || 'Topic C',
+      keyTerms[3] || 'Topic D'
+    ];
+    
+    // Ensure unique options
+    const uniqueOptions = [...new Set(options)].slice(0, 4);
+    while (uniqueOptions.length < 4) {
+      uniqueOptions.push(`Option ${String.fromCharCode(65 + uniqueOptions.length)}`);
+    }
+    
+    return {
+      question: questionText,
+      options: uniqueOptions,
+      correctAnswer: 0 // Default to first option
+    };
+  }
+
+  /**
     * Enhanced pattern-based question extraction (fallback)
     */
   private static extractBasicQuestions(text: string): QuestAIQuestion[] {
     const questions: QuestAIQuestion[] = [];
     
-    // First try to split by question numbers
-    let questionBlocks = text.split(/\d+\./).filter(block => block.trim().length > 0);
+    // Try multiple parsing strategies
+    let questionBlocks: string[] = [];
     
-    // If no question numbers found, try splitting by "Answer:" patterns
+    // Strategy 1: Split by question numbers (1., 2., etc.)
+    questionBlocks = text.split(/\d+\./).filter(block => block.trim().length > 20);
+    
+    // Strategy 2: If no question numbers, try splitting by "Q1.", "Q2.", etc.
     if (questionBlocks.length <= 1) {
-      questionBlocks = text.split(/Answer:\s*[A-D]\)/i).filter(block => block.trim().length > 0);
+      questionBlocks = text.split(/Q\d+\./i).filter(block => block.trim().length > 20);
     }
     
-    for (let i = 0; i < questionBlocks.length; i++) {
+    // Strategy 3: If still no questions, try splitting by "Question" followed by number
+    if (questionBlocks.length <= 1) {
+      questionBlocks = text.split(/Question\s+\d+/i).filter(block => block.trim().length > 20);
+    }
+    
+    // Strategy 4: If no structured questions found, create questions from content chunks
+    if (questionBlocks.length <= 1) {
+      questionBlocks = this.createQuestionsFromContent(text);
+    }
+    
+    console.log(`📝 Found ${questionBlocks.length} potential question blocks`);
+    
+    for (let i = 0; i < questionBlocks.length && questions.length < 20; i++) {
       const block = questionBlocks[i].trim();
-      
-      // Skip if block is too short
-      if (block.length < 20) continue;
       
       try {
         const question = this.parseQuestionBlock(block);
-        if (question) {
+        if (question && question.question.length > 10) {
           questions.push(question);
         }
       } catch (error) {
@@ -497,6 +591,26 @@ JSON:`;
     }
     
     return questions;
+  }
+
+  /**
+    * Create questions from content chunks when no structured questions are found
+    */
+  private static createQuestionsFromContent(text: string): string[] {
+    const chunks: string[] = [];
+    
+    // Split text into sentences
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    
+    // Group sentences into chunks
+    for (let i = 0; i < sentences.length; i += 3) {
+      const chunk = sentences.slice(i, i + 3).join('. ').trim();
+      if (chunk.length > 30) {
+        chunks.push(chunk);
+      }
+    }
+    
+    return chunks;
   }
 
   /**
@@ -516,7 +630,7 @@ JSON:`;
     const validOptions = this.ensureValidOptions(options);
     
     // Validate correct answer index
-    const validCorrectAnswer = correctAnswer < validOptions.length ? correctAnswer : 0;
+    const validCorrectAnswer = correctAnswer >= 0 && correctAnswer <= validOptions.length - 1 ? correctAnswer : 0;
     
     return {
       question: questionText,
@@ -530,13 +644,20 @@ JSON:`;
     */
   private static extractOptionsAndAnswer(block: string): { options: string[], correctAnswer: number } {
     const options: string[] = [];
-    let correctAnswer = 0;
+    let correctAnswer = 0; // Default to first option (0-based)
     
     // Look for answer pattern first: Answer: [A-D]
     const answerMatch = block.match(/Answer:\s*([A-D])/i);
     if (answerMatch) {
       const answerLetter = answerMatch[1].toUpperCase();
-      correctAnswer = answerLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+      correctAnswer = answerLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3 (0-based)
+    }
+    
+    // Look for answer pattern with checkmark: [A-D] ✓
+    const checkmarkMatch = block.match(/([A-D])\s*[✓✔]/i);
+    if (checkmarkMatch) {
+      const answerLetter = checkmarkMatch[1].toUpperCase();
+      correctAnswer = answerLetter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3 (0-based)
     }
     
     // Simple approach: split by option letters and extract content
@@ -560,6 +681,14 @@ JSON:`;
         if (optionText.length > 0) {
           options.push(optionText);
         }
+      }
+    }
+    
+    // If still no options found, try inline parsing
+    if (options.length === 0) {
+      const inlineOptions = this.parseInlineOptions(block);
+      if (inlineOptions.length > 0) {
+        options.push(...inlineOptions);
       }
     }
     
