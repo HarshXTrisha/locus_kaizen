@@ -406,12 +406,14 @@ export async function saveQuizResult(result: Omit<QuizResult, 'id'>, userName?: 
         });
         await updateLeaderboard(result.quizId, result.userId, displayName, result.score);
         console.log('✅ Leaderboard updated for iimb-bba-dbe quiz');
-      } catch (leaderboardError) {
-        console.error('❌ Error updating leaderboard:', leaderboardError);
-        console.error('❌ Error details:', leaderboardError.message);
-        console.error('❌ Error stack:', leaderboardError.stack);
-        // Don't throw error here, as the result is already saved
-      }
+             } catch (leaderboardError) {
+         console.error('❌ Error updating leaderboard:', leaderboardError);
+         if (leaderboardError instanceof Error) {
+           console.error('❌ Error details:', leaderboardError.message);
+           console.error('❌ Error stack:', leaderboardError.stack);
+         }
+         // Don't throw error here, as the result is already saved
+       }
     } else {
       console.log('❌ Not an IIMB-BBA-DBE quiz, skipping leaderboard update');
       console.log('❌ Expected source: "iimb-bba-dbe", got:', result.source);
