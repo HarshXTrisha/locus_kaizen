@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, Users, Trophy, Play, Settings, BarChart3, Clock, Target, Link as LinkIcon, Copy, Plus, CheckCircle, Upload, FileText } from 'lucide-react';
+import { Calendar, Users, Trophy, Play, Settings, BarChart3, Clock, Target, Link as LinkIcon, Copy, Plus, CheckCircle, Upload, FileText, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
-import { createQuiz, getUserQuizzesWithControls, getUserQuizResults, getUserTakenQuizzes } from '@/lib/firebase-quiz';
+import { createQuiz, getUserQuizzesWithControls, getUserQuizResults, getUserTakenQuizzes, deleteQuiz, deleteQuizResult } from '@/lib/firebase-quiz';
 import { useAppStore } from '@/lib/store';
 import { FileUploadArea } from '@/components/upload/FileUploadArea';
 import { PDFUploadArea } from '@/components/upload/PDFUploadArea';
@@ -196,6 +196,102 @@ export default function IIMBBBADBEPage() {
     } catch (e) {
       setCopyStatus('Copy failed');
       setTimeout(() => setCopyStatus(''), 1500);
+    }
+  };
+
+  // Delete quiz function
+  const handleDeleteQuiz = async (quizId: string) => {
+    if (!user?.id) {
+      showError('Authentication Required', 'Please sign in to delete quizzes.');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await deleteQuiz(quizId);
+      showSuccess('Quiz Deleted', 'Quiz deleted successfully!');
+      
+      // Reload portal data
+      const [userQuizzes, userTakenQuizzes, userResults] = await Promise.all([
+        getUserQuizzesWithControls(user.id),
+        getUserTakenQuizzes(user.id),
+        getUserQuizResults(user.id)
+      ]);
+
+      // Filter for IIMB portal data
+      const iimbQuizzes = userQuizzes.filter(quiz => quiz.source === 'iimb-bba-dbe');
+      const iimbTakenQuizzes = userTakenQuizzes.filter(quiz => quiz.source === 'iimb-bba-dbe');
+      const iimbResults = userResults.filter(result => result.source === 'iimb-bba-dbe');
+
+      setQuizzes(iimbQuizzes);
+      setTakenQuizzes(iimbTakenQuizzes);
+      setResults(iimbResults);
+
+      // Update stats
+      const averageScore = iimbResults.length > 0 
+        ? Math.round(iimbResults.reduce((sum, result) => sum + result.score, 0) / iimbResults.length)
+        : 0;
+
+      setStats({
+        totalQuizzes: iimbQuizzes.length + iimbTakenQuizzes.length,
+        totalResults: iimbResults.length,
+        averageScore
+      });
+      
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
+      showError('Delete Failed', 'Failed to delete quiz. Please try again.');
+    }
+  };
+
+  // Delete result function
+  const handleDeleteResult = async (resultId: string) => {
+    if (!user?.id) {
+      showError('Authentication Required', 'Please sign in to delete results.');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this result? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await deleteQuizResult(resultId);
+      showSuccess('Result Deleted', 'Result deleted successfully!');
+      
+      // Reload portal data
+      const [userQuizzes, userTakenQuizzes, userResults] = await Promise.all([
+        getUserQuizzesWithControls(user.id),
+        getUserTakenQuizzes(user.id),
+        getUserQuizResults(user.id)
+      ]);
+
+      // Filter for IIMB portal data
+      const iimbQuizzes = userQuizzes.filter(quiz => quiz.source === 'iimb-bba-dbe');
+      const iimbTakenQuizzes = userTakenQuizzes.filter(quiz => quiz.source === 'iimb-bba-dbe');
+      const iimbResults = userResults.filter(result => result.source === 'iimb-bba-dbe');
+
+      setQuizzes(iimbQuizzes);
+      setTakenQuizzes(iimbTakenQuizzes);
+      setResults(iimbResults);
+
+      // Update stats
+      const averageScore = iimbResults.length > 0 
+        ? Math.round(iimbResults.reduce((sum, result) => sum + result.score, 0) / iimbResults.length)
+        : 0;
+
+      setStats({
+        totalQuizzes: iimbQuizzes.length + iimbTakenQuizzes.length,
+        totalResults: iimbResults.length,
+        averageScore
+      });
+      
+    } catch (error) {
+      console.error('Error deleting result:', error);
+      showError('Delete Failed', 'Failed to delete result. Please try again.');
     }
   };
 
@@ -587,14 +683,21 @@ export default function IIMBBBADBEPage() {
                         <span>{quiz.questions?.length || 0} questions</span>
                         <span>{quiz.timeLimit} min</span>
                       </div>
-                      <div className="flex space-x-2">
-                        <Link
-                          href={`/quiz/${quiz.id}`}
-                          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm"
-                        >
-                          Take Quiz
-                        </Link>
-                      </div>
+                                             <div className="flex space-x-2">
+                         <Link
+                           href={`/quiz/${quiz.id}`}
+                           className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm"
+                         >
+                           Take Quiz
+                         </Link>
+                         <button
+                           onClick={() => handleDeleteQuiz(quiz.id)}
+                           className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                           title="Delete Quiz"
+                         >
+                           <Trash2 className="h-4 w-4" />
+                         </button>
+                       </div>
                     </div>
                   ))}
                 </div>
@@ -681,21 +784,28 @@ export default function IIMBBBADBEPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        result.score >= 80 ? 'bg-green-100 text-green-800' :
-                        result.score >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {result.score}%
-                      </span>
-                      <Link
-                        href={`/results/${result.id}`}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                      >
-                        View Details
-                      </Link>
-                    </div>
+                                         <div className="flex items-center space-x-2">
+                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                         result.score >= 80 ? 'bg-green-100 text-green-800' :
+                         result.score >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                         'bg-red-100 text-red-800'
+                       }`}>
+                         {result.score}%
+                       </span>
+                       <Link
+                         href={`/results/${result.id}`}
+                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                       >
+                         View Details
+                       </Link>
+                       <button
+                         onClick={() => handleDeleteResult(result.id)}
+                         className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                         title="Delete Result"
+                       >
+                         <Trash2 className="h-4 w-4" />
+                       </button>
+                     </div>
                   </div>
                 ))}
               </div>
