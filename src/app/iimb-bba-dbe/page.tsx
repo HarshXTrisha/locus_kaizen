@@ -709,27 +709,55 @@ export default function IIMBBBADBEPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">IIMB-BBA-DBE Leaderboards</h2>
               
-                             {quizzes.length === 0 ? (
-                 <EmptyState
-                   type="analytics"
-                   title="No Leaderboards Available"
-                   description="Create and take quizzes to see leaderboards"
-                   actionLabel="Create Quiz"
-                   onAction={() => setActiveTab('upload')}
-                 />
-              ) : (
-                <div className="space-y-6">
-                  {quizzes.map((quiz) => (
-                    <div key={quiz.id} className="border border-gray-200 rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">{quiz.title}</h3>
-                      <LeaderboardDisplay 
-                        quizId={quiz.id} 
-                        userScore={results.find(r => r.quizId === quiz.id)?.score}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Combine created and taken quizzes, removing duplicates */}
+              {(() => {
+                const allQuizzes = [...quizzes, ...takenQuizzes];
+                const uniqueQuizzes = allQuizzes.filter((quiz, index, self) => 
+                  index === self.findIndex(q => q.id === quiz.id)
+                );
+                
+                if (uniqueQuizzes.length === 0) {
+                  return (
+                    <EmptyState
+                      type="analytics"
+                      title="No Leaderboards Available"
+                      description="Create and take quizzes to see leaderboards"
+                      actionLabel="Create Quiz"
+                      onAction={() => setActiveTab('upload')}
+                    />
+                  );
+                }
+                
+                return (
+                  <div className="space-y-6">
+                    {uniqueQuizzes.map((quiz) => {
+                      const isCreated = quizzes.some(q => q.id === quiz.id);
+                      const isTaken = takenQuizzes.some(q => q.id === quiz.id);
+                      const userScore = results.find(r => r.quizId === quiz.id)?.score;
+                      
+                      return (
+                        <div key={quiz.id} className="border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">{quiz.title}</h3>
+                            <div className="flex items-center space-x-2">
+                              {isCreated && (
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Created</span>
+                              )}
+                              {isTaken && (
+                                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Taken</span>
+                              )}
+                            </div>
+                          </div>
+                          <LeaderboardDisplay 
+                            quizId={quiz.id} 
+                            userScore={userScore}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
