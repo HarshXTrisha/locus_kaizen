@@ -606,7 +606,7 @@ export default function IIMBBBADBEPage() {
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <Play className="h-5 w-5 mr-2 text-green-600" />
-                  Quizzes I've Taken ({takenQuizzes.length})
+                  Quizzes I&apos;ve Taken ({takenQuizzes.length})
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {takenQuizzes.map((quiz) => (
