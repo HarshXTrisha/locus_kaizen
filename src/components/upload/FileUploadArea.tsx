@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Upload, FileJson, X, CheckCircle, AlertCircle, Download, Plus, FileText } from 'lucide-react';
+import { Upload, FileJson, X, CheckCircle, AlertCircle, Download, Plus, FileText, Clipboard } from 'lucide-react';
 import { ExtractedQuestion } from '@/lib/pdf-processor';
 import { showSuccess, showError } from '@/components/common/NotificationSystem';
 
@@ -38,6 +38,8 @@ export function FileUploadArea({
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [processingStatus, setProcessingStatus] = useState<string>('');
+  const [activeMode, setActiveMode] = useState<'upload' | 'paste'>('upload');
+  const [pastedContent, setPastedContent] = useState<string>('');
 
   const downloadJSONTemplate = () => {
     const template = {
@@ -489,9 +491,197 @@ Correct Answer: C`;
     }
   }, [handleFileProcess, fileType]);
 
+  const processPastedContent = async (content: string): Promise<ExtractedQuestion[]> => {
+    try {
+      if (!content.trim()) {
+        throw new Error('Please paste some content to process.');
+      }
+
+      // Check content length (limit to 1MB equivalent)
+      const maxLength = 1024 * 1024; // 1MB
+      if (content.length > maxLength) {
+        throw new Error('Content too large. Maximum size is 1MB equivalent.');
+      }
+
+      if (fileType === 'json') {
+        // Process as JSON
+        const quizData: QuizJSON = JSON.parse(content);
+        
+        if (!quizData.questions || !Array.isArray(quizData.questions)) {
+          throw new Error('Invalid JSON format: questions array is required');
+        }
+
+        // Limit number of questions to prevent performance issues
+        const maxQuestions = 500;
+        if (quizData.questions.length > maxQuestions) {
+          throw new Error(`Too many questions. Maximum allowed is ${maxQuestions} questions. Your content contains ${quizData.questions.length} questions.`);
+        }
+
+        // Validate each question to prevent malformed data
+        const validatedQuestions = quizData.questions.map((q, index) => {
+          if (!q.text || typeof q.text !== 'string') {
+            throw new Error(`Question ${index + 1}: Missing or invalid question text`);
+          }
+          if (!q.type || !['multiple-choice', 'true-false', 'short-answer'].includes(q.type)) {
+            throw new Error(`Question ${index + 1}: Invalid question type. Must be 'multiple-choice', 'true-false', or 'short-answer'`);
+          }
+          if (!q.correctAnswer || typeof q.correctAnswer !== 'string') {
+            throw new Error(`Question ${index + 1}: Missing or invalid correct answer`);
+          }
+
+          // Type-specific validation
+          if (q.type === 'multiple-choice') {
+            if (!q.options || !Array.isArray(q.options) || q.options.length < 2) {
+              throw new Error(`Question ${index + 1}: Multiple-choice questions must have at least 2 options`);
+            }
+            // Validate that correct answer is one of the options
+            if (!q.options.includes(q.correctAnswer)) {
+              throw new Error(`Question ${index + 1}: Correct answer must be one of the provided options`);
+            }
+          } else if (q.type === 'true-false') {
+            // For true-false, ensure correct answer is either "True" or "False"
+            if (!['True', 'False'].includes(q.correctAnswer)) {
+              throw new Error(`Question ${index + 1}: True/False questions must have correctAnswer as "True" or "False"`);
+            }
+            // Set default options for true-false if not provided
+            if (!q.options || !Array.isArray(q.options)) {
+              q.options = ['True', 'False'];
+            }
+          } else if (q.type === 'short-answer') {
+            // For short answer, no options are needed, just ensure correct answer exists
+            if (!q.correctAnswer.trim()) {
+              throw new Error(`Question ${index + 1}: Short answer questions must have a correct answer`);
+            }
+          }
+
+          return {
+            id: q.id || `q${index + 1}`,
+            text: q.text.trim(),
+            type: q.type,
+            options: q.type === 'short-answer' ? undefined : (q.options ? q.options.map(opt => opt.trim()) : undefined),
+            correctAnswer: q.correctAnswer.trim(),
+            points: q.points && q.points > 0 ? q.points : 1
+          };
+        });
+
+        return validatedQuestions;
+      } else if (fileType === 'txt') {
+        // Process as TXT
+        const lines = content.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        
+        const questions: ExtractedQuestion[] = [];
+        let currentQuestion: any = null;
+        let questionNumber = 1;
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          
+          // Check if this is a question line (starts with Q followed by number)
+          if (line.match(/^Q\d+\./)) {
+            // Save previous question if exists
+            if (currentQuestion && currentQuestion.text) {
+              questions.push(currentQuestion);
+            }
+            
+            // Start new question
+            const questionText = line.replace(/^Q\d+\.\s*/, '').trim();
+            currentQuestion = {
+              id: `q${questionNumber}`,
+              text: questionText,
+              type: 'multiple-choice' as const,
+              options: [],
+              correctAnswer: '',
+              points: 1
+            };
+            questionNumber++;
+          }
+          // Check if this is an option line (starts with A), B), C), D), etc.)
+          else if (line.match(/^[A-Z]\)/)) {
+            if (currentQuestion) {
+              const option = line.replace(/^[A-Z]\)\s*/, '').trim();
+              currentQuestion.options!.push(option);
+            }
+          }
+          // Check if this is a correct answer line
+          else if (line.toLowerCase().includes('correct answer:')) {
+            if (currentQuestion) {
+              const answer = line.replace(/correct answer:\s*/i, '').trim();
+              currentQuestion.correctAnswer = answer;
+              
+              // If no options were found, this might be a short answer question
+              if (currentQuestion.options!.length === 0) {
+                currentQuestion.type = 'short-answer';
+                delete currentQuestion.options;
+              }
+              // If only True/False options, mark as true-false
+              else if (currentQuestion.options!.length === 2 && 
+                       currentQuestion.options!.every((opt: string) => ['True', 'False'].includes(opt))) {
+                currentQuestion.type = 'true-false';
+              }
+            }
+          }
+          // If it's just text without special formatting, it might be a short answer question
+          else if (currentQuestion && !currentQuestion.correctAnswer && !line.match(/^[A-Z]\)/)) {
+            currentQuestion.text += ' ' + line;
+          }
+        }
+
+        // Add the last question if exists
+        if (currentQuestion && currentQuestion.text) {
+          questions.push(currentQuestion);
+        }
+
+        // Validate questions
+        if (questions.length === 0) {
+          throw new Error('No valid questions found in the pasted content. Please check the format.');
+        }
+
+        // Limit number of questions
+        const maxQuestions = 500;
+        if (questions.length > maxQuestions) {
+          throw new Error(`Too many questions. Maximum allowed is ${maxQuestions} questions. Your content contains ${questions.length} questions.`);
+        }
+
+        return questions;
+      } else {
+        throw new Error(`Unsupported content type: ${fileType}`);
+      }
+    } catch (error) {
+      throw new Error(`${fileType.toUpperCase()} parsing error: ${error instanceof Error ? error.message : 'Invalid format'}`);
+    }
+  };
+
+  const handlePasteProcess = async () => {
+    if (!pastedContent.trim()) {
+      showError('No Content', 'Please paste some content to process.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setProcessingStatus('Processing pasted content...');
+    onUploadStart?.();
+
+    try {
+      const questions = await processPastedContent(pastedContent);
+      
+      setProcessingStatus(`✅ Successfully processed pasted content with ${questions.length} questions`);
+      onQuestionsExtracted(questions);
+      showSuccess('Content Processed', `Successfully extracted ${questions.length} questions from pasted content`);
+    } catch (error) {
+      console.error('Error processing pasted content:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process pasted content';
+      setProcessingStatus(`❌ ${errorMessage}`);
+      showError('Processing Failed', errorMessage);
+    } finally {
+      setIsProcessing(false);
+      onUploadComplete?.();
+    }
+  };
+
   const clearUpload = () => {
     setUploadedFiles([]);
     setProcessingStatus('');
+    setPastedContent('');
     onQuestionsExtracted([]);
   };
 
@@ -500,67 +690,176 @@ Correct Answer: C`;
 
   return (
     <div className="space-y-6">
-      {/* Upload Area */}
-      <div
-        className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          isDragOver
-            ? 'border-[#20C997] bg-[#20C997]/5'
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-      >
-        <input
-          type="file"
-          accept={accept}
-          multiple
-          onChange={handleFileSelect}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-        
-        <div className="space-y-4">
-          <div className="p-3 bg-[#20C997]/10 rounded-full w-fit mx-auto">
-            {isJSON ? (
-              <FileJson className="h-8 w-8 text-[#20C997]" />
-            ) : (
-              <FileText className="h-8 w-8 text-[#20C997]" />
-            )}
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Upload {fileType.toUpperCase()} Quiz Files
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Drag and drop {fileType.toUpperCase()} files here, or click to browse. You can upload multiple files at once.
-            </p>
-            
-            {/* MCQ Only Notice */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-              <div className="flex items-center gap-2 text-yellow-800">
-                <AlertCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">Important: Test Portal Only Supports MCQ</span>
-              </div>
-              <p className="text-yellow-700 text-xs mt-1">
-                Only Multiple Choice Questions (MCQ) are supported in the test portal. True/False and Short Answer questions will not work properly.
-              </p>
+      {/* Mode Selection Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex gap-6">
+          <button
+            onClick={() => setActiveMode('upload')}
+            className={`shrink-0 border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
+              activeMode === 'upload'
+                ? 'border-[#20C997] text-[#20C997]'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Upload className="h-4 w-4" />
+              Upload Files
             </div>
-            
-            {/* Supported Format */}
-            <div className="flex justify-center gap-6 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                {isJSON ? (
-                  <FileJson className="h-4 w-4 text-blue-500" />
-                ) : (
-                  <FileText className="h-4 w-4 text-green-500" />
-                )}
-                <span>{fileType.toUpperCase()} Quiz Files (Multiple files supported)</span>
+          </button>
+          <button
+            onClick={() => setActiveMode('paste')}
+            className={`shrink-0 border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
+              activeMode === 'paste'
+                ? 'border-[#20C997] text-[#20C997]'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Clipboard className="h-4 w-4" />
+              Paste Content
+            </div>
+          </button>
+        </nav>
+      </div>
+
+      {/* Upload Mode */}
+      {activeMode === 'upload' && (
+        <div
+          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            isDragOver
+              ? 'border-[#20C997] bg-[#20C997]/5'
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
+          <input
+            type="file"
+            accept={accept}
+            multiple
+            onChange={handleFileSelect}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
+          
+          <div className="space-y-4">
+            <div className="p-3 bg-[#20C997]/10 rounded-full w-fit mx-auto">
+              {isJSON ? (
+                <FileJson className="h-8 w-8 text-[#20C997]" />
+              ) : (
+                <FileText className="h-8 w-8 text-[#20C997]" />
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Upload {fileType.toUpperCase()} Quiz Files
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Drag and drop {fileType.toUpperCase()} files here, or click to browse. You can upload multiple files at once.
+              </p>
+              
+              {/* MCQ Only Notice */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <div className="flex items-center gap-2 text-yellow-800">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">Important: Test Portal Only Supports MCQ</span>
+                </div>
+                <p className="text-yellow-700 text-xs mt-1">
+                  Only Multiple Choice Questions (MCQ) are supported in the test portal. True/False and Short Answer questions will not work properly.
+                </p>
+              </div>
+              
+              {/* Supported Format */}
+              <div className="flex justify-center gap-6 text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  {isJSON ? (
+                    <FileJson className="h-4 w-4 text-blue-500" />
+                  ) : (
+                    <FileText className="h-4 w-4 text-green-500" />
+                  )}
+                  <span>{fileType.toUpperCase()} Quiz Files (Multiple files supported)</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Paste Mode */}
+      {activeMode === 'paste' && (
+        <div className="space-y-4">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+            <div className="space-y-4">
+              <div className="p-3 bg-[#20C997]/10 rounded-full w-fit mx-auto">
+                <Clipboard className="h-8 w-8 text-[#20C997]" />
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Paste {fileType.toUpperCase()} Content
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Directly paste your {fileType.toUpperCase()} quiz content below. No file upload needed.
+                </p>
+                
+                {/* MCQ Only Notice */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                  <div className="flex items-center gap-2 text-yellow-800">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="text-sm font-medium">Important: Test Portal Only Supports MCQ</span>
+                  </div>
+                  <p className="text-yellow-700 text-xs mt-1">
+                    Only Multiple Choice Questions (MCQ) are supported in the test portal. True/False and Short Answer questions will not work properly.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Textarea for pasted content */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Paste your {fileType.toUpperCase()} content here:
+            </label>
+            <textarea
+              value={pastedContent}
+              onChange={(e) => setPastedContent(e.target.value)}
+              placeholder={isJSON ? 
+                'Paste your JSON quiz content here...\n\nExample:\n{\n  "title": "Sample Quiz",\n  "questions": [\n    {\n      "text": "What is the capital of France?",\n      "type": "multiple-choice",\n      "options": ["London", "Berlin", "Paris", "Madrid"],\n      "correctAnswer": "Paris"\n    }\n  ]\n}' :
+                'Paste your TXT quiz content here...\n\nExample:\nQ1. What is the capital of France?\nA) London\nB) Berlin\nC) Paris\nD) Madrid\nCorrect Answer: C'
+              }
+              rows={12}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-[#20C997] focus:border-[#20C997] font-mono text-sm resize-y"
+            />
+            
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-500">
+                {pastedContent.length > 0 && (
+                  <span>Content length: {pastedContent.length} characters</span>
+                )}
+              </div>
+              <button
+                onClick={handlePasteProcess}
+                disabled={isProcessing || !pastedContent.trim()}
+                className="flex items-center gap-2 px-6 py-2 bg-[#20C997] text-white rounded-lg hover:bg-[#1BA085] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Clipboard className="h-4 w-4" />
+                    Process Content
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Format Instructions */}
       <div className={`border rounded-lg p-6 ${isJSON ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}>
@@ -624,11 +923,13 @@ Correct Answer: C`;
         </div>
       )}
 
-      {/* Uploaded Files Display */}
-      {uploadedFiles.length > 0 && !isProcessing && (
+      {/* Results Display */}
+      {((uploadedFiles.length > 0 || pastedContent.trim()) && !isProcessing) && (
         <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
           <div className="flex items-center justify-between mb-3">
-            <h5 className="font-medium text-gray-900">Uploaded Files ({uploadedFiles.length})</h5>
+            <h5 className="font-medium text-gray-900">
+              {activeMode === 'upload' ? `Uploaded Files (${uploadedFiles.length})` : 'Pasted Content'}
+            </h5>
             <button
               onClick={clearUpload}
               className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
@@ -637,19 +938,34 @@ Correct Answer: C`;
             </button>
           </div>
               
-          <div className="space-y-2">
-            {uploadedFiles.map((file, index) => (
-              <div key={index} className="flex items-center gap-3 p-2 bg-white rounded border">
-                {isJSON ? (
-                  <FileJson className="h-4 w-4 text-blue-500" />
-                ) : (
-                  <FileText className="h-4 w-4 text-green-500" />
-                )}
-                <span className="text-sm text-gray-900 flex-1">{file.name}</span>
-                <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
+          {activeMode === 'upload' && uploadedFiles.length > 0 && (
+            <div className="space-y-2">
+              {uploadedFiles.map((file, index) => (
+                <div key={index} className="flex items-center gap-3 p-2 bg-white rounded border">
+                  {isJSON ? (
+                    <FileJson className="h-4 w-4 text-blue-500" />
+                  ) : (
+                    <FileText className="h-4 w-4 text-green-500" />
+                  )}
+                  <span className="text-sm text-gray-900 flex-1">{file.name}</span>
+                  <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeMode === 'paste' && pastedContent.trim() && (
+            <div className="p-3 bg-white rounded border">
+              <div className="flex items-center gap-3">
+                <Clipboard className="h-4 w-4 text-[#20C997]" />
+                <span className="text-sm text-gray-900">Pasted Content</span>
+                <span className="text-xs text-gray-500">({pastedContent.length} characters)</span>
               </div>
-            ))}
-          </div>
+              <div className="mt-2 text-xs text-gray-600 font-mono bg-gray-50 p-2 rounded max-h-20 overflow-y-auto">
+                {pastedContent.substring(0, 200)}{pastedContent.length > 200 ? '...' : ''}
+              </div>
+            </div>
+          )}
               
           {processingStatus && (
             <p className={`mt-3 text-sm ${
