@@ -12,6 +12,7 @@ import { FileUploadArea } from '@/components/upload/FileUploadArea';
 import { PDFUploadArea } from '@/components/upload/PDFUploadArea';
 import { getLeaderboard } from '@/lib/leaderboard';
 import { LeaderboardDisplay } from '@/components/common/LeaderboardDisplay';
+import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 
 export default function IIMBBBADBEPage() {
   const { user } = useAppStore();
@@ -56,6 +57,19 @@ export default function IIMBBBADBEPage() {
   // Custom subject state
   const [customSubject, setCustomSubject] = useState('');
   const [showCustomSubjectInput, setShowCustomSubjectInput] = useState(false);
+
+  // Confirmation modal state
+  const [confirmationModal, setConfirmationModal] = useState<{
+    isOpen: boolean;
+    type: 'quiz' | 'result';
+    itemId: string;
+    itemName: string;
+  }>({
+    isOpen: false,
+    type: 'quiz',
+    itemId: '',
+    itemName: ''
+  });
 
   // Load portal data
   useEffect(() => {
@@ -199,14 +213,20 @@ export default function IIMBBBADBEPage() {
     }
   };
 
+  // Show delete quiz confirmation
+  const showDeleteQuizConfirmation = (quizId: string, quizTitle: string) => {
+    setConfirmationModal({
+      isOpen: true,
+      type: 'quiz',
+      itemId: quizId,
+      itemName: quizTitle
+    });
+  };
+
   // Delete quiz function
   const handleDeleteQuiz = async (quizId: string) => {
     if (!user?.id) {
       showError('Authentication Required', 'Please sign in to delete quizzes.');
-      return;
-    }
-
-    if (!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
       return;
     }
 
@@ -247,14 +267,20 @@ export default function IIMBBBADBEPage() {
     }
   };
 
+  // Show delete result confirmation
+  const showDeleteResultConfirmation = (resultId: string, resultScore: number) => {
+    setConfirmationModal({
+      isOpen: true,
+      type: 'result',
+      itemId: resultId,
+      itemName: `Result (${resultScore}%)`
+    });
+  };
+
   // Delete result function
   const handleDeleteResult = async (resultId: string) => {
     if (!user?.id) {
       showError('Authentication Required', 'Please sign in to delete results.');
-      return;
-    }
-
-    if (!confirm('Are you sure you want to delete this result? This action cannot be undone.')) {
       return;
     }
 
@@ -690,13 +716,13 @@ export default function IIMBBBADBEPage() {
                          >
                            Take Quiz
                          </Link>
-                         <button
-                           onClick={() => handleDeleteQuiz(quiz.id)}
-                           className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                           title="Delete Quiz"
-                         >
-                           <Trash2 className="h-4 w-4" />
-                         </button>
+                                                   <button
+                            onClick={() => showDeleteQuizConfirmation(quiz.id, quiz.title)}
+                            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                            title="Delete Quiz"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                        </div>
                     </div>
                   ))}
@@ -798,13 +824,13 @@ export default function IIMBBBADBEPage() {
                        >
                          View Details
                        </Link>
-                       <button
-                         onClick={() => handleDeleteResult(result.id)}
-                         className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                         title="Delete Result"
-                       >
-                         <Trash2 className="h-4 w-4" />
-                       </button>
+                                               <button
+                          onClick={() => showDeleteResultConfirmation(result.id, result.score)}
+                          className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                          title="Delete Result"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                      </div>
                   </div>
                 ))}
@@ -870,8 +896,31 @@ export default function IIMBBBADBEPage() {
               })()}
             </div>
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
+                 )}
+
+        {/* Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={confirmationModal.isOpen}
+          onClose={() => setConfirmationModal(prev => ({ ...prev, isOpen: false }))}
+          onConfirm={() => {
+            if (confirmationModal.type === 'quiz') {
+              handleDeleteQuiz(confirmationModal.itemId);
+            } else {
+              handleDeleteResult(confirmationModal.itemId);
+            }
+          }}
+          title={confirmationModal.type === 'quiz' ? 'Delete Quiz' : 'Delete Result'}
+          message={
+            confirmationModal.type === 'quiz'
+              ? 'Are you sure you want to delete this quiz? This action cannot be undone and will remove all associated data.'
+              : 'Are you sure you want to delete this result? This action cannot be undone.'
+          }
+          confirmText="Delete"
+          cancelText="Cancel"
+          type="danger"
+          itemName={confirmationModal.itemName}
+        />
+       </div>
+     </div>
+   );
+ }

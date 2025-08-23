@@ -100,7 +100,7 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
           </div>
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <Clock className="h-4 w-4" />
-            <span>Updated {leaderboard.lastUpdated?.toLocaleTimeString?.() || 'Unknown'}</span>
+            <span>Updated {leaderboard.lastUpdated && !isNaN(leaderboard.lastUpdated.getTime()) ? leaderboard.lastUpdated.toLocaleTimeString() : 'Unknown'}</span>
           </div>
         </div>
         
@@ -125,7 +125,7 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
       <div className="divide-y divide-gray-100">
         {leaderboard.scores.map((entry) => (
           <div
-            key={`${entry.userId}-${entry.timestamp?.getTime?.() || Date.now()}`}
+            key={`${entry.userId}-${entry.timestamp && !isNaN(entry.timestamp.getTime()) ? entry.timestamp.getTime() : Date.now()}`}
             className={`px-6 py-4 transition-colors duration-200 ${getRankColor(entry.rank)} ${
               entry.userId === user?.id ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
             }`}
@@ -147,9 +147,9 @@ export function LeaderboardDisplay({ quizId, userScore, className = '' }: Leader
                     )}
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <span>Completed {entry.timestamp?.toLocaleDateString?.() || 'Unknown'}</span>
+                    <span>Completed {entry.timestamp && !isNaN(entry.timestamp.getTime()) ? entry.timestamp.toLocaleDateString() : 'Unknown'}</span>
                     <span>•</span>
-                    <span>{entry.timestamp?.toLocaleTimeString?.() || 'Unknown'}</span>
+                    <span>{entry.timestamp && !isNaN(entry.timestamp.getTime()) ? entry.timestamp.toLocaleTimeString() : 'Unknown'}</span>
                   </div>
                 </div>
               </div>

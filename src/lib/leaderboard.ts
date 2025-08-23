@@ -141,13 +141,35 @@ export async function getLeaderboard(quizId: string): Promise<QuizLeaderboard | 
     const data = leaderboardDoc.data() as DatabaseQuizLeaderboard;
     
     // Convert database format to user-facing format
-    const scores: LeaderboardEntry[] = (data.scores || []).map(entry => ({
-      userId: entry.userId,
-      userName: entry.userName,
-      score: entry.score,
-      timestamp: entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp),
-      rank: entry.rank
-    }));
+    const scores: LeaderboardEntry[] = (data.scores || []).map(entry => {
+      let timestamp: Date;
+      
+      // Handle different timestamp formats from Firestore
+      if (entry.timestamp instanceof Date) {
+        timestamp = entry.timestamp;
+      } else if (entry.timestamp && typeof entry.timestamp === 'object' && 'toDate' in entry.timestamp) {
+        // Firestore Timestamp object
+        timestamp = (entry.timestamp as any).toDate();
+      } else if (entry.timestamp && typeof entry.timestamp === 'number') {
+        // Unix timestamp
+        timestamp = new Date(entry.timestamp);
+      } else if (entry.timestamp && typeof entry.timestamp === 'string') {
+        // ISO string
+        timestamp = new Date(entry.timestamp);
+      } else {
+        // Fallback to current date
+        console.warn('Invalid timestamp format for entry:', entry);
+        timestamp = new Date();
+      }
+      
+      return {
+        userId: entry.userId,
+        userName: entry.userName,
+        score: entry.score,
+        timestamp,
+        rank: entry.rank
+      };
+    });
 
     return {
       quizId,
@@ -178,13 +200,35 @@ export function subscribeToLeaderboard(
     const data = doc.data() as DatabaseQuizLeaderboard;
     
     // Convert database format to user-facing format
-    const scores: LeaderboardEntry[] = (data.scores || []).map(entry => ({
-      userId: entry.userId,
-      userName: entry.userName,
-      score: entry.score,
-      timestamp: entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp),
-      rank: entry.rank
-    }));
+    const scores: LeaderboardEntry[] = (data.scores || []).map(entry => {
+      let timestamp: Date;
+      
+      // Handle different timestamp formats from Firestore
+      if (entry.timestamp instanceof Date) {
+        timestamp = entry.timestamp;
+      } else if (entry.timestamp && typeof entry.timestamp === 'object' && 'toDate' in entry.timestamp) {
+        // Firestore Timestamp object
+        timestamp = (entry.timestamp as any).toDate();
+      } else if (entry.timestamp && typeof entry.timestamp === 'number') {
+        // Unix timestamp
+        timestamp = new Date(entry.timestamp);
+      } else if (entry.timestamp && typeof entry.timestamp === 'string') {
+        // ISO string
+        timestamp = new Date(entry.timestamp);
+      } else {
+        // Fallback to current date
+        console.warn('Invalid timestamp format for entry:', entry);
+        timestamp = new Date();
+      }
+      
+      return {
+        userId: entry.userId,
+        userName: entry.userName,
+        score: entry.score,
+        timestamp,
+        rank: entry.rank
+      };
+    });
 
     const leaderboard: QuizLeaderboard = {
       quizId,
