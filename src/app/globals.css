@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,9 +39,18 @@
 
 /* Critical CSS optimizations */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(0, 0%, 100%);
+  --muted-foreground: hsl(0, 0%, 85%);
+  --primary: hsl(0, 0%, 100%);
+  --primary-foreground: hsl(0, 0%, 4%);
+  --secondary: hsl(0, 0%, 10%);
+  --muted: hsl(0, 0%, 10%);
+  --accent: hsl(0, 0%, 10%);
+  --border: hsl(0, 0%, 18%);
+  --input: hsl(0, 0%, 18%);
+  --font-display: 'Instrument Serif', serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,13 +63,14 @@
 /* Optimize font loading */
 @layer base {
   html {
-    font-family: var(--font-inter);
+    font-family: var(--font-body);
   }
   
   body {
     background: var(--background);
     color: var(--foreground);
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-family: var(--font-body);
   }
 }
 
@@ -423,3 +435,59 @@
 .animate-blink {
   animation: blink 1s infinite;
 }
+
+/* Liquid Glass Effect */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.08);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.6) 0%, 
+    rgba(255,255,255,0.2) 20%,
+    rgba(255,255,255,0.05) 40%, 
+    rgba(255,255,255,0.05) 60%,
+    rgba(255,255,255,0.2) 80%, 
+    rgba(255,255,255,0.6) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Fade Rise Animations */
+@keyframes fade-rise {
+  from { 
+    opacity: 0; 
+    transform: translateY(24px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-rise { 
+  animation: fade-rise 0.8s ease-out both; 
+}
+
+.animate-fade-rise-delay { 
+  animation: fade-rise 0.8s ease-out 0.2s both; 
+}
+
+.animate-fade-rise-delay-2 { 
+  animation: fade-rise 0.8s ease-out 0.4s both; 
+}
+

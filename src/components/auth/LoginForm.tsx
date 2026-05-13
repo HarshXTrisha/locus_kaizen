@@ -146,40 +146,43 @@ export function LoginForm() {
 
   return (
     <div className="w-full">
-      <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-[#212529] mb-4 leading-tight tracking-tight">Welcome Back!</h2>
-        <p className="text-gray-600 text-center">Sign in to continue your learning journey with QuestAI.</p>
+      <div className="text-center mb-8">
+        <h2 
+          className="text-4xl font-normal text-white mb-3 leading-tight tracking-tight" 
+          style={{ fontFamily: "'Instrument Serif', serif" }}
+        >
+          Welcome <em className="not-italic text-white/60">back.</em>
+        </h2>
+        <p className="text-white/70 text-sm">Sign in to continue your learning journey</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Google Sign In Button */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-gray-700 border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-[#20C997] hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
+          className="flex w-full items-center justify-center liquid-glass rounded-full px-8 py-4 text-base font-medium text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading && authProvider === 'google' ? (
             <ButtonLoader text="Signing In..." />
           ) : (
             <>
-              <div className="mr-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="mr-3">
                 <GoogleIcon />
               </div>
-              <span className="group-hover:text-[#20C997] transition-colors duration-300">
-                Sign In with Google
-              </span>
+              <span>Sign In with Google</span>
             </>
           )}
         </button>
 
         {/* Divider */}
-        <div className="relative">
+        <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-white/20"></div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500 font-medium">or</span>
+          <div className="relative flex justify-center text-xs">
+            <span className="px-3 text-white/60 bg-transparent">or</span>
           </div>
         </div>
 
@@ -188,35 +191,33 @@ export function LoginForm() {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="flex w-full items-center justify-center rounded-2xl bg-white px-8 py-5 text-xl font-semibold text-gray-700 border-2 border-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-[#20C997] hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 group"
+          className="flex w-full items-center justify-center liquid-glass rounded-full px-8 py-4 text-base font-medium text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading && authProvider === 'microsoft' ? (
             <ButtonLoader text="Signing In..." />
           ) : (
             <>
-              <div className="mr-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="mr-3">
                 <MicrosoftIcon />
               </div>
-              <span className="group-hover:text-[#20C997] transition-colors duration-300">
-                Sign In with Microsoft
-              </span>
+              <span>Sign In with Microsoft</span>
             </>
           )}
         </button>
 
         {/* Benefits */}
-        <div className="mt-10 space-y-5">
-          <div className="flex items-center text-base text-[#6C757D] font-medium">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
-            <span>Secure authentication with Google or Microsoft</span>
+        <div className="mt-8 space-y-3 pt-4">
+          <div className="flex items-center text-xs text-white/60">
+            <div className="w-1.5 h-1.5 bg-white/50 rounded-full mr-3"></div>
+            <span>Secure authentication</span>
           </div>
-          <div className="flex items-center text-base text-[#6C757D] font-medium">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
-            <span>Access to all quiz features</span>
+          <div className="flex items-center text-xs text-white/60">
+            <div className="w-1.5 h-1.5 bg-white/50 rounded-full mr-3"></div>
+            <span>Access all quiz features</span>
           </div>
-          <div className="flex items-center text-base text-[#6C757D] font-medium">
-            <div className="w-2 h-2 bg-[#20C997] rounded-full mr-4"></div>
-            <span>Personalized learning dashboard</span>
+          <div className="flex items-center text-xs text-white/60">
+            <div className="w-1.5 h-1.5 bg-white/50 rounded-full mr-3"></div>
+            <span>Personalized dashboard</span>
           </div>
         </div>
       </div>
