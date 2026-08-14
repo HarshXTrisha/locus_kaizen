@@ -352,8 +352,13 @@ Correct Answer: C`;
         // Check if this is a correct answer line
         else if (line.toLowerCase().includes('correct answer:')) {
           if (currentQuestion) {
-            const answer = line.replace(/correct answer:\s*/i, '').trim();
-            currentQuestion.correctAnswer = answer;
+            const answerLetter = line.replace(/correct answer:\s*/i, "").trim().toUpperCase();
+            const answerIndex = answerLetter.charCodeAt(0) - 65;
+            if (currentQuestion.options && answerIndex >= 0 && answerIndex < currentQuestion.options.length) {
+              currentQuestion.correctAnswer = currentQuestion.options[answerIndex];
+            } else {
+              currentQuestion.correctAnswer = answerLetter;
+            }
             
             // If no options were found, this might be a short answer question
             if (currentQuestion.options!.length === 0) {
@@ -605,8 +610,13 @@ Correct Answer: C`;
           // Check if this is a correct answer line
           else if (line.toLowerCase().includes('correct answer:')) {
             if (currentQuestion) {
-              const answer = line.replace(/correct answer:\s*/i, '').trim();
-              currentQuestion.correctAnswer = answer;
+            const answerLetter = line.replace(/correct answer:\s*/i, "").trim().toUpperCase();
+            const answerIndex = answerLetter.charCodeAt(0) - 65;
+            if (currentQuestion.options && answerIndex >= 0 && answerIndex < currentQuestion.options.length) {
+              currentQuestion.correctAnswer = currentQuestion.options[answerIndex];
+            } else {
+              currentQuestion.correctAnswer = answerLetter;
+            }
               
               // If no options were found, this might be a short answer question
               if (currentQuestion.options!.length === 0) {
@@ -686,7 +696,6 @@ Correct Answer: C`;
   };
 
   const isJSON = fileType === 'json';
-  const isTXT = fileType === 'txt';
 
   return (
     <div className="space-y-6">
